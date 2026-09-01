@@ -1,0 +1,2355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RUMBO IA | AI CRM and Automation for Small Businesses</title>
+<meta name="description" content="RUMBO IA is a human-controlled AI CRM and automation workspace for small businesses in Argentina and Latin America.">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#07070D">
+
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://rumbo.verso.fans/">
+<meta property="og:title" content="RUMBO IA">
+<meta property="og:description" content="AI-powered CRM and business automation with human control.">
+<meta property="og:image" content="https://rumbo.verso.fans/og-image.jpg">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="RUMBO IA">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@rumbo_ia">
+<meta name="twitter:title" content="RUMBO IA">
+<meta name="twitter:description" content="AI-powered CRM and business automation with human control.">
+<meta name="twitter:image" content="https://rumbo.verso.fans/og-image.jpg">
+
+<link rel="canonical" href="https://rumbo.verso.fans/">
+<link rel="alternate" hreflang="es" href="/es">
+<link rel="alternate" hreflang="en" href="/">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Rumbo IA",
+  "url": "https://rumbo.verso.fans",
+  "logo": "https://rumbo.verso.fans/logo.png",
+  "description": "RUMBO IA is a human-controlled AI CRM and automation workspace for small businesses in Argentina and Latin America.",
+  "areaServed": "Worldwide",
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "contactType": "customer service",
+    "email": "sebastian@rumbo.verso.fans",
+    "availableLanguage": ["English", "Spanish"]
+  }
+}
+
+</script>
+
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+
+:root{
+  --bg:#07070D;
+  --bg2:#0B0B16;
+  --surface:#0F0F1E;
+  --border:rgba(255,255,255,0.07);
+  --b2:rgba(255,255,255,0.13);
+  --white:#EDE9E0;
+  --w2:#A09B92;
+  --w3:#8B857E;
+  --orange:#FF4500;
+  --o-bg:rgba(255,69,0,0.07);
+  --o-bdr:rgba(255,69,0,0.3);
+  --blue:#0B1D52;
+  --gold:#C8922A;
+  --green:#00C896;
+  --fd:'Syne',sans-serif;
+  --fb:'DM Sans',sans-serif;
+  --fm:'DM Mono',monospace;
+  --px:56px;
+}
+
+html{scroll-behavior:smooth}
+html{overflow-x:hidden}
+[hidden]{display:none !important}
+a{color:inherit}
+body{background:var(--bg);color:var(--white);font-family:var(--fb);font-weight:300;overflow-x:hidden}
+
+:focus-visible{outline:2px solid var(--orange);outline-offset:3px;border-radius:2px}
+
+/* NAV */
+.site-header{position:fixed;top:0;left:0;right:0;z-index:100;transition:background .4s,border-color .4s}
+.site-header.scrolled{background:rgba(7,7,13,0.93);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+
+nav{height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 var(--px)}
+
+.nav-logo{display:flex;align-items:center;gap:12px;text-decoration:none}
+.nav-brand{font-family:var(--fd);font-size:17px;font-weight:800;letter-spacing:-.5px;color:var(--white)}
+.nav-brand span{color:var(--orange)}
+
+.nav-links{display:flex;gap:36px;list-style:none}
+.nav-links a{font-size:13px;color:var(--w2);text-decoration:none;font-weight:400;transition:color .2s}
+.nav-links a:hover{color:var(--white)}
+
+.nav-cta{padding:10px 24px;background:var(--orange);color:#07070D !important;border-radius:3px;font-weight:700 !important;font-family:var(--fd);font-size:13px !important;transition:opacity .2s !important}
+.nav-cta:hover{opacity:.88}
+
+.nav-toggle{display:none;background:none;border:1px solid var(--border);border-radius:3px;padding:7px 9px;cursor:pointer;flex-direction:column;gap:4px}
+.nav-toggle span{display:block;width:18px;height:1.5px;background:var(--white);transition:transform .3s,opacity .3s}
+.nav-toggle[aria-expanded="true"] span:nth-child(1){transform:translateY(5.5px) rotate(45deg)}
+.nav-toggle[aria-expanded="true"] span:nth-child(2){opacity:0;transform:scaleX(0)}
+.nav-toggle[aria-expanded="true"] span:nth-child(3){transform:translateY(-5.5px) rotate(-45deg)}
+
+/* HERO */
+.hero{min-height:100vh;display:flex;align-items:center;padding:120px var(--px) 80px;position:relative;overflow:hidden}
+.hero-canvas{position:absolute;inset:0;pointer-events:none}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,0.022) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.022) 1px,transparent 1px);background-size:80px 80px;mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black,transparent)}
+.hero-glow-1{position:absolute;width:800px;height:800px;background:radial-gradient(circle,rgba(11,29,82,.5) 0%,transparent 70%);top:-200px;right:-200px;border-radius:50%;animation:glowPulse1 8s ease-in-out infinite}
+.hero-glow-2{position:absolute;width:500px;height:500px;background:radial-gradient(circle,rgba(255,69,0,.07) 0%,transparent 70%);bottom:-100px;left:-100px;border-radius:50%;animation:glowPulse2 6s ease-in-out infinite}
+.particles{position:absolute;inset:0;overflow:hidden}
+.particle{position:absolute;width:2px;height:2px;background:var(--orange);border-radius:50%;opacity:0;animation:particleFloat linear infinite}
+
+.hero-content{width:100%;max-width:min(1120px,92vw);position:relative;z-index:2;container-type:inline-size}
+.hero-badge{display:inline-flex;align-items:center;gap:10px;padding:8px 16px;border:1px solid var(--o-bdr);border-radius:2px;background:var(--o-bg);margin-bottom:40px;opacity:0;animation:fadeUp .7s .2s ease forwards}
+.hero-badge-dot{width:6px;height:6px;background:var(--orange);border-radius:50%;animation:badgePulse 2s infinite;flex-shrink:0}
+.hero-badge-text{font-family:var(--fm);font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--orange)}
+
+.hero-title{font-family:var(--fd);font-weight:800;line-height:.9;letter-spacing:-4px;margin-bottom:40px;opacity:0;animation:fadeUp .9s .35s ease forwards}
+.hero-title .line-1{display:block;font-size:clamp(38px,8.6cqw,104px);color:var(--white)}
+.hero-title .line-2{display:block;font-size:clamp(38px,8.6cqw,104px);color:transparent;-webkit-text-stroke:2px var(--orange)}
+.hero-title .line-3{display:block;font-size:clamp(24px,4.2cqw,52px);color:var(--w2);font-weight:700;letter-spacing:-1.5px;margin-top:12px}
+
+.hero-desc{font-size:clamp(15px,1.8vw,18px);color:var(--w2);max-width:560px;line-height:1.75;margin-bottom:52px;opacity:0;animation:fadeUp .8s .5s ease forwards}
+.hero-desc strong{color:var(--white);font-weight:500}
+
+.hero-actions{display:flex;gap:14px;align-items:center;flex-wrap:wrap;opacity:0;animation:fadeUp .8s .65s ease forwards}
+
+.hero-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:32px 40px;margin-top:64px;padding-top:44px;border-top:1px solid var(--border);opacity:0;animation:fadeUp .8s .8s ease forwards}
+.hero-stat-num{font-family:var(--fd);font-size:clamp(28px,3vw,36px);font-weight:800;color:var(--white);letter-spacing:-2px;line-height:1;margin-bottom:6px}
+.hero-stat-num span{color:var(--orange);font-size:.62em;letter-spacing:-.5px}
+.hero-stat-label{font-size:13px;color:var(--w3);line-height:1.4}
+
+.scroll-indicator{position:absolute;bottom:40px;left:var(--px);display:flex;align-items:center;gap:12px;opacity:0;animation:fadeIn 1s 1.2s ease forwards}
+.scroll-line{width:1px;height:48px;background:linear-gradient(to bottom,transparent,var(--orange),transparent);animation:scrollAnim 2s ease-in-out infinite}
+.scroll-text{font-family:var(--fm);font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--w3);writing-mode:vertical-rl;transform:rotate(180deg)}
+
+/* TICKER */
+.ticker{overflow:hidden;border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:14px 0;background:var(--bg2)}
+.ticker:hover .ticker-track{animation-play-state:paused}
+.ticker-track{display:flex;width:max-content;animation:tickerScroll 30s linear infinite}
+.ticker-item{display:flex;align-items:center;gap:20px;padding:0 40px;white-space:nowrap;font-family:var(--fm);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--w3)}
+.ticker-dot{width:4px;height:4px;background:var(--orange);border-radius:50%;flex-shrink:0}
+
+/* SECTIONS */
+main section{padding:120px var(--px);position:relative}
+.section-eyebrow{display:flex;align-items:center;gap:14px;margin-bottom:24px}
+.eyebrow-line{width:32px;height:1px;background:var(--orange);flex-shrink:0}
+.eyebrow-text{font-family:var(--fm);font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--orange);font-weight:500}
+.section-title{font-family:var(--fd);font-size:clamp(32px,5vw,64px);font-weight:800;letter-spacing:-2.5px;line-height:1;color:var(--white);margin-bottom:20px;overflow-wrap:break-word}
+.section-sub{font-size:17px;color:var(--w2);max-width:560px;line-height:1.75}
+
+/* BUTTONS */
+.btn-primary{color:#07070D !important;display:inline-flex;align-items:center;gap:10px;padding:16px 32px;background:var(--orange);color:#fff;text-decoration:none;font-family:var(--fd);font-size:15px;font-weight:700;letter-spacing:-.3px;border-radius:3px;border:none;transition:transform .2s,box-shadow .2s}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 16px 48px rgba(255,69,0,.3)}
+.btn-secondary{display:inline-flex;align-items:center;gap:10px;padding:16px 32px;border:1px solid var(--b2);color:var(--white);text-decoration:none;font-family:var(--fd);font-size:15px;font-weight:600;letter-spacing:-.3px;border-radius:3px;transition:border-color .2s,background .2s}
+.btn-secondary:hover{border-color:var(--orange);background:var(--o-bg)}
+
+/* SERVICES */
+#servicios{background:var(--bg2);border-top:1px solid var(--border)}
+.services-header{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:80px;align-items:end;margin-bottom:80px}
+.services-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:4px;overflow:hidden}
+.service-card{background:var(--bg2);padding:56px 48px;position:relative;overflow:hidden;transition:background .4s}
+.service-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--orange),transparent);transform:scaleX(0);transform-origin:left;transition:transform .4s ease}
+.service-card:hover{background:var(--surface)}
+.service-card:hover::before{transform:scaleX(1)}
+.service-number{font-family:var(--fd);font-size:72px;font-weight:800;color:rgba(255,255,255,.03);line-height:1;position:absolute;top:20px;right:28px;transition:color .4s;user-select:none;aria-hidden:true}
+.service-card:hover .service-number{color:rgba(255,69,0,.07)}
+.service-icon{width:52px;height:52px;border:1px solid var(--b2);border-radius:4px;display:flex;align-items:center;justify-content:center;margin-bottom:32px;transition:border-color .3s,background .3s}
+.service-card:hover .service-icon{border-color:var(--o-bdr);background:var(--o-bg)}
+.service-name{font-family:var(--fd);font-size:22px;font-weight:700;color:var(--white);letter-spacing:-.5px;margin-bottom:16px}
+.service-desc{font-size:15px;color:var(--w2);line-height:1.75;margin-bottom:28px}
+.service-features{display:flex;flex-direction:column;gap:8px;margin-bottom:32px}
+.sf{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w3)}
+.sf::before{content:'';width:4px;height:4px;background:var(--orange);border-radius:50%;flex-shrink:0}
+.service-price{display:inline-flex;align-items:center;gap:6px;font-family:var(--fm);font-size:12px;letter-spacing:1px;color:var(--orange);padding:7px 14px;border:1px solid var(--o-bdr);border-radius:2px;background:var(--o-bg)}
+
+/* PROCESS */
+#proceso{border-top:1px solid var(--border)}
+.process-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:100px;align-items:center;margin-top:80px}
+.process-steps{list-style:none;display:flex;flex-direction:column}
+.process-step{display:flex;gap:28px;padding:36px 0;border-bottom:1px solid var(--border);transition:padding-left .3s}
+.process-step:first-child{padding-top:0}
+.process-step:last-child{border-bottom:none}
+.process-step:hover{padding-left:12px}
+.ps-num{font-family:var(--fd);font-size:11px;font-weight:800;color:var(--orange);width:32px;flex-shrink:0;margin-top:4px;opacity:.7}
+.ps-title{font-family:var(--fd);font-size:20px;font-weight:700;color:var(--white);letter-spacing:-.5px;margin-bottom:10px}
+.ps-desc{font-size:14px;color:var(--w2);line-height:1.75}
+.process-visual{position:relative;height:480px;display:flex;align-items:center;justify-content:center}
+.pv-circle-outer{width:380px;height:380px;border:1px solid rgba(255,255,255,.05);border-radius:50%;position:absolute;animation:rotateOrbit 20s linear infinite}
+.pv-circle-mid{width:270px;height:270px;border:1px solid rgba(255,69,0,.12);border-radius:50%;position:absolute;animation:rotateOrbit 14s linear infinite reverse}
+.pv-circle-inner{width:160px;height:160px;border:1px solid rgba(22,44,122,.4);border-radius:50%;position:absolute;animation:rotateOrbit 8s linear infinite}
+.pv-circle-mid::before{content:'';position:absolute;top:-5px;left:50%;width:9px;height:9px;background:var(--orange);border-radius:50%;box-shadow:0 0 16px var(--orange);transform:translateX(-50%)}
+.pv-core{width:90px;height:90px;background:radial-gradient(circle at 40% 35%,rgba(255,107,53,.3),rgba(255,69,0,.08) 60%);border:1px solid rgba(255,69,0,.25);border-radius:50%;display:flex;align-items:center;justify-content:center;position:relative;z-index:5;box-shadow:0 0 60px rgba(255,69,0,.12)}
+.pv-orbit-labels{position:absolute;inset:0;animation:counterRotate 20s linear infinite}
+
+/* HERRAMIENTAS */
+#herramientas{background:var(--bg2);border-top:1px solid var(--border)}
+.os-showcase{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:100px;align-items:center;margin-top:80px}
+.os-tag{display:inline-flex;align-items:center;gap:8px;font-family:var(--fm);font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--green);border:1px solid rgba(0,200,150,.3);background:rgba(0,200,150,.06);padding:6px 12px;border-radius:2px;margin-bottom:28px}
+.os-tag-dot{width:5px;height:5px;background:var(--green);border-radius:50%;animation:badgePulse 2s infinite}
+.os-title{font-family:var(--fd);font-size:clamp(32px,4.5vw,60px);font-weight:800;letter-spacing:-2.5px;line-height:1;margin-bottom:24px}
+.os-title span{color:var(--orange)}
+.os-desc{font-size:16px;color:var(--w2);line-height:1.8;margin-bottom:36px;max-width:480px}
+.os-pillars{display:flex;flex-direction:column;gap:14px;margin-bottom:40px}
+.os-pillar{display:flex;align-items:flex-start;gap:16px;padding:18px 20px;border:1px solid var(--border);border-radius:3px;background:var(--surface);transition:border-color .3s,background .3s}
+.os-pillar:hover{border-color:var(--o-bdr);background:rgba(255,69,0,.03)}
+.os-pillar-icon{font-size:20px;flex-shrink:0;margin-top:1px}
+.os-pillar-name{font-family:var(--fd);font-size:14px;font-weight:700;color:var(--white);letter-spacing:-.2px;margin-bottom:3px}
+.os-pillar-desc{font-size:12px;color:var(--w3);line-height:1.5}
+.os-screen{background:var(--bg);border:1px solid var(--b2);border-radius:8px;overflow:hidden;box-shadow:0 32px 80px rgba(0,0,0,.5),0 0 0 1px rgba(255,255,255,.04)}
+.os-screen-bar{height:44px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 16px}
+.os-dots{display:flex;gap:6px}
+.os-dot{width:10px;height:10px;border-radius:50%}
+.os-dot-r{background:#FF5F57}
+.os-dot-y{background:#FEBC2E}
+.os-dot-g{background:#28C840}
+.os-screen-title{font-family:var(--fm);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--w3)}
+.os-screen-body{padding:24px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
+.os-tool-pill{padding:14px 16px;border:1px solid var(--border);border-radius:4px;background:var(--surface);transition:all .25s}
+.os-tool-pill:hover{border-color:var(--o-bdr);background:var(--o-bg);transform:translateY(-2px)}
+.os-tool-pill.active{border-color:rgba(0,200,150,.3);background:rgba(0,200,150,.05)}
+.os-pill-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.os-pill-icon{font-size:16px}
+.os-status{font-family:var(--fm);font-size:7px;letter-spacing:1.5px;text-transform:uppercase;padding:2px 7px;border-radius:2px}
+.os-status.on{color:var(--green);background:rgba(0,200,150,.1);border:1px solid rgba(0,200,150,.25)}
+.os-status.dev{color:var(--gold);background:rgba(200,146,42,.1);border:1px solid rgba(200,146,42,.25)}
+.os-pill-name{font-family:var(--fd);font-size:12px;font-weight:700;color:var(--white);letter-spacing:-.2px}
+.os-pill-sub{font-size:10px;color:var(--w3);margin-top:2px}
+
+/* RESULTS */
+#resultados{background:linear-gradient(135deg,var(--blue) 0%,var(--bg) 60%);border-top:1px solid rgba(22,44,122,.4);border-bottom:1px solid rgba(22,44,122,.4)}
+.results-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:rgba(255,255,255,.04);border-radius:4px;overflow:hidden;margin-top:72px}
+.result-card{padding:52px 40px;background:rgba(7,7,13,.7);text-align:center;position:relative;overflow:hidden;transition:background .3s}
+.result-card:hover{background:rgba(11,29,82,.5)}
+.result-card::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:40px;height:2px;background:var(--orange);border-radius:2px;opacity:0;transition:opacity .3s}
+.result-card:hover::after{opacity:1}
+.rc-num{font-family:var(--fd);font-size:clamp(40px,5vw,72px);font-weight:800;letter-spacing:-3px;line-height:1;margin-bottom:12px}
+.rc-num span{color:var(--orange)}
+.rc-label{font-size:14px;color:var(--w2);line-height:1.5;max-width:160px;margin:0 auto}
+
+/* INDUSTRIES */
+#industrias{border-top:1px solid var(--border);background:var(--bg2)}
+.industries-layout{display:grid;grid-template-columns:minmax(0,380px) minmax(0,1fr);gap:100px;align-items:start;margin-top:80px}
+.industries-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.industry-card{padding:24px 20px;border:1px solid var(--border);border-radius:3px;background:var(--surface);transition:all .3s;text-align:center}
+.industry-card:hover{border-color:var(--o-bdr);background:var(--o-bg);transform:translateY(-3px)}
+.industry-icon{font-size:28px;display:block;margin-bottom:10px}
+.industry-name{font-family:var(--fd);font-size:13px;font-weight:700;color:var(--white);display:block;margin-bottom:6px}
+.industry-desc{font-size:11px;color:var(--w3);line-height:1.5}
+
+/* PRICING */
+#precios{border-top:1px solid var(--border)}
+.pricing-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:16px;margin-top:72px;align-items:start}
+.pricing-card{grid-column:span 2;padding:40px 30px;border:1px solid var(--border);border-radius:4px;background:var(--surface);position:relative;transition:transform .3s,border-color .3s}
+.pricing-card:nth-child(4){grid-column:2/4}
+.pricing-card:nth-child(5){grid-column:4/6}
+.pricing-card:hover{transform:translateY(-6px)}
+.pricing-card.featured{border-color:var(--o-bdr);background:linear-gradient(160deg,rgba(255,69,0,.05) 0%,var(--surface) 50%)}
+.pricing-card.featured::before{content:'RECOMMENDED';position:absolute;top:-12px;left:50%;transform:translateX(-50%);font-family:var(--fm);font-size:9px;letter-spacing:3px;color:#fff;background:var(--orange);padding:5px 14px;border-radius:2px;white-space:nowrap}
+.pc-tier{font-family:var(--fm);font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:14px}
+.pc-name{font-family:var(--fd);font-size:24px;font-weight:800;letter-spacing:-1px;margin-bottom:8px;color:var(--white)}
+.pc-desc{font-size:13px;color:var(--w2);line-height:1.6;margin-bottom:28px;padding-bottom:28px;border-bottom:1px solid var(--border)}
+.pc-price{margin-bottom:32px}
+.pc-amount{font-family:var(--fd);font-size:44px;font-weight:800;letter-spacing:-2px;color:var(--white);line-height:1}
+.pc-amount .currency{font-size:22px;color:var(--orange);vertical-align:super}
+.pc-amount .period{font-size:14px;color:var(--w3);font-weight:400;letter-spacing:0}
+.pc-features{display:flex;flex-direction:column;gap:12px;margin-bottom:36px}
+.pc-feature{display:flex;align-items:flex-start;gap:12px;font-size:13px;color:var(--w2);line-height:1.5}
+.pc-feature-icon{width:18px;height:18px;background:rgba(0,200,150,.12);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.btn-plan{display:block;text-align:center;padding:13px 24px;border-radius:3px;font-family:var(--fd);font-size:14px;font-weight:700;letter-spacing:-.2px;text-decoration:none;transition:all .2s}
+.btn-plan.outline{border:1px solid var(--b2);color:var(--white)}
+.btn-plan.outline:hover{border-color:var(--orange);background:var(--o-bg)}
+.btn-plan.filled{background:var(--orange);color:#fff}
+.btn-plan.filled:hover{transform:translateY(-1px);box-shadow:0 8px 32px rgba(255,69,0,.3)}
+.pc-setup{font-family:var(--fm);font-size:11px;letter-spacing:.5px;color:var(--w3);margin-top:10px}
+.pc-usage-note{font-size:11px;line-height:1.5;color:var(--w3);margin:-22px 0 26px;padding-top:14px;border-top:1px solid var(--border)}
+.pricing-footnote{margin-top:32px;text-align:center;font-size:12px;line-height:1.7;color:var(--w3);max-width:720px;margin-left:auto;margin-right:auto}
+
+/* TESTIMONIALS */
+#testimonios{background:var(--bg2);border-top:1px solid var(--border)}
+.testimonials-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:72px}
+.testimonial-card{padding:40px 36px;border:1px solid var(--border);border-radius:4px;background:var(--surface);transition:border-color .3s,transform .3s}
+.testimonial-card:hover{border-color:var(--b2);transform:translateY(-4px)}
+.tc-quote{font-size:32px;color:var(--orange);opacity:.4;font-family:Georgia,serif;line-height:1;margin-bottom:20px;aria-hidden:true}
+.tc-text{font-size:15px;color:var(--w2);line-height:1.8;margin-bottom:28px;font-style:italic}
+.tc-author{display:flex;align-items:center;gap:14px;padding-top:24px;border-top:1px solid var(--border)}
+.tc-avatar{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:16px;font-weight:800;color:#fff;flex-shrink:0}
+.tc-name{font-family:var(--fd);font-size:15px;font-weight:700;color:var(--white);letter-spacing:-.3px;margin-bottom:3px}
+.tc-role{font-size:12px;color:var(--w3)}
+.tc-stars{display:flex;gap:3px;margin-bottom:20px}
+.star{color:var(--gold);font-size:14px}
+
+/* FAQ */
+#faq{border-top:1px solid var(--border)}
+.faq-layout{display:grid;grid-template-columns:minmax(0,380px) minmax(0,1fr);gap:100px;margin-top:80px;align-items:start}
+.faq-item{border-bottom:1px solid var(--border);overflow:hidden}
+.faq-question{width:100%;display:flex;align-items:center;justify-content:space-between;padding:24px 0;background:transparent;border:none;color:var(--white);font-family:var(--fd);font-size:16px;font-weight:600;letter-spacing:-.3px;text-align:left;cursor:pointer;transition:color .2s;gap:20px}
+.faq-question:hover{color:var(--orange)}
+.faq-icon{width:24px;height:24px;border:1px solid var(--b2);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .3s;color:var(--w3)}
+.faq-item.open .faq-icon{background:var(--orange);border-color:var(--orange);color:#fff;transform:rotate(45deg)}
+.faq-answer{max-height:0;overflow:hidden;transition:max-height .4s ease,padding .3s;font-size:14px;color:var(--w2);line-height:1.8}
+.faq-item.open .faq-answer{max-height:200px;padding-bottom:24px}
+
+/* CONTACT */
+#contacto{background:linear-gradient(135deg,var(--blue) 0%,var(--bg) 70%);border-top:1px solid rgba(22,44,122,.5);text-align:center;position:relative;overflow:hidden}
+#contacto::before{content:'';position:absolute;top:-200px;left:50%;transform:translateX(-50%);width:600px;height:600px;background:radial-gradient(circle,rgba(255,69,0,.07) 0%,transparent 70%);border-radius:50%;pointer-events:none}
+.cta-label{font-family:var(--fm);font-size:10px;letter-spacing:5px;text-transform:uppercase;color:var(--orange);margin-bottom:28px;display:flex;align-items:center;justify-content:center;gap:12px}
+.cta-label::before,.cta-label::after{content:'';width:32px;height:1px;background:var(--orange);opacity:.5}
+.cta-title{font-family:var(--fd);font-size:clamp(36px,6vw,80px);font-weight:800;letter-spacing:-3px;line-height:1;margin-bottom:24px;position:relative;z-index:1}
+.cta-title .highlight{color:var(--orange)}
+.cta-sub{font-size:clamp(15px,1.8vw,18px);color:var(--w2);max-width:520px;margin:0 auto 52px;line-height:1.75;position:relative;z-index:1}
+.contact-form{max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:12px;position:relative;z-index:1}
+.form-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
+.form-input{width:100%;padding:14px 18px;background:rgba(255,255,255,.04);border:1px solid var(--b2);border-radius:3px;color:var(--white);font-family:var(--fb);font-size:14px;font-weight:300;outline:none;transition:border-color .2s,background .2s}
+.form-input:focus{border-color:rgba(255,69,0,.5);background:rgba(255,69,0,.04)}
+.form-input::placeholder{color:var(--w3)}
+.form-select{width:100%;padding:14px 18px;background:rgba(255,255,255,.04);border:1px solid var(--b2);border-radius:3px;color:var(--w2);font-family:var(--fb);font-size:14px;outline:none;transition:border-color .2s;appearance:none}
+.form-select:focus{border-color:rgba(255,69,0,.5)}
+.form-select option{background:var(--bg2)}
+.form-submit{padding:16px 32px;background:var(--orange);border:none;border-radius:3px;color:#07070D;font-family:var(--fd);font-size:15px;font-weight:700;letter-spacing:-.3px;cursor:pointer;transition:transform .2s,box-shadow .2s;width:100%}
+.form-submit:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(255,69,0,.35)}
+.form-note{font-size:12px;color:var(--w3);text-align:center;margin-top:4px}
+.form-divider{display:flex;align-items:center;gap:10px;justify-content:center;margin-top:8px}
+.form-divider::before,.form-divider::after{content:'';height:1px;flex:1;background:var(--border)}
+.form-divider-text{font-family:var(--fm);font-size:9px;letter-spacing:2px;color:var(--w3);text-transform:uppercase}
+.wa-form-btn{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:12px;padding:14px;border:1px solid rgba(37,211,102,.3);border-radius:3px;background:rgba(37,211,102,.06);text-decoration:none;transition:background .2s}
+.wa-form-btn:hover{background:rgba(37,211,102,.12)}
+.wa-form-label{font-family:var(--fd);font-size:13px;font-weight:700;color:#25D366}
+.wa-form-sub{font-size:12px;color:var(--w3)}
+
+/* FOOTER */
+.site-footer{padding:56px var(--px);border-top:1px solid var(--border);background:var(--bg)}
+.footer-top{display:grid;grid-template-columns:minmax(0,260px) repeat(4,minmax(0,1fr));gap:40px;margin-bottom:56px}
+.footer-top nav{display:block;height:auto;padding:0;align-items:initial;justify-content:initial}
+.footer-brand-name{font-family:var(--fd);font-size:18px;font-weight:800;letter-spacing:-.5px;color:var(--white)}
+.footer-brand-name span{color:var(--orange)}
+.footer-brand-desc{font-size:13px;color:var(--w3);line-height:1.75;margin:20px 0 24px}
+.footer-col-title{font-family:var(--fd);font-size:13px;font-weight:700;color:var(--white);letter-spacing:-.2px;margin-bottom:20px}
+.footer-links{list-style:none;display:flex;flex-direction:column;gap:10px}
+.footer-links a{font-size:13px;color:var(--w3);text-decoration:none;transition:color .2s}
+.footer-links a:hover{color:var(--orange)}
+.footer-bottom{display:flex;align-items:center;justify-content:space-between;padding-top:32px;border-top:1px solid var(--border)}
+.footer-copy{font-family:var(--fm);font-size:11px;letter-spacing:1px;color:var(--w3)}
+.footer-socials{display:flex;gap:10px}
+.social-link{width:34px;height:34px;border:1px solid var(--border);border-radius:3px;display:flex;align-items:center;justify-content:center;color:var(--w3);text-decoration:none;font-size:12px;transition:all .2s}
+.social-link:hover{border-color:var(--orange);color:var(--orange);background:var(--o-bg)}
+
+/* WHATSAPP FAB */
+.wa-fab{position:fixed;bottom:28px;right:28px;z-index:200;display:flex;align-items:center;gap:10px;padding:13px 20px;background:#25D366;border-radius:40px;text-decoration:none;box-shadow:0 8px 32px rgba(37,211,102,.35);transition:transform .3s,box-shadow .3s;animation:waPop .5s 1.5s ease both}
+.wa-fab:hover{transform:translateY(-3px);box-shadow:0 16px 48px rgba(37,211,102,.45)}
+.wa-fab-icon{width:22px;height:22px;fill:#fff;flex-shrink:0}
+.wa-fab-text{font-family:var(--fd);font-size:13px;font-weight:700;color:#fff;letter-spacing:-.2px;white-space:nowrap}
+.wa-fab-sub{font-size:10px;color:rgba(255,255,255,.75);font-weight:400}
+
+/* REVEAL */
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.reveal-delay-1{transition-delay:.1s}
+.reveal-delay-2{transition-delay:.2s}
+.reveal-delay-3{transition-delay:.3s}
+.reveal-delay-4{transition-delay:.4s}
+
+/* KEYFRAMES */
+@keyframes glowPulse1{0%,100%{transform:scale(1) translate(0,0)}50%{transform:scale(1.1) translate(-30px,20px)}}
+@keyframes glowPulse2{0%,100%{transform:scale(1)}50%{transform:scale(1.2)}}
+@keyframes badgePulse{0%,100%{box-shadow:0 0 0 0 rgba(255,69,0,.5)}50%{box-shadow:0 0 0 5px rgba(255,69,0,0)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes rotateOrbit{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes counterRotate{from{transform:rotate(0deg)}to{transform:rotate(-360deg)}}
+@keyframes tickerScroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes scrollAnim{0%,100%{transform:scaleY(1);opacity:.6}50%{transform:scaleY(1.2);opacity:1}}
+@keyframes waPop{from{opacity:0;transform:scale(.7) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}}
+@keyframes particleFloat{0%{opacity:0;transform:translateY(100vh)}10%{opacity:.6}90%{opacity:.3}100%{opacity:0;transform:translateY(-100px) translateX(var(--drift))}}
+
+/* REDUCED MOTION */
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important}
+  html{scroll-behavior:auto}
+  .hero-badge,.hero-title,.hero-desc,.hero-actions,.hero-stats,.scroll-indicator{animation:none;opacity:1;transform:none}
+  .reveal{opacity:1;transform:none}
+  .wa-fab{animation:none;opacity:1;transform:none}
+}
+
+/* The inline menu ran out of room well before the old 768px switch: at
+   1045px the brand and the links sat 4px apart. The compact menu now takes
+   over while there is still breathing room. */
+@media (max-width:1100px){
+  .nav-links{display:none;position:absolute;top:64px;left:0;right:0;background:rgba(7,7,13,.97);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);flex-direction:column;gap:0;padding:12px 0;transition:opacity .2s}
+  .nav-links.open{display:flex}
+  .nav-links li{width:100%}
+  .nav-links a{display:block;padding:12px 24px}
+  .nav-toggle{display:flex}
+}
+
+
+/* --- leak calculator ------------------------------------------------- */
+.calc-layout{display:grid;grid-template-columns:minmax(0,0.9fr) minmax(0,1.1fr);gap:72px;align-items:center}
+.calc-fields{display:flex;flex-direction:column;gap:28px}
+.calc-field label{display:block;font-size:13px;color:var(--w2);margin-bottom:10px}
+.calc-row{display:flex;align-items:baseline;gap:10px}
+.calc-row input[type=number]{width:120px;background:var(--surface);border:1px solid var(--b2);border-radius:3px;color:var(--white);font-family:var(--fd);font-size:26px;font-weight:800;padding:8px 12px;letter-spacing:-1px}
+.calc-row input[type=number]:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
+.calc-unit{font-family:var(--fm);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--w3)}
+.calc-field input[type=range]{width:100%;margin-top:14px;accent-color:var(--orange)}
+.calc-field input[type=range]:focus-visible{outline:2px solid var(--orange);outline-offset:4px}
+.calc-result{background:linear-gradient(160deg,rgba(255,69,0,.06) 0%,var(--surface) 55%);border:1px solid var(--o-bdr);border-radius:4px;padding:44px 40px}
+.calc-eyebrow{font-family:var(--fm);font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:18px}
+.calc-amount{font-family:var(--fd);font-weight:800;font-size:clamp(30px,7.5vw,72px);line-height:.95;letter-spacing:-2px;color:var(--white);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.calc-amount .calc-currency{color:var(--orange);font-size:.44em;letter-spacing:-1px;margin-right:10px}
+.calc-period{font-size:13px;color:var(--w2);margin-top:14px}
+.calc-bar{height:6px;background:rgba(255,255,255,.07);border-radius:99px;margin:30px 0 12px;overflow:hidden}
+.calc-bar-fill{height:100%;background:var(--orange);border-radius:99px;transition:width .35s ease}
+.calc-split{display:flex;justify-content:space-between;font-family:var(--fm);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--w3)}
+.calc-plan{margin-top:32px;padding-top:26px;border-top:1px solid var(--border);font-size:14px;color:var(--w2);line-height:1.7}
+.calc-plan strong{color:var(--white)}
+.calc-assumption{margin-top:26px;font-size:12px;color:var(--w3);line-height:1.7}
+.calc-assumption summary{cursor:pointer;color:var(--w2)}
+.calc-assumption summary:focus-visible{outline:2px solid var(--orange);outline-offset:3px}
+@media (prefers-reduced-motion: reduce){.calc-bar-fill{transition:none}}
+@media (max-width:1100px){.calc-layout{grid-template-columns:minmax(0,1fr);gap:44px}}
+
+
+/* --- live switchboard ------------------------------------------------- */
+.sw-layout{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,0.95fr);gap:32px;margin-top:56px;align-items:start}
+.sw-panel{background:var(--surface);border:1px solid var(--border);border-radius:5px;overflow:hidden;display:flex;flex-direction:column}
+.sw-head{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--border);background:rgba(255,255,255,.02)}
+.sw-dot{width:7px;height:7px;border-radius:50%;background:var(--w3);flex-shrink:0}
+.sw-dot.live{background:var(--green);box-shadow:0 0 0 0 rgba(0,200,150,.6);animation:swPulse 1.8s infinite}
+@keyframes swPulse{70%{box-shadow:0 0 0 7px rgba(0,200,150,0)}100%{box-shadow:0 0 0 0 rgba(0,200,150,0)}}
+.sw-head-title{font-family:var(--fm);font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--w2)}
+.sw-timer{margin-left:auto;font-family:var(--fm);font-size:11px;color:var(--w2);font-variant-numeric:tabular-nums}
+
+.sw-transcript{padding:18px;min-height:290px;max-height:390px;overflow-y:auto;display:flex;flex-direction:column;gap:12px;scroll-behavior:smooth}
+.sw-turn{max-width:88%;padding:11px 14px;border-radius:4px;font-size:14px;line-height:1.55;animation:swIn .28s ease}
+@keyframes swIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.sw-turn.agent{background:rgba(255,255,255,.045);border-left:2px solid var(--orange);align-self:flex-start}
+.sw-turn.caller{background:rgba(0,200,150,.09);border-right:2px solid var(--green);align-self:flex-end;text-align:right}
+.sw-turn.system{align-self:center;text-align:center;background:none;color:var(--w2);font-family:var(--fm);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;max-width:100%}
+.sw-who{font-family:var(--fm);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--w2);display:block;margin-bottom:5px}
+.sw-typing::after{content:'';display:inline-block;width:6px;height:14px;background:var(--orange);margin-left:3px;vertical-align:-2px;animation:swBlink .9s steps(2) infinite}
+@keyframes swBlink{50%{opacity:0}}
+
+.sw-controls{border-top:1px solid var(--border);padding:14px 18px;display:flex;flex-direction:column;gap:12px;background:rgba(0,0,0,.15)}
+.sw-say{display:flex;gap:8px}
+.sw-say input{flex:1;min-width:0;background:var(--bg);border:1px solid var(--b2);border-radius:3px;color:var(--white);font-family:var(--fb);font-size:14px;padding:11px 13px}
+.sw-say input:focus-visible{outline:2px solid var(--orange);outline-offset:1px}
+.sw-btn{border:1px solid var(--b2);background:none;color:var(--white);font-family:var(--fd);font-size:12px;font-weight:700;padding:10px 15px;border-radius:3px;cursor:pointer;transition:border-color .15s,color .15s;white-space:nowrap}
+.sw-btn:hover:not(:disabled){border-color:var(--orange);color:var(--orange)}
+.sw-btn:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
+.sw-btn:disabled{opacity:.4;cursor:not-allowed}
+.sw-btn.primary{background:var(--orange);border-color:var(--orange);color:#07070D}
+.sw-btn.primary:hover:not(:disabled){opacity:.9;color:#07070D}
+.sw-btn.interrupt{border-color:var(--gold);color:var(--gold)}
+.sw-chips{display:flex;flex-wrap:wrap;gap:7px}
+.sw-chip{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:99px;color:var(--w2);font-size:12px;padding:6px 12px;cursor:pointer;transition:border-color .15s,color .15s}
+.sw-chip:hover{border-color:var(--orange);color:var(--white)}
+.sw-chip:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
+
+.sw-rules{padding:18px;display:flex;flex-direction:column;gap:9px;min-height:290px}
+.sw-rule{display:grid;grid-template-columns:20px 1fr;gap:11px;align-items:start;opacity:.32;transition:opacity .3s}
+.sw-rule.fired{opacity:1}
+.sw-rule-mark{width:20px;height:20px;border-radius:3px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--w3);flex-shrink:0;margin-top:1px}
+.sw-rule.fired .sw-rule-mark{border-color:var(--green);color:var(--green)}
+.sw-rule.blocked .sw-rule-mark{border-color:var(--orange);color:var(--orange)}
+.sw-rule-name{font-size:13px;color:var(--white);line-height:1.4}
+.sw-rule.fired .sw-rule-name{font-weight:500}
+.sw-rule-law{font-family:var(--fm);font-size:10px;color:var(--w2);letter-spacing:.5px;display:block;margin-top:3px;line-height:1.5}
+.sw-outcome{margin-top:auto;border-top:1px solid var(--border);padding:16px 18px;background:rgba(0,0,0,.15)}
+.sw-outcome-label{font-family:var(--fm);font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:var(--w2);margin-bottom:7px}
+.sw-outcome-value{font-size:14px;color:var(--white);line-height:1.6}
+.sw-honesty{margin-top:22px;font-size:12px;color:var(--w2);line-height:1.75;border-left:2px solid var(--border);padding-left:14px}
+.sw-honesty strong{color:var(--white);font-weight:500}
+@media (prefers-reduced-motion: reduce){
+  .sw-turn{animation:none}
+  .sw-dot.live{animation:none}
+  .sw-typing::after{animation:none}
+  .sw-transcript{scroll-behavior:auto}
+}
+@media (max-width:1100px){.sw-layout{grid-template-columns:minmax(0,1fr);gap:24px}}
+
+
+.form-trap{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.form-consent{display:flex;align-items:flex-start;gap:10px;font-size:13px;color:var(--w2);line-height:1.6;margin:4px 0 6px}
+.form-consent input{margin-top:3px;accent-color:var(--orange);flex-shrink:0}
+.form-consent input:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
+.form-consent a{color:var(--white);text-decoration:underline}
+.form-status{font-size:13px;line-height:1.6;margin-top:10px;min-height:1.2em}
+.form-status.ok{color:var(--green)}
+.form-status.bad{color:var(--orange)}
+
+
+/* --- the swarm (WebGL) ------------------------------------------------ */
+.swarm-stage{position:relative;margin-top:52px;border:1px solid var(--border);border-radius:5px;overflow:hidden;background:radial-gradient(ellipse at 50% 40%,rgba(11,29,82,.35) 0%,var(--bg) 70%)}
+.swarm-canvas{display:block;width:100%;height:clamp(340px,52vh,560px);touch-action:none;cursor:grab}
+.swarm-canvas:active{cursor:grabbing}
+.swarm-canvas:focus-visible{outline:2px solid var(--orange);outline-offset:-2px}
+.swarm-overlay{position:absolute;inset:auto 0 0 0;display:flex;flex-wrap:wrap;gap:14px 26px;align-items:center;padding:16px 20px;background:linear-gradient(to top,rgba(7,7,13,.92),rgba(7,7,13,0));pointer-events:none}
+.swarm-overlay > *{pointer-events:auto}
+.swarm-key{display:flex;align-items:center;gap:8px;font-family:var(--fm);font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--w2)}
+.swarm-swatch{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.swarm-swatch.ok{background:#00C896;box-shadow:0 0 9px rgba(0,200,150,.8)}
+.swarm-swatch.gone{background:var(--orange);box-shadow:0 0 9px rgba(255,69,0,.8)}
+.swarm-count{font-family:var(--fd);font-weight:800;font-size:15px;color:var(--white);font-variant-numeric:tabular-nums;letter-spacing:-.5px}
+.swarm-tilt{margin-left:auto;background:rgba(255,255,255,.06);border:1px solid var(--b2);color:var(--white);font-family:var(--fd);font-size:12px;font-weight:700;padding:9px 14px;border-radius:3px;cursor:pointer}
+.swarm-tilt:hover{border-color:var(--orange);color:var(--orange)}
+.swarm-tilt:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
+.swarm-hint{font-size:12px;color:var(--w2);margin-top:14px;line-height:1.7}
+.swarm-fallback{padding:40px 24px;text-align:center;color:var(--w2);font-size:14px;line-height:1.8}
+@media (max-width:700px){
+  .swarm-canvas{height:clamp(300px,60vh,460px)}
+  .swarm-overlay{gap:10px 16px;padding:13px 15px}
+  .swarm-tilt{margin-left:0;width:100%;text-align:center}
+}
+
+/* MOBILE */
+@media (max-width:1024px){
+  :root{--px:40px}
+  .industries-layout{grid-template-columns:minmax(0,1fr);gap:48px}
+  .faq-layout{grid-template-columns:minmax(0,1fr);gap:48px}
+  .pricing-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .pricing-card:nth-child(4){grid-column:span 2}
+  .pricing-card:nth-child(5){grid-column:2/4}
+}
+
+@media (max-width:768px){
+  :root{--px:20px}
+
+  .nav-links{display:none;position:absolute;top:64px;left:0;right:0;background:rgba(7,7,13,.97);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);flex-direction:column;gap:0;padding:12px 0;transition:opacity .2s}
+  .nav-links.open{display:flex}
+  .nav-links li a{display:block;padding:14px var(--px);font-size:15px;color:var(--w2);border-bottom:1px solid var(--border)}
+  .nav-links li:last-child a{border-bottom:none}
+  .nav-links .nav-cta{margin:12px var(--px);display:block;text-align:center;border-radius:3px}
+  .nav-toggle{display:flex}
+
+  .hero{padding:88px var(--px) 56px}
+  .hero-title{letter-spacing:-2px}
+  .hero-title .line-1,.hero-title .line-2{font-size:clamp(24px,9.2cqw,62px)}
+  .hero-stats{gap:24px}
+  .scroll-indicator{display:none}
+
+  main section{padding:72px var(--px)}
+
+  .services-header{grid-template-columns:minmax(0,1fr);gap:24px}
+  .services-grid{grid-template-columns:minmax(0,1fr)}
+  .service-card{padding:36px 24px}
+  .service-number{display:none}
+
+  .process-layout{grid-template-columns:minmax(0,1fr);gap:48px}
+  .process-visual{display:none}
+
+  .os-showcase{grid-template-columns:minmax(0,1fr);gap:48px}
+
+  .results-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+
+  .industries-layout{gap:32px}
+  .industries-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+
+  .pricing-grid{grid-template-columns:minmax(0,1fr)}
+  .pricing-card,.pricing-card:nth-child(4),.pricing-card:nth-child(5){grid-column:auto}
+
+  .testimonials-grid{grid-template-columns:minmax(0,1fr)}
+
+  .faq-layout{gap:32px}
+
+  .form-row{grid-template-columns:minmax(0,1fr)}
+
+  .footer-top{grid-template-columns:repeat(2,minmax(0,1fr));gap:40px}
+
+  .wa-fab-text,.wa-fab-sub{display:none}
+  .wa-fab{padding:14px;border-radius:50%}
+}
+
+@media (max-width:480px){
+  .results-grid{grid-template-columns:minmax(0,1fr)}
+  .industries-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .footer-top{grid-template-columns:minmax(0,1fr)}
+  .hero-actions{flex-direction:column;align-items:flex-start}
+  .btn-primary,.btn-secondary{width:100%;justify-content:center}
+}
+
+/* NAV active section highlight */
+.nav-links a.active{color:var(--white)}
+
+/* Form input invalid state */
+.form-input:invalid:not(:placeholder-shown){border-color:rgba(255,80,80,.5)}
+.form-input:valid:not(:placeholder-shown){border-color:rgba(0,200,150,.3)}
+
+/* Pricing card active highlight */
+.pricing-card.featured{position:relative}
+
+/* Service list fix */
+.service-features{list-style:none}
+.pc-features{list-style:none}
+
+/* Footer logo missing hover */
+.footer-logo:hover .footer-brand-name span{opacity:.8}
+
+/* Smooth nav open */
+@media (max-width:768px){
+  .nav-links{opacity:0;pointer-events:none;transition:opacity .2s ease}
+  .nav-links.open{opacity:1;pointer-events:all}
+}
+
+/* FOOTER LOGO */
+.footer-logo{display:flex;align-items:center;gap:12px;text-decoration:none}
+</style>
+<link rel="preload" href="fonts/syne-800-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/dm-sans-400-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="fonts/fonts.css">
+</head>
+<body>
+
+<a href="#main-content" class="sr-only" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden">Skip to main content</a>
+
+<a href="mailto:sebastian@rumbo.verso.fans?subject=RUMBO%20IA%20Inquiry&body=Hello%20RUMBO%20IA%2C%20I%20would%20like%20to%20know%20more%20about%20your%20services"
+   target="_blank"
+   rel="noopener noreferrer"
+   class="wa-fab"
+   aria-label="Message us on WhatsApp — We reply within minutes">
+  <svg class="wa-fab-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+  </svg>
+  <div>
+    <div class="wa-fab-text">WhatsApp</div>
+    <div class="wa-fab-sub">We reply within minutes</div>
+  </div>
+</a>
+
+<header class="site-header" id="site-header">
+  <nav aria-label="Main navigation">
+    <a href="#inicio" class="nav-logo" aria-label="Rumbo IA — Home">
+      <svg width="28" height="28" viewBox="0 0 40 40" fill="none" aria-hidden="true" focusable="false">
+        <path d="M8 28L20 10L32 28" stroke="#FF4500" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="20" cy="10" r="3" fill="#FF4500"/>
+        <line x1="20" y1="13" x2="20" y2="31" stroke="rgba(255,69,0,0.45)" stroke-width="1.5" stroke-dasharray="3 3"/>
+      </svg>
+      <span class="nav-brand">RUMBO <span>IA</span></span>
+    </a>
+    <button class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Open menu">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links" id="navLinks" role="list">
+      <li><a href="#servicios">Services</a></li>
+      <li><a href="#proceso">Process</a></li>
+      <li><a href="#herramientas">Tools</a></li>
+      <li><a href="#switchboard">Try it</a>
+        <a href="#precios">Pricing</a></li>
+      <li><a href="#faq">FAQ</a></li>
+      <li><a href="/es" hreflang="es" aria-label="Ver esta página en español">ES</a></li>
+      <li><a href="#contacto" class="nav-cta">Let’s talk →</a></li>
+    </ul>
+  </nav>
+</header>
+
+<main id="main-content">
+
+<section class="hero" id="inicio" aria-labelledby="hero-heading">
+  <div class="hero-canvas" aria-hidden="true">
+    <div class="hero-grid"></div>
+    <div class="hero-glow-1"></div>
+    <div class="hero-glow-2"></div>
+    <div class="particles" id="particles"></div>
+  </div>
+  <div class="hero-content">
+    <div class="hero-badge" role="status">
+      <span class="hero-badge-dot" aria-hidden="true"></span>
+      <span class="hero-badge-text">AI revenue operating system</span>
+    </div>
+    <h1 class="hero-title" id="hero-heading">
+      <span class="line-1">EVERY ENQUIRY</span>
+      <span class="line-2">ANSWERED</span>
+      <span class="line-3">including the ones you never got to.</span>
+    </h1>
+    <p class="hero-desc">
+      RUMBO answers the phone, follows up on quotes and books appointments &mdash; by call, WhatsApp and email &mdash; and hands your team the conversations that need a person. <strong>Plans from USD 149 a month.</strong>
+    </p>
+    <div class="hero-actions">
+      <a href="#contacto" class="btn-primary">
+        See how it works
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+      <a href="#servicios" class="btn-secondary">See services</a>
+    </div>
+    <div class="hero-stats" aria-label="Key figures">
+      <div>
+        <div class="hero-stat-num">24<span>/7</span></div>
+        <div class="hero-stat-label">Answering when your team cannot</div>
+      </div>
+      <div>
+        <div class="hero-stat-num">4<span> channels</span></div>
+        <div class="hero-stat-label">Phone, WhatsApp, email and web in one inbox</div>
+      </div>
+      <div>
+        <div class="hero-stat-num">0<span></span></div>
+        <div class="hero-stat-label">Sensitive messages sent without a person approving</div>
+      </div>
+      <div>
+        <div class="hero-stat-num"><span>USD </span>149</div>
+        <div class="hero-stat-label">Entry plan, per month</div>
+      </div>
+    </div>
+  </div>
+  <div class="scroll-indicator" aria-hidden="true">
+    <div class="scroll-line"></div>
+    <span class="scroll-text">Scroll</span>
+  </div>
+</section>
+
+<div class="ticker" aria-hidden="true">
+  <div class="ticker-track" id="tickerTrack">
+    <span class="ticker-item"><span class="ticker-dot"></span>Websites &amp; Apps</span>
+    <span class="ticker-item"><span class="ticker-dot"></span>AI Chatbots</span>
+    <span class="ticker-item"><span class="ticker-dot"></span>Process Automation</span>
+    <span class="ticker-item"><span class="ticker-dot"></span>AI-Powered Marketing</span>
+    <span class="ticker-item"><span class="ticker-dot"></span>RUMBO OS — Operating System</span>
+    <span class="ticker-item"><span class="ticker-dot"></span>NEXO 3.0 — AI Agent</span>
+    <span class="ticker-item"><span class="ticker-dot"></span>Digital Strategy</span>
+    <span class="ticker-item"><span class="ticker-dot"></span>Business Transformation</span>
+    <span class="ticker-item"><span class="ticker-dot"></span>Technology Partner</span>
+    <span class="ticker-item"><span class="ticker-dot"></span>Global Reach</span>
+    <span class="ticker-item"><span class="ticker-dot"></span>Websites &amp; Apps</span>
+    <span class="ticker-item"><span class="ticker-dot"></span>AI Chatbots</span>
+    <span class="ticker-item"><span class="ticker-dot"></span>Process Automation</span>
+    <span class="ticker-item"><span class="ticker-dot"></span>AI-Powered Marketing</span>
+    <span class="ticker-item"><span class="ticker-dot"></span>RUMBO OS — Operating System</span>
+    <span class="ticker-item"><span class="ticker-dot"></span>NEXO 3.0 — AI Agent</span>
+    <span class="ticker-item"><span class="ticker-dot"></span>Digital Strategy</span>
+    <span class="ticker-item"><span class="ticker-dot"></span>Business Transformation</span>
+    <span class="ticker-item"><span class="ticker-dot"></span>Technology Partner</span>
+    <span class="ticker-item"><span class="ticker-dot"></span>Global Reach</span>
+  </div>
+</div>
+
+<section id="servicios" aria-labelledby="servicios-heading">
+  <div class="services-header reveal">
+    <div>
+      <div class="section-eyebrow">
+        <span class="eyebrow-line" aria-hidden="true"></span>
+        <span class="eyebrow-text">Our services</span>
+      </div>
+      <h2 class="section-title" id="servicios-heading">Four pillars.<br>One partner.</h2>
+    </div>
+    <div>
+      <p class="section-sub">You do not have to coordinate multiple vendors. We integrate web, AI, automation and marketing into one coherent strategy built to grow your business.</p>
+    </div>
+  </div>
+  <div class="services-grid">
+    <article class="service-card reveal">
+      <div class="service-number" aria-hidden="true">01</div>
+      <div class="service-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FF4500" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><rect x="3" y="3" width="18" height="14" rx="2"/><path d="M7 21h10M12 17v4"/><path d="M8 8l2 2 4-4"/></svg>
+      </div>
+      <h3 class="service-name">Websites &amp; Apps</h3>
+      <p class="service-desc">We build your digital presence from scratch or improve what you already have. Landing pages built to convert, corporate sites that make an impression, and apps that solve real problems.</p>
+      <ul class="service-features" aria-label="Included">
+        <li class="sf">High-conversion landing pages</li>
+        <li class="sf">Corporate sites, 3-5 pages</li>
+        <li class="sf">E-commerce and online stores</li>
+        <li class="sf">SEO and performance optimization</li>
+        <li class="sf">Responsive, mobile-first design</li>
+      </ul>
+      <span class="service-price">Included from RUMBO Capture</span>
+    </article>
+    <article class="service-card reveal reveal-delay-1">
+      <div class="service-number" aria-hidden="true">02</div>
+      <div class="service-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FF4500" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/><circle cx="9" cy="10" r="1" fill="#FF4500"/><circle cx="12" cy="10" r="1" fill="#FF4500"/><circle cx="15" cy="10" r="1" fill="#FF4500"/></svg>
+      </div>
+      <h3 class="service-name">Chatbots &amp; AI Assistants</h3>
+      <p class="service-desc">Your business answers, qualifies and sells around the clock without tying up your team. Intelligent chatbots integrated into WhatsApp, your website, or any platform you already use.</p>
+      <ul class="service-features" aria-label="Included">
+        <li class="sf">WhatsApp Business API integration</li>
+        <li class="sf">Web chatbot with trained AI</li>
+        <li class="sf">Automatic lead qualification</li>
+        <li class="sf">Automated sales flows</li>
+        <li class="sf">Admin dashboard included</li>
+      </ul>
+      <span class="service-price">Included from RUMBO Front Desk AI</span>
+    </article>
+    <article class="service-card reveal reveal-delay-2">
+      <div class="service-number" aria-hidden="true">03</div>
+      <div class="service-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FF4500" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><rect x="2" y="7" width="6" height="5" rx="1"/><rect x="16" y="7" width="6" height="5" rx="1"/><rect x="9" y="14" width="6" height="5" rx="1"/><path d="M8 9.5h3M16 9.5h-3"/><path d="M5 12v3l7 0M19 12v3l-7 0"/></svg>
+      </div>
+      <h3 class="service-name">Process Automation</h3>
+      <p class="service-desc">We remove the manual, repetitive tasks that eat into your team’s time. We connect your systems and design automated workflows that run on their own.</p>
+      <ul class="service-features" aria-label="Included">
+        <li class="sf">CRM integration and syncing</li>
+        <li class="sf">Automated email marketing flows</li>
+        <li class="sf">Automated reports and dashboards</li>
+        <li class="sf">Smart notifications and alerts</li>
+        <li class="sf">Automated client onboarding</li>
+      </ul>
+      <span class="service-price">Included from RUMBO Recovery</span>
+    </article>
+    <article class="service-card reveal reveal-delay-3">
+      <div class="service-number" aria-hidden="true">04</div>
+      <div class="service-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FF4500" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><polyline points="4,17 9,12 13,16 19,8"/><polyline points="15,8 19,8 19,12"/></svg>
+      </div>
+      <h3 class="service-name">AI-Powered Marketing</h3>
+      <p class="service-desc">Content, advertising and email marketing strategies powered by artificial intelligence. More output in less time, with clear reporting on what was done and how it performed.</p>
+      <ul class="service-features" aria-label="Included">
+        <li class="sf">Content strategy and calendar</li>
+        <li class="sf">30 AI-assisted posts per month</li>
+        <li class="sf">Automated email campaigns</li>
+        <li class="sf">AI-assisted competitive analysis</li>
+        <li class="sf">Monthly performance reporting</li>
+      </ul>
+      <span class="service-price">Included from RUMBO Growth Engine</span>
+    </article>
+  </div>
+</section>
+
+<section id="proceso" aria-labelledby="proceso-heading">
+  <div class="section-eyebrow reveal">
+    <span class="eyebrow-line" aria-hidden="true"></span>
+    <span class="eyebrow-text">How we work</span>
+  </div>
+  <h2 class="section-title reveal" id="proceso-heading">Simple. Fast. Effective.</h2>
+  <div class="process-layout">
+    <ol class="process-steps reveal">
+      <li class="process-step">
+        <span class="ps-num" aria-hidden="true">01</span>
+        <div>
+          <h3 class="ps-title">Initial assessment</h3>
+          <p class="ps-desc">In a 60-minute session we review your business, your goals and your current bottlenecks. We identify the biggest opportunities and the best place to start.</p>
+        </div>
+      </li>
+      <li class="process-step">
+        <span class="ps-num" aria-hidden="true">02</span>
+        <div>
+          <h3 class="ps-title">Tailored proposal</h3>
+          <p class="ps-desc">Within 48 hours you get a concrete plan: what we will do, how, with which tools, and what to expect. No vague promises.</p>
+        </div>
+      </li>
+      <li class="process-step">
+        <span class="ps-num" aria-hidden="true">03</span>
+        <div>
+          <h3 class="ps-title">Agile implementation</h3>
+          <p class="ps-desc">We execute the plan in short 1-2 week sprints, so you see real progress from day one. You handle none of the technical work — we build all of it.</p>
+        </div>
+      </li>
+      <li class="process-step">
+        <span class="ps-num" aria-hidden="true">04</span>
+        <div>
+          <h3 class="ps-title">Measurement and optimization</h3>
+          <p class="ps-desc">Every delivery comes with clear metrics. We measure, optimize and keep improving. The work does not end at handover — it ends when the numbers move.</p>
+        </div>
+      </li>
+    </ol>
+    <div class="process-visual reveal reveal-delay-2" aria-hidden="true">
+      <div class="pv-circle-outer"></div>
+      <div class="pv-circle-mid"></div>
+      <div class="pv-circle-inner"></div>
+      <div class="pv-core">
+        <svg width="40" height="40" viewBox="0 0 48 48" fill="none"><path d="M10 34L24 10L38 34" stroke="#FF4500" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="24" cy="10" r="3.5" fill="#FF4500"/><line x1="24" y1="13.5" x2="24" y2="36" stroke="rgba(255,69,0,0.45)" stroke-width="1.5" stroke-dasharray="3 4"/></svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="herramientas" aria-labelledby="herramientas-heading">
+  <div class="reveal">
+    <div class="section-eyebrow">
+      <span class="eyebrow-line" aria-hidden="true"></span>
+      <span class="eyebrow-text">Our in-house tools</span>
+    </div>
+    <h2 class="section-title" id="herramientas-heading">We do not just deliver solutions. We build the <span style="color:var(--orange)">tools.</span></h2>
+  </div>
+  <div class="os-showcase">
+    <div class="reveal">
+      <div class="os-tag"><span class="os-tag-dot" aria-hidden="true"></span>RUMBO OS · 13 tools, 13/13 tests passing</div>
+      <p class="os-desc">We are building our own ecosystem of AI tools — RUMBO OS — to plan, deliver and scale technology projects faster. More than 14 specialized tools, each designed to solve one concrete problem.</p>
+      <ul class="os-pillars" style="list-style:none">
+        <li class="os-pillar">
+          <span class="os-pillar-icon" aria-hidden="true">🧠</span>
+          <div>
+            <div class="os-pillar-name">NEXO 3.0 — Core AI Agent</div>
+            <div class="os-pillar-desc">Intelligent chat with full business context, client management and strategy generation in seconds.</div>
+          </div>
+        </li>
+        <li class="os-pillar">
+          <span class="os-pillar-icon" aria-hidden="true">📄</span>
+          <div>
+            <div class="os-pillar-name">Proposal Generator</div>
+            <div class="os-pillar-desc">Complete, customized commercial proposals ready to send in minutes — not days.</div>
+          </div>
+        </li>
+        <li class="os-pillar">
+          <span class="os-pillar-icon" aria-hidden="true">🌐</span>
+          <div>
+            <div class="os-pillar-name">Landing Page Builder</div>
+            <div class="os-pillar-desc">From brief to deploy-ready HTML. No code to write, no weeks of waiting.</div>
+          </div>
+        </li>
+        <li class="os-pillar">
+          <span class="os-pillar-icon" aria-hidden="true">📱</span>
+          <div>
+            <div class="os-pillar-name">AI Content Generator</div>
+            <div class="os-pillar-desc">Full content calendars, posts and reels adapted to each client brand voice.</div>
+          </div>
+        </li>
+      </ul>
+      <a href="#contacto" class="btn-primary" style="display:inline-flex">Request early access →</a>
+    </div>
+    <div class="reveal reveal-delay-2">
+      <div class="os-screen" role="img" aria-label="RUMBO OS preview showing 8 tools">
+        <div class="os-screen-bar" aria-hidden="true">
+          <div class="os-dots">
+            <div class="os-dot os-dot-r"></div>
+            <div class="os-dot os-dot-y"></div>
+            <div class="os-dot os-dot-g"></div>
+          </div>
+          <div class="os-screen-title">RUMBO OS · v1.0</div>
+          <div style="width:48px"></div>
+        </div>
+        <div class="os-screen-body" aria-hidden="true">
+          <div class="os-tool-pill active"><div class="os-pill-top"><span class="os-pill-icon">🧠</span><span class="os-status on">Live</span></div><div class="os-pill-name">NEXO 3.0</div><div class="os-pill-sub">Core AI agent</div></div>
+          <div class="os-tool-pill active"><div class="os-pill-top"><span class="os-pill-icon">📱</span><span class="os-status on">Live</span></div><div class="os-pill-name">Content Kit</div><div class="os-pill-sub">Posts &amp; social media</div></div>
+          <div class="os-tool-pill active"><div class="os-pill-top"><span class="os-pill-icon">📄</span><span class="os-status on">Built</span></div><div class="os-pill-name">Proposals</div><div class="os-pill-sub">Commercial generator</div></div>
+          <div class="os-tool-pill active"><div class="os-pill-top"><span class="os-pill-icon">🌐</span><span class="os-status on">Built</span></div><div class="os-pill-name">Web Builder</div><div class="os-pill-sub">Automated landing pages</div></div>
+          <div class="os-tool-pill active"><div class="os-pill-top"><span class="os-pill-icon">🤖</span><span class="os-status on">Built</span></div><div class="os-pill-name">Chatbots</div><div class="os-pill-sub">AI flow designer</div></div>
+          <div class="os-tool-pill active"><div class="os-pill-top"><span class="os-pill-icon">⚙️</span><span class="os-status on">Built</span></div><div class="os-pill-name">Automations</div><div class="os-pill-sub">Process mapper</div></div>
+          <div class="os-tool-pill active"><div class="os-pill-top"><span class="os-pill-icon">💰</span><span class="os-status on">Built</span></div><div class="os-pill-name">Quotes</div><div class="os-pill-sub">Smart calculator</div></div>
+          <div class="os-tool-pill active"><div class="os-pill-top"><span class="os-pill-icon">📊</span><span class="os-status on">Built</span></div><div class="os-pill-name">Reports</div><div class="os-pill-sub">Automated metrics</div></div>
+        </div>
+      </div>
+      <div style="margin-top:14px;padding:16px 20px;border:1px solid var(--border);border-radius:3px;background:var(--surface);display:flex;align-items:center;gap:14px">
+        <span aria-hidden="true" style="font-size:18px">🚀</span>
+        <div>
+          <div style="font-family:var(--fd);font-size:13px;font-weight:700;color:var(--white);letter-spacing:-.2px">14 tools · growing every week</div>
+          <div style="font-size:11px;color:var(--w3);margin-top:2px">The ecosystem expands with every new project</div>
+        </div>
+        <div style="margin-left:auto;font-family:var(--fm);font-size:8px;letter-spacing:2px;color:var(--orange);text-transform:uppercase;flex-shrink:0">RUMBO OS</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section id="industrias" aria-labelledby="industrias-heading">
+  <div class="industries-layout">
+    <div class="reveal">
+      <div class="section-eyebrow">
+        <span class="eyebrow-line" aria-hidden="true"></span>
+        <span class="eyebrow-text">Industries</span>
+      </div>
+      <h2 class="section-title" id="industrias-heading">We work across every industry.</h2>
+      <p class="section-sub" style="margin-top:20px">If your business has customers, processes and growth targets, Rumbo IA has solutions for you. We adapt to your industry, not the other way around.</p>
+    </div>
+    <ul class="industries-grid reveal reveal-delay-1" style="list-style:none" aria-label="Industries we serve">
+      <li class="industry-card"><span class="industry-icon" aria-hidden="true">🛍️</span><span class="industry-name">Retail</span><span class="industry-desc">E-commerce and sales automation</span></li>
+      <li class="industry-card"><span class="industry-icon" aria-hidden="true">🏥</span><span class="industry-name">Healthcare</span><span class="industry-desc">Chatbots for scheduling and inquiries</span></li>
+      <li class="industry-card"><span class="industry-icon" aria-hidden="true">🎓</span><span class="industry-name">Education</span><span class="industry-desc">Platforms and digital marketing</span></li>
+      <li class="industry-card"><span class="industry-icon" aria-hidden="true">🏗️</span><span class="industry-name">Construction</span><span class="industry-desc">Digital presence and automation</span></li>
+      <li class="industry-card"><span class="industry-icon" aria-hidden="true">🍕</span><span class="industry-name">Food &amp; Beverage</span><span class="industry-desc">Bookings and AI-powered marketing</span></li>
+      <li class="industry-card"><span class="industry-icon" aria-hidden="true">⚖️</span><span class="industry-name">Legal</span><span class="industry-desc">Client acquisition and management</span></li>
+      <li class="industry-card"><span class="industry-icon" aria-hidden="true">🏠</span><span class="industry-name">Real Estate</span><span class="industry-desc">CRM and chatbots for listings</span></li>
+      <li class="industry-card"><span class="industry-icon" aria-hidden="true">💼</span><span class="industry-name">B2B Services</span><span class="industry-desc">Corporate digital strategy</span></li>
+      <li class="industry-card"><span class="industry-icon" aria-hidden="true">🚀</span><span class="industry-name">Startups</span><span class="industry-desc">Accelerated growth with AI</span></li>
+    </ul>
+  </div>
+</section>
+
+
+
+<section id="switchboard" aria-labelledby="switchboard-heading">
+  <div style="text-align:center" class="reveal">
+    <div class="section-eyebrow" style="justify-content:center">
+      <span class="eyebrow-line" aria-hidden="true"></span>
+      <span class="eyebrow-text">Try it</span>
+      <span class="eyebrow-line" aria-hidden="true"></span>
+    </div>
+    <h2 class="section-title" id="switchboard-heading">Say something.<br>Watch what it does.</h2>
+    <p class="section-sub" style="margin:0 auto;text-align:center">Type what a customer would say. The compliance rules on the right are the ones that actually run in the product &mdash; the same code, in your browser, with no network call.</p>
+  </div>
+
+  <div class="sw-layout reveal">
+    <div class="sw-panel">
+      <div class="sw-head">
+        <span class="sw-dot" id="sw-dot" aria-hidden="true"></span>
+        <span class="sw-head-title" id="sw-status">Line idle</span>
+        <span class="sw-timer" id="sw-timer">00:00</span>
+      </div>
+
+      <div class="sw-transcript" id="sw-transcript" role="log" aria-live="polite" aria-label="Call transcript">
+        <p class="sw-turn system">Press call to begin</p>
+      </div>
+
+      <div class="sw-controls">
+        <div class="sw-say">
+          <label for="sw-input" class="sr-only">What the caller says</label>
+          <input type="text" id="sw-input" placeholder="Type what a customer would say&hellip;" autocomplete="off" disabled>
+          <button type="button" class="sw-btn primary" id="sw-send" disabled>Say</button>
+        </div>
+        <div class="sw-chips" id="sw-chips" role="group" aria-label="Example things a caller might say"></div>
+        <div class="sw-say">
+          <button type="button" class="sw-btn primary" id="sw-call">Call the business</button>
+          <button type="button" class="sw-btn interrupt" id="sw-interrupt" disabled>Interrupt</button>
+          <button type="button" class="sw-btn" id="sw-hangup" disabled>Hang up</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="sw-panel">
+      <div class="sw-head">
+        <span class="sw-head-title">What the system did</span>
+      </div>
+      <div class="sw-rules" id="sw-rules"></div>
+      <div class="sw-outcome">
+        <div class="sw-outcome-label">Call summary</div>
+        <div class="sw-outcome-value" id="sw-summary">Nothing yet.</div>
+      </div>
+    </div>
+  </div>
+
+  <p class="sw-honesty reveal">
+    <strong>What is real here:</strong> the opening announcement, the opt-out detection and the barge-in rule are the product&rsquo;s own code, running unchanged in this page.
+    <strong>What is not:</strong> the replies. In the product a language model writes them and a person approves anything sensitive; here they are scripted, because this page makes no network calls.
+  </p>
+</section>
+
+<section id="calculadora" aria-labelledby="calculadora-heading">
+  <div style="text-align:center" class="reveal">
+    <div class="section-eyebrow" style="justify-content:center">
+      <span class="eyebrow-line" aria-hidden="true"></span>
+      <span class="eyebrow-text">The arithmetic</span>
+      <span class="eyebrow-line" aria-hidden="true"></span>
+    </div>
+    <h2 class="section-title" id="calculadora-heading">What the gap costs,<br>in your own numbers.</h2>
+    <p class="section-sub" style="margin:0 auto 64px;text-align:center">Three figures you already know. Nothing here is a claim about our product — it is your arithmetic, and every assumption is on screen and editable.</p>
+  </div>
+  <div class="calc-layout reveal">
+    <div class="calc-fields">
+      <div class="calc-field">
+        <label for="calc-enquiries">Enquiries you get in a week</label>
+        <div class="calc-row">
+          <input type="number" id="calc-enquiries" value="25" min="1" max="5000" step="1" inputmode="numeric">
+          <span class="calc-unit">per week</span>
+        </div>
+      </div>
+      <div class="calc-field">
+        <label for="calc-missed">Of those, how many do you not answer the same day</label>
+        <div class="calc-row">
+          <input type="number" id="calc-missed" value="30" min="0" max="100" step="1" inputmode="numeric">
+          <span class="calc-unit">per cent</span>
+        </div>
+        <input type="range" id="calc-missed-range" value="30" min="0" max="100" step="1" aria-label="Of those, how many do you not answer the same day">
+      </div>
+      <div class="calc-field">
+        <label for="calc-ticket">What an average customer is worth to you</label>
+        <div class="calc-row">
+          <span class="calc-unit">USD</span>
+          <input type="number" id="calc-ticket" value="450" min="1" max="1000000" step="10" inputmode="numeric">
+        </div>
+      </div>
+      <div class="calc-field">
+        <label for="calc-convert">Of the ones answered late, how many you would have closed</label>
+        <div class="calc-row">
+          <input type="number" id="calc-convert" value="20" min="0" max="100" step="1" inputmode="numeric">
+          <span class="calc-unit">per cent</span>
+        </div>
+        <input type="range" id="calc-convert-range" value="20" min="0" max="100" step="1" aria-label="Of the ones answered late, how many you would have closed">
+      </div>
+    </div>
+
+    <div class="calc-result">
+      <div class="calc-eyebrow">Walking out the door each year</div>
+      <p class="calc-amount" id="calc-amount" aria-live="polite" aria-atomic="true">
+        <span class="calc-currency">USD</span><span id="calc-amount-value">35,100</span>
+      </p>
+      <p class="calc-period">Estimated, from the three figures above.</p>
+      <div class="calc-bar"><div class="calc-bar-fill" id="calc-bar" style="width:6%"></div></div>
+      <div class="calc-split"><span>Slipping away</span><span>Closing today</span></div>
+      <p class="calc-plan">The plan that covers this: <strong id="calc-plan">RUMBO Recovery</strong> <span id="calc-plan-price">— USD 349/mo</span></p>
+      <details class="calc-assumption">
+        <summary>How this is worked out</summary>
+        <p>Weekly enquiries × 52, times the share you do not answer the same day, times the share of those you would have closed, times the value of a customer. The last figure is the only assumption, and you can change it. A late reply does not always mean a lost sale — that is why it is a percentage and not all of them.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+
+<section id="swarm" aria-labelledby="swarm-heading">
+  <div style="text-align:center" class="reveal">
+    <div class="section-eyebrow" style="justify-content:center">
+      <span class="eyebrow-line" aria-hidden="true"></span>
+      <span class="eyebrow-text">A year, in one view</span>
+      <span class="eyebrow-line" aria-hidden="true"></span>
+    </div>
+    <h2 class="section-title" id="swarm-heading">Every enquiry you get,<br>and the ones falling out.</h2>
+    <p class="section-sub" style="margin:0 auto;text-align:center">One point is one enquiry. Green was answered. Orange is drifting away. Change the numbers in the calculator above and the swarm changes with them.</p>
+  </div>
+
+  <div class="swarm-stage reveal">
+    <canvas id="swarm-canvas" class="swarm-canvas" tabindex="0"
+            role="img"
+            aria-label="A rotating three-dimensional swarm of points. Each point is one enquiry over a year; green points were answered and orange points were missed. Use the arrow keys to look around."></canvas>
+    <div class="swarm-overlay">
+      <span class="swarm-key"><span class="swarm-swatch ok" aria-hidden="true"></span>Answered <span class="swarm-count" id="swarm-caught">—</span></span>
+      <span class="swarm-key"><span class="swarm-swatch gone" aria-hidden="true"></span>Lost <span class="swarm-count" id="swarm-lost">—</span></span>
+      <button type="button" class="swarm-tilt" id="swarm-tilt" aria-pressed="false">Tilt to look around</button>
+    </div>
+    <p class="swarm-fallback" id="swarm-fallback" hidden>Your browser cannot draw the swarm. The numbers above say the same thing.</p>
+  </div>
+  <p class="swarm-hint reveal" id="swarm-status">Drag to look around. On a phone, tilt it.</p>
+</section>
+
+<section id="precios" aria-labelledby="precios-heading">
+  <div style="text-align:center" class="reveal">
+    <div class="section-eyebrow" style="justify-content:center">
+      <span class="eyebrow-line" aria-hidden="true"></span>
+      <span class="eyebrow-text">Plans</span>
+      <span class="eyebrow-line" aria-hidden="true"></span>
+    </div>
+    <h2 class="section-title" id="precios-heading">Five plans.<br>One operating system.</h2>
+    <p class="section-sub" style="margin:0 auto;text-align:center">Every plan includes the RUMBO platform plus a one-time onboarding fee. You start where your business is today and move up a plan when you need more.</p>
+  </div>
+  <div class="pricing-grid">
+    <article class="pricing-card reveal reveal-delay-1">
+      <div class="pc-tier">Plan 01</div>
+      <div class="pc-name">RUMBO Capture</div>
+      <p class="pc-desc">Businesses that receive enquiries and lose them in the follow-up.</p>
+      <div class="pc-price">
+        <div class="pc-amount"><span class="currency">$</span>149 <span class="period">/ month</span></div>
+        <div class="pc-setup">+ USD 390 one-time onboarding</div>
+        <div class="pc-setup">Up to 3 users &middot; 1,500 contacts &middot; 1,000 AI interactions &middot; 3 workflows</div>
+      </div>
+      <ul class="pc-features" style="list-style:none">
+        <li class="pc-feature"><div class="pc-feature-icon"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#00C896" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></div>Shared inbox and CRM</li>
+        <li class="pc-feature"><div class="pc-feature-icon"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#00C896" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></div>Web and channel capture</li>
+        <li class="pc-feature"><div class="pc-feature-icon"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#00C896" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></div>Lead Vault</li>
+        <li class="pc-feature"><div class="pc-feature-icon"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#00C896" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></div>AI-drafted replies</li>
+        <li class="pc-feature"><div class="pc-feature-icon"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#00C896" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></div>Tasks, alerts and reporting</li>
+      </ul>
+      <p class="pc-usage-note">Messaging and third-party providers are billed on usage.</p>
+      <a href="#contacto" class="btn-plan outline">Get started &rarr;</a>
+    </article>
+    <article class="pricing-card reveal reveal-delay-2 featured">
+      <div class="pc-tier">Plan 02</div>
+      <div class="pc-name">RUMBO Recovery</div>
+      <p class="pc-desc">Teams with demand already coming in that leaks between the quote and the sale.</p>
+      <div class="pc-price">
+        <div class="pc-amount"><span class="currency">$</span>349 <span class="period">/ month</span></div>
+        <div class="pc-setup">+ USD 750 one-time onboarding</div>
+        <div class="pc-setup">Up to 6 users &middot; 4,000 contacts &middot; 3,500 AI interactions &middot; 8 workflows</div>
+      </div>
+      <ul class="pc-features" style="list-style:none">
+        <li class="pc-feature"><div class="pc-feature-icon"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#00C896" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></div>Everything in Capture</li>
+        <li class="pc-feature"><div class="pc-feature-icon"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#00C896" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></div>Quote follow-up</li>
+        <li class="pc-feature"><div class="pc-feature-icon"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#00C896" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></div>No-show recovery</li>
+        <li class="pc-feature"><div class="pc-feature-icon"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#00C896" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></div>Customer reactivation</li>
+        <li class="pc-feature"><div class="pc-feature-icon"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#00C896" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></div>Booking calendar</li>
+        <li class="pc-feature"><div class="pc-feature-icon"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#00C896" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></div>Knowledge base, approvals and analytics</li>
+      </ul>
+      <p class="pc-usage-note">Includes the platform; channel and model consumption is reported separately.</p>
+      <a href="#contacto" class="btn-plan">Get started &rarr;</a>
+    </article>
+    <article class="pricing-card reveal reveal-delay-3">
+      <div class="pc-tier">Plan 03</div>
+      <div class="pc-name">RUMBO Front Desk AI</div>
+      <p class="pc-desc">Businesses losing calls they cannot answer, after hours or during them.</p>
+      <div class="pc-price">
+        <div class="pc-amount"><span class="currency">$</span>599 <span class="period">/ month</span></div>
+        <div class="pc-setup">+ USD 1,200 one-time onboarding</div>
+        <div class="pc-setup">Up to 10 users &middot; 7,500 contacts &middot; 6,000 AI interactions &middot; 12 workflows</div>
+      </div>
+      <ul class="pc-features" style="list-style:none">
+        <li class="pc-feature"><div class="pc-feature-icon"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#00C896" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></div>Everything in Recovery</li>
+        <li class="pc-feature"><div class="pc-feature-icon"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#00C896" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></div>24/7 AI receptionist</li>
+        <li class="pc-feature"><div class="pc-feature-icon"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#00C896" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></div>Missed-call recovery</li>
+        <li class="pc-feature"><div class="pc-feature-icon"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#00C896" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></div>Scheduling and warm transfers</li>
+        <li class="pc-feature"><div class="pc-feature-icon"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#00C896" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></div>Call record and intent scoring</li>
+      </ul>
+      <p class="pc-usage-note">Telephony minutes, voice and messaging are billed on usage.</p>
+      <a href="#contacto" class="btn-plan outline">Get started &rarr;</a>
+    </article>
+    <article class="pricing-card reveal reveal-delay-4">
+      <div class="pc-tier">Plan 04</div>
+      <div class="pc-name">RUMBO Growth Engine</div>
+      <p class="pc-desc">Companies that need to create new demand, not only handle what arrives.</p>
+      <div class="pc-price">
+        <div class="pc-amount"><span class="currency">$</span>999 <span class="period">/ month</span></div>
+        <div class="pc-setup">+ USD 1,500 one-time onboarding</div>
+        <div class="pc-setup">Up to 15 users &middot; 20,000 contacts &middot; 12,000 AI interactions &middot; 20 workflows</div>
+      </div>
+      <ul class="pc-features" style="list-style:none">
+        <li class="pc-feature"><div class="pc-feature-icon"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#00C896" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></div>Everything in Front Desk</li>
+        <li class="pc-feature"><div class="pc-feature-icon"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#00C896" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></div>24/7 Opportunity Scanner</li>
+        <li class="pc-feature"><div class="pc-feature-icon"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#00C896" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></div>Public contact enrichment and rule-based scoring</li>
+        <li class="pc-feature"><div class="pc-feature-icon"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#00C896" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></div>Campaigns with human review</li>
+        <li class="pc-feature"><div class="pc-feature-icon"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#00C896" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></div>Outbound webhook and official channels</li>
+      </ul>
+      <p class="pc-usage-note">Searches, enrichment, email, WhatsApp and voice are billed on actual use.</p>
+      <a href="#contacto" class="btn-plan outline">Get started &rarr;</a>
+    </article>
+    <article class="pricing-card reveal reveal-delay-4">
+      <div class="pc-tier">Plan 05</div>
+      <div class="pc-name">RUMBO Managed AI Operations</div>
+      <p class="pc-desc">Companies that want the running and improvement of the operation handled for them.</p>
+      <div class="pc-price">
+        <div class="pc-amount"><span class="currency">$</span>1,500 <span class="period">/ month</span></div>
+        <div class="pc-setup">+ USD 2,500 one-time onboarding</div>
+        <div class="pc-setup">Unlimited users, contacts and workflows</div>
+      </div>
+      <ul class="pc-features" style="list-style:none">
+        <li class="pc-feature"><div class="pc-feature-icon"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#00C896" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></div>Everything in Growth Engine</li>
+        <li class="pc-feature"><div class="pc-feature-icon"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#00C896" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></div>Monthly optimisation (a service, not software)</li>
+        <li class="pc-feature"><div class="pc-feature-icon"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#00C896" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></div>Conversation and prompt review</li>
+        <li class="pc-feature"><div class="pc-feature-icon"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#00C896" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></div>New automations built for you</li>
+        <li class="pc-feature"><div class="pc-feature-icon"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#00C896" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></div>Priority support and executive reporting</li>
+      </ul>
+      <p class="pc-usage-note">Scope and SLA are set by contract; external consumption is not included.</p>
+      <a href="#contacto" class="btn-plan outline">Talk to the team &rarr;</a>
+    </article>
+  </div>
+  <p class="pricing-footnote reveal">All amounts are in USD and cover the platform subscription and its onboarding. Variable consumption &mdash; telephony minutes, messaging, email and AI model usage &mdash; is billed separately based on actual usage.</p>
+</section>
+
+
+<section id="faq" aria-labelledby="faq-heading">
+  <div class="faq-layout">
+    <div class="reveal">
+      <div class="section-eyebrow">
+        <span class="eyebrow-line" aria-hidden="true"></span>
+        <span class="eyebrow-text">Frequently asked questions</span>
+      </div>
+      <h2 class="section-title" id="faq-heading">Everything you need to know.</h2>
+      <p class="section-sub" style="margin-top:20px">Still have questions? Write to us directly — we reply within 24 hours.</p>
+      <a href="#contacto" class="btn-primary" style="margin-top:32px;display:inline-flex">Contact us now →</a>
+    </div>
+    <div class="faq-list reveal reveal-delay-1">
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)" aria-expanded="false">Do I need technical knowledge to work with you?<div class="faq-icon" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></div></button>
+        <div class="faq-answer">Not at all. That is exactly our role. You tell us what you want to achieve, and we handle the entire technical side. We explain everything in plain language, without jargon.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)" aria-expanded="false">How soon will I see the first results?<div class="faq-icon" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></div></button>
+        <div class="faq-answer">Setup is the onboarding you pay for once, and it starts as soon as we have your details. How long it takes to go live depends on approvals outside our control &mdash; a phone number, a WhatsApp business account &mdash; so we give you a date after we see your setup rather than a number now.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)" aria-expanded="false">Do you only work with large companies, or with smaller ones too?<div class="faq-icon" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></div></button>
+        <div class="faq-answer">Both. Plans start at USD 149/month with RUMBO Capture for businesses that are just getting started, and go up to USD 1,500/month with RUMBO Managed AI Operations for companies that want their whole commercial operation supervised. Company size is not the deciding factor — the intent to grow is.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)" aria-expanded="false">Which countries do you work in?<div class="faq-icon" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></div></button>
+        <div class="faq-answer">We operate 100% remotely, which lets us work with companies in any country. We coordinate meetings and deliveries in your time zone and work in English or Spanish.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)" aria-expanded="false">How do payments and contracts work?<div class="faq-icon" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></div></button>
+        <div class="faq-answer">Every plan has two components: a one-time onboarding fee and a monthly subscription, both in USD. Variable consumption — telephony minutes, messaging, email and AI model usage — is billed separately based on actual usage.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)" aria-expanded="false">What happens after the project is delivered?<div class="faq-icon" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></div></button>
+        <div class="faq-answer">We do not disappear. Every project includes a post-delivery support period. And if you want to keep growing, there is an ongoing maintenance and advisory plan available. We work as long-term partners.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="contacto" aria-labelledby="contacto-heading">
+  <div class="reveal">
+    <div class="cta-label">Start today</div>
+    <h2 class="cta-title" id="contacto-heading">Ready to set a new<br><span class="highlight">Rumbo</span> for your company?</h2>
+    <p class="cta-sub">The first step is free. Tell us what you need and within 24 hours we will come back with a concrete plan.</p>
+  </div>
+  <div class="contact-form reveal reveal-delay-1">
+    <form id="contactForm" novalidate data-intake-endpoint="">
+    <div class="form-row">
+      <input type="text" name="nombre" class="form-input" placeholder="Your name" required autocomplete="name" aria-label="Your name">
+      <input type="text" name="empresa" class="form-input" placeholder="Your company name" autocomplete="organization" aria-label="Your company name">
+    </div>
+    <div class="form-row">
+      <input type="email" name="email" class="form-input" placeholder="Contact email" required autocomplete="email" aria-label="Contact email">
+      <input type="tel" name="whatsapp" class="form-input" placeholder="WhatsApp (optional)" autocomplete="tel" aria-label="WhatsApp">
+    </div>
+    <!-- Honeypot: a real person never sees this, a bot fills it in. The API
+         accepts and discards anything that arrives with it set. -->
+    <div class="form-trap" aria-hidden="true"><label for="form-website">Website</label><input type="text" id="form-website" name="website" tabindex="-1" autocomplete="off"></div>
+    <select name="servicio" class="form-select" aria-label="Solution of interest">
+      <option value="" disabled selected>Which solution are you interested in?</option>
+      <option>Website or landing page</option>
+      <option>AI chatbot for WhatsApp/web</option>
+      <option>Process automation</option>
+      <option>AI-powered marketing</option>
+      <option>Full Growth plan</option>
+      <option>Early access to RUMBO OS</option>
+      <option>I would like advice on where to start</option>
+    </select>
+    <input type="text" name="mensaje" class="form-input" placeholder="Briefly tell us what you need..." aria-label="Message">
+    <label class="form-consent"><input type="checkbox" name="consent" id="form-consent" required> I agree that RUMBO IA may use these details to reply to me. <a href="privacy.html">Privacy policy</a>.</label>
+    <button type="submit" class="form-submit">Start my transformation →</button>
+    </form>
+    <p class="form-note">We reply within 24h. No spam, no pressure. We use what you send only to answer you — see the <a href="privacy.html">privacy policy</a>.</p>
+    <div class="form-divider"><span class="form-divider-text">or message us directly</span></div>
+    <a href="mailto:sebastian@rumbo.verso.fans?subject=RUMBO%20IA%20Consultation&body=Hello%20RUMBO%20IA%2C%20I%20would%20like%20a%20free%20consultation"
+       target="_blank"
+       rel="noopener noreferrer"
+       class="wa-form-btn"
+       aria-label="Message us on WhatsApp — We reply within minutes">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="#25D366" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+      <span class="wa-form-label">Message us on WhatsApp</span>
+      <span class="wa-form-sub">We reply within minutes</span>
+    </a>
+  </div>
+</section>
+
+</main>
+
+<footer class="site-footer" aria-label="Footer">
+  <div class="footer-top">
+    <div>
+      <a href="#inicio" class="footer-logo" aria-label="Rumbo IA — Back to top">
+        <svg width="26" height="26" viewBox="0 0 40 40" fill="none" aria-hidden="true"><path d="M8 28L20 10L32 28" stroke="#FF4500" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="20" cy="10" r="3" fill="#FF4500"/><line x1="20" y1="13" x2="20" y2="30" stroke="rgba(255,69,0,0.4)" stroke-width="1.5" stroke-dasharray="3 3"/></svg>
+        <span class="footer-brand-name">RUMBO <span>IA</span></span>
+      </a>
+      <p class="footer-brand-desc">Answers the phone, follows up on quotes and books appointments. A person approves anything sensitive.</p>
+      <p style="font-family:var(--fm);font-size:10px;color:var(--w3);letter-spacing:2px">SOLD WORLDWIDE · ENGLISH AND SPANISH</p>
+    </div>
+    <nav aria-label="Services">
+      <div class="footer-col-title">Services</div>
+      <ul class="footer-links">
+        <li><a href="#servicios">Websites &amp; Apps</a></li>
+        <li><a href="#servicios">AI Chatbots</a></li>
+        <li><a href="#servicios">Automation</a></li>
+        <li><a href="#servicios">AI-Powered Marketing</a></li>
+        <li><a href="#precios">See pricing</a></li>
+      </ul>
+    </nav>
+    <nav aria-label="Tools">
+      <div class="footer-col-title">Tools</div>
+      <ul class="footer-links">
+        <li><a href="#herramientas">RUMBO OS</a></li>
+        <li><a href="#herramientas">NEXO 3.0 — AI Agent</a></li>
+        <li><a href="#herramientas">Proposal Generator</a></li>
+        <li><a href="#herramientas">Landing Page Builder</a></li>
+        <li><a href="#herramientas">AI Content Kit</a></li>
+      </ul>
+    </nav>
+    <nav aria-label="Contact">
+      <div class="footer-col-title">Contact</div>
+      <ul class="footer-links">
+        <li><a href="#contacto">Free assessment</a></li>
+        <li><a href="mailto:sebastian@rumbo.verso.fans">sebastian@rumbo.verso.fans</a></li>
+        <li><a href="mailto:sebastian@rumbo.verso.fans?subject=RUMBO%20IA%20WhatsApp%20Request">WhatsApp direct</a></li>
+        <li><a href="https://www.linkedin.com" target="_blank" rel="noopener noreferrer">LinkedIn</a></li>
+        <li><a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer">Instagram</a></li>
+      </ul>
+    </nav>
+    <nav aria-label="Legal">
+      <div class="footer-col-title">Legal</div>
+      <ul class="footer-links">
+        <li><a href="privacy.html">Privacy policy</a></li>
+        <li><a href="terms.html">Terms of service</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div class="footer-bottom">
+    <p class="footer-copy">© 2026 RUMBO IA — All rights reserved</p>
+    <div class="footer-socials">
+      <a href="https://www.linkedin.com" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="RUMBO IA on LinkedIn">in</a>
+      <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="RUMBO IA on Instagram">ig</a>
+      <a href="mailto:sebastian@rumbo.verso.fans" class="social-link" aria-label="RUMBO IA on email">wa</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+const headerEl = document.getElementById('site-header');
+window.addEventListener('scroll', () => {
+  headerEl.classList.toggle('scrolled', window.scrollY > 40);
+}, { passive: true });
+
+const navToggle = document.getElementById('navToggle');
+const navLinks  = document.getElementById('navLinks');
+navToggle.addEventListener('click', () => {
+  const isOpen = navLinks.classList.toggle('open');
+  navToggle.setAttribute('aria-expanded', isOpen);
+  navToggle.setAttribute('aria-label', isOpen ? 'Close menu' : 'Open menu');
+  document.body.style.overflow = isOpen ? 'hidden' : '';
+});
+navLinks.querySelectorAll('a').forEach(a => {
+  a.addEventListener('click', () => {
+    navLinks.classList.remove('open');
+    navToggle.setAttribute('aria-expanded', 'false');
+    document.body.style.overflow = '';
+  });
+});
+// Close nav on outside click
+document.addEventListener('click', e => {
+  if (navLinks.classList.contains('open') && !navLinks.contains(e.target) && !navToggle.contains(e.target)) {
+    navLinks.classList.remove('open');
+    navToggle.setAttribute('aria-expanded', 'false');
+    document.body.style.overflow = '';
+  }
+});
+
+const particleContainer = document.getElementById('particles');
+if (window.matchMedia('(prefers-reduced-motion: no-preference)').matches) {
+  for (let i = 0; i < 20; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.left = (Math.random() * 100) + '%';
+    p.style.setProperty('--drift', (Math.random() * 100 - 50) + 'px');
+    p.style.animationDuration = (8 + Math.random() * 12) + 's';
+    p.style.animationDelay = (Math.random() * 10) + 's';
+    p.style.width = p.style.height = (1 + Math.random() * 2) + 'px';
+    particleContainer.appendChild(p);
+  }
+}
+
+const revealObserver = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('visible'); revealObserver.unobserve(e.target); }
+  });
+}, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+function toggleFaq(btn) {
+  const item = btn.parentElement;
+  const isOpen = item.classList.contains('open');
+  document.querySelectorAll('.faq-item.open').forEach(i => {
+    i.classList.remove('open');
+    i.querySelector('.faq-question').setAttribute('aria-expanded', 'false');
+  });
+  if (!isOpen) {
+    item.classList.add('open');
+    btn.setAttribute('aria-expanded', 'true');
+  }
+}
+
+/* Sends the enquiry to /api/intake and reports what actually happened.
+   Never claims success it did not get: an enquiry that silently vanishes is
+   the exact failure this product exists to prevent. */
+(function () {
+  var form = document.getElementById('contactForm');
+  if (!form) return;
+
+  var status = document.createElement('p');
+  status.className = 'form-status';
+  status.setAttribute('role', 'status');
+  status.setAttribute('aria-live', 'polite');
+  form.appendChild(status);
+
+  /* Where the console app lives, read at submit time rather than at load, so
+     it can be set after the page is up. With it unset the form tells the
+     visitor to email instead of pretending to have sent something. */
+  function intakeEndpoint() { return form.getAttribute('data-intake-endpoint') || ''; }
+
+  function say(text, ok) {
+    status.textContent = text;
+    status.className = 'form-status ' + (ok ? 'ok' : 'bad');
+  }
+
+  form.addEventListener('submit', async function (event) {
+    event.preventDefault();
+    var button = form.querySelector('.form-submit');
+    var data = new FormData(form);
+
+    var name = String(data.get('nombre') || '').trim();
+    var email = String(data.get('email') || '').trim();
+    var phone = String(data.get('whatsapp') || '').trim();
+    var interest = String(data.get('servicio') || '').trim();
+    var note = String(data.get('mensaje') || '').trim();
+
+    if (!name) { say('Please tell us your name.', false); form.querySelector('[name=nombre]').focus(); return; }
+    if (!email || email.indexOf('@') < 0) { say('Please enter an email we can reply to.', false); form.querySelector('[name=email]').focus(); return; }
+    if (!data.get('consent')) { say('Please tick the box so we may reply to you.', false); document.getElementById('form-consent').focus(); return; }
+
+    // The API requires at least ten characters, so build a real message.
+    var message = [interest && ('Interested in: ' + interest), note, 'Sent from the website contact form.']
+      .filter(Boolean).join(' — ');
+
+    var endpoint = intakeEndpoint();
+    if (!endpoint) {
+      say('This form is not connected yet. Please email us directly and we will reply.', false);
+      return;
+    }
+
+    var original = button.textContent;
+    button.disabled = true;
+    button.textContent = 'Sending…';
+    say('', true);
+
+    try {
+      var response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          // The API rejects a submission without one, which is what stops a
+          // double-click becoming two enquiries.
+          'Idempotency-Key': 'landing-' + Date.now() + '-' + Math.random().toString(36).slice(2, 10)
+        },
+        body: JSON.stringify({
+          source: 'public-landing',
+          name: name,
+          email: email,
+          phone: phone || undefined,
+          message: message,
+          consent: true,
+          website: String(data.get('website') || '')
+        })
+      });
+
+      if (response.ok || response.status === 202) {
+        form.reset();
+        say('Got it. We will reply to ' + email + '.', true);
+      } else if (response.status === 429) {
+        say('That is a lot of messages at once. Please wait a moment and try again.', false);
+      } else {
+        say('We could not send that. Please email us directly and we will pick it up.', false);
+      }
+    } catch (error) {
+      say('We could not reach the server. Please email us directly and we will pick it up.', false);
+    } finally {
+      button.disabled = false;
+      button.textContent = original;
+    }
+  });
+})();
+
+
+// Active nav link on scroll
+const navSections = document.querySelectorAll('main section[id]');
+const navAnchors  = document.querySelectorAll('.nav-links a[href^="#"]');
+const activateNav = () => {
+  let current = '';
+  navSections.forEach(s => {
+    if (window.scrollY >= s.offsetTop - 120) current = s.id;
+  });
+  navAnchors.forEach(a => {
+    a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+  });
+};
+window.addEventListener('scroll', activateNav, { passive: true });
+activateNav();
+
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const t = document.querySelector(a.getAttribute('href'));
+    if (t) { e.preventDefault(); t.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+  });
+});
+</script>
+
+<script>
+/* The leak calculator. Plain arithmetic on the visitor's own figures — no
+   claim about the product is encoded here, which is what makes it credible
+   when someone checks the maths. */
+(function () {
+  var byId = function (id) { return document.getElementById(id); };
+  var enquiries = byId('calc-enquiries');
+  if (!enquiries) return;
+  var missed = byId('calc-missed');
+  var missedRange = byId('calc-missed-range');
+  var ticket = byId('calc-ticket');
+  var convert = byId('calc-convert');
+  var convertRange = byId('calc-convert-range');
+  var amount = byId('calc-amount-value');
+  var bar = byId('calc-bar');
+  var planName = byId('calc-plan');
+  var planPrice = byId('calc-plan-price');
+  var locale = 'en-US';
+
+  /* Plans mirror domain/product-catalog.json. A visitor who lands on a number
+     here and a different one at the pricing table stops trusting both. */
+  var PLANS = [
+    { name: 'RUMBO Capture', monthly: 149, upTo: 12000 },
+    { name: 'RUMBO Recovery', monthly: 349, upTo: 60000 },
+    { name: 'RUMBO Front Desk AI', monthly: 599, upTo: 150000 },
+    { name: 'RUMBO Growth Engine', monthly: 999, upTo: 400000 },
+    { name: 'RUMBO Managed AI Operations', monthly: 1500, upTo: Infinity }
+  ];
+
+  var clamp = function (input) {
+    var value = Number(input.value);
+    var min = Number(input.min);
+    var max = Number(input.max);
+    if (!isFinite(value)) return min;
+    if (value > max) { input.value = String(max); return max; }
+    return Math.max(min, value);
+  };
+
+  function update() {
+    var perYear = clamp(enquiries) * 52;
+    var lostShare = clamp(missed) / 100;
+    var closeShare = clamp(convert) / 100;
+    var value = clamp(ticket);
+    var lost = perYear * lostShare * closeShare * value;
+
+    amount.textContent = Math.round(lost).toLocaleString(locale);
+
+    /* The bar shows the share of the year's enquiry value that leaks, so it
+       stays meaningful whatever the absolute numbers are. */
+    var total = perYear * value;
+    var share = total > 0 ? Math.min(100, (lost / total) * 100) : 0;
+    bar.style.width = share.toFixed(1) + '%';
+
+    var plan = PLANS[PLANS.length - 1];
+    for (var i = 0; i < PLANS.length; i += 1) { if (lost <= PLANS[i].upTo) { plan = PLANS[i]; break; } }
+    planName.textContent = plan.name;
+    planPrice.textContent = '— USD ' + plan.monthly + '/mo';
+  }
+
+  /* Number field and slider are two views of one value; each keeps the other
+     honest so a keyboard user and a pointer user see the same thing. */
+  function pair(field, range) {
+    if (!range) return;
+    field.addEventListener('input', function () { range.value = clamp(field); update(); });
+    range.addEventListener('input', function () { field.value = range.value; update(); });
+  }
+  pair(missed, missedRange);
+  pair(convert, convertRange);
+  [enquiries, ticket].forEach(function (field) { field.addEventListener('input', update); });
+  [enquiries, missed, ticket, convert].forEach(function (field) {
+    field.addEventListener('blur', function () { field.value = clamp(field); update(); });
+  });
+
+  update();
+})();
+</script>
+
+
+<script>
+/* The live switchboard.
+ *
+ * Three things in here are the product's own code, copied unchanged so the
+ * page cannot drift from what the software does:
+ *
+ *   buildCallPreamble  — domain/call-compliance.ts
+ *   containsOptOut     — application/crm.ts
+ *   abortTurn/isStale  — apps/voice-gateway/helpers.mjs (barge-in)
+ *
+ * The replies are scripted and the page says so. Everything else would be a
+ * lie: this file makes no network calls and there is no model behind it.
+ */
+(function () {
+  var el = function (id) { return document.getElementById(id); };
+  var transcript = el('sw-transcript');
+  if (!transcript) return;
+
+  // ── product code, copied verbatim ──────────────────────────────────────
+  // domain/call-compliance.ts
+  var IDENTITY = function (name, phone) {
+    return phone ? 'You are speaking with ' + name + '. Our contact number is ' + phone + '.'
+                 : 'You are speaking with ' + name + '.';
+  };
+  var RECORDING_NOTICE = 'This call is recorded. If you prefer not to be recorded, say so and we will stop.';
+
+  function buildCallPreamble(input) {
+    var parts = [];
+    if (input.businessLegalName) parts.push(IDENTITY(input.businessLegalName, input.contactPhone));
+    parts.push(input.disclosure.trim());
+    if (input.recordingEnabled) parts.push(RECORDING_NOTICE);
+    return parts.join(' ');
+  }
+
+  // application/crm.ts — the single opt-out detector, all channels
+  var OPT_OUT_PATTERNS = [
+    /\b(?:stop|unsubscribe)\b/,
+    /\b(?:cancelar|cancela|cancelame)\s+(?:mi\s+)?suscripcion\b/,
+    /\bno\s+(?:me\s+)?(?:escribas|contactes|contacten|mandes\s+mensajes)\b/,
+    /\bno\s+contactar\b/,
+    /\b(?:dame|darme|solicito|quiero)\s+de\s+baja\b/,
+    /\b(?:dar|darme|dame)\s+de\s+baja\s+(?:mi\s+)?(?:suscripcion|cuenta|numero|contacto)\b/,
+    /\b(?:elimina|eliminar|borra|borrar)\s+(?:mis?\s+)?(?:numero|contacto|datos)\b/,
+    /\bno\s+(?:me\s+)?llam(?:e|es|en|ar)\b/,
+    /\bno\s+vuelvan?\s+a\s+llamar\b/,
+    /\bdej(?:e|en|a)\s+de\s+llamar\b/,
+    /\bsac(?:ame|arme|enme|a)\s+de\s+(?:la|su|esta)\s+lista\b/,
+    /\bno\s+quiero\s+que\s+me\s+llamen\b/,
+    /\bstop\s+calling\b/,
+    /\bdo\s*n[o']?t\s+call\s+me\b/,
+    /\bdo\s+not\s+call\b/,
+    /\btake\s+me\s+off\s+(?:the|your)\s+list\b/,
+    /\bremove\s+me\s+from\b/,
+    /\bdelete\s+my\s+data\b/
+  ];
+
+  function containsOptOut(text) {
+    var normalized = text
+      .normalize('NFD')
+      .replace(/[̀-ͯ]/g, '')
+      .toLowerCase()
+      .replace(/\s+/g, ' ')
+      .trim();
+    if (!normalized) return false;
+    return OPT_OUT_PATTERNS.some(function (pattern) { return pattern.test(normalized); });
+  }
+
+  // apps/voice-gateway/helpers.mjs — what makes barge-in real
+  function abortTurn(session) {
+    session.generation += 1;
+    if (session.inFlight) {
+      try { session.inFlight.abort(); } catch (error) { /* already gone */ }
+      session.inFlight = null;
+    }
+  }
+  function isStale(session, generation) { return session.generation !== generation; }
+  // ── end of product code ────────────────────────────────────────────────
+
+  var AGENT = {
+    businessLegalName: 'Riverside Dental',
+    contactPhone: '+1 415 555 0132',
+    disclosure: 'You are speaking with an AI assistant.',
+    recordingEnabled: true
+  };
+
+  /* Scripted replies. Matched on the caller's words, in the order below —
+     the product classifies intent with a model, this does not pretend to. */
+  var SCRIPT = [
+    { test: /\b(appointment|book|schedule|slot|visit)\b/, intent: 'appointment',
+      reply: 'I can book that. What day suits you, and is this a check-up or something urgent?',
+      did: 'Appointment request recorded. Calendar hold created, pending confirmation.' },
+    { test: /\b(price|cost|how much|quote|estimate)\b/, intent: 'sales',
+      reply: 'Prices depend on what you need, so I will not guess. Tell me what it is for and I will have someone send you a written quote.',
+      did: 'Quote request recorded. No price quoted — the agent is not allowed to.' },
+    { test: /\b(human|person|manager|someone|speak to)\b/, intent: 'transfer',
+      reply: 'Of course. I will put you through, and I will pass on what you have told me so far.',
+      did: 'Escalated to a person. Context handed over.' },
+    { test: /\b(open|hours|closed|when are you)\b/, intent: 'information',
+      reply: 'We are open Monday to Friday, eight to six. Would you like me to book you in?',
+      did: 'Answered from approved facts only.' },
+    { test: /\b(emergency|urgent|pain|bleeding|now)\b/, intent: 'transfer',
+      reply: 'That sounds urgent. I am putting you through to someone now.',
+      did: 'Urgency detected. Escalated immediately.' }
+  ];
+  var FALLBACK = {
+    intent: 'information',
+    reply: 'I have noted that. Can you tell me a little more, so I pass the right details to the team?',
+    did: 'Enquiry recorded and assigned for follow-up.'
+  };
+
+  var CHIPS = [
+    'I need an appointment next week',
+    'How much does a filling cost?',
+    'Can I speak to a person?',
+    'What are your opening hours?',
+    'Stop calling me'
+  ];
+
+  var RULES = [
+    { key: 'identity',   name: 'The business identified itself',   law: '47 CFR 64.1200(b) — name and callback number' },
+    { key: 'ai',         name: 'The caller was told it is AI',     law: 'EU AI Act art. 50 — applies 2 Aug 2026' },
+    { key: 'recording',  name: 'Recording announced before it starts', law: 'All-party consent — roughly a dozen US states' },
+    { key: 'optout',     name: 'Opt-out watched on every turn',    law: 'Honoured across phone, WhatsApp and email at once' },
+    { key: 'bargein',    name: 'Caller can talk over the agent',   law: 'Reply in flight is discarded, not queued' },
+    { key: 'approval',   name: 'Nothing sensitive sent unapproved', law: 'A person releases anything that leaves the system' }
+  ];
+
+  var state = { live: false, generation: 0, inFlight: null, turns: [], suppressed: false, startedAt: 0, timer: null, pending: null };
+
+  function fireRule(key, blocked) {
+    var node = document.querySelector('[data-rule="' + key + '"]');
+    if (!node) return;
+    node.classList.add('fired');
+    if (blocked) node.classList.add('blocked');
+    var mark = node.querySelector('.sw-rule-mark');
+    if (mark) mark.textContent = blocked ? '!' : '✓';
+  }
+
+  function resetRules() {
+    Array.prototype.forEach.call(document.querySelectorAll('.sw-rule'), function (node) {
+      node.classList.remove('fired', 'blocked');
+      var mark = node.querySelector('.sw-rule-mark');
+      if (mark) mark.textContent = '';
+    });
+  }
+
+  function addTurn(who, text, className) {
+    var turn = document.createElement('p');
+    turn.className = 'sw-turn ' + (className || who);
+    if (who === 'system') {
+      turn.textContent = text;
+    } else {
+      var label = document.createElement('span');
+      label.className = 'sw-who';
+      label.textContent = who === 'agent' ? 'RUMBO' : 'Caller';
+      turn.appendChild(label);
+      turn.appendChild(document.createTextNode(text));
+    }
+    transcript.appendChild(turn);
+    transcript.scrollTop = transcript.scrollHeight;
+    return turn;
+  }
+
+  function setLive(live) {
+    state.live = live;
+    el('sw-dot').classList.toggle('live', live);
+    el('sw-status').textContent = live ? 'On the line' : 'Line idle';
+    el('sw-input').disabled = !live;
+    el('sw-send').disabled = !live;
+    el('sw-hangup').disabled = !live;
+    el('sw-call').disabled = live;
+    Array.prototype.forEach.call(document.querySelectorAll('.sw-chip'), function (chip) { chip.disabled = !live; });
+  }
+
+  function tick() {
+    var seconds = Math.floor((Date.now() - state.startedAt) / 1000);
+    var mm = String(Math.floor(seconds / 60)).padStart(2, '0');
+    var ss = String(seconds % 60).padStart(2, '0');
+    el('sw-timer').textContent = mm + ':' + ss;
+  }
+
+  function startCall() {
+    transcript.innerHTML = '';
+    resetRules();
+    state.generation = 0;
+    state.inFlight = null;
+    state.turns = [];
+    state.suppressed = false;
+    state.startedAt = Date.now();
+    el('sw-summary').textContent = 'Call in progress.';
+    setLive(true);
+    clearInterval(state.timer);
+    state.timer = setInterval(tick, 1000);
+    tick();
+
+    // The real preamble, built by the real function.
+    var preamble = buildCallPreamble(AGENT);
+    addTurn('agent', preamble);
+    state.turns.push({ who: 'agent', text: preamble });
+    fireRule('identity');
+    fireRule('ai');
+    fireRule('recording');
+    fireRule('optout');
+    el('sw-input').focus();
+  }
+
+  function speak(reply, did, intent) {
+    var generation = state.generation;
+    var controller = typeof AbortController === 'function' ? new AbortController() : null;
+    state.inFlight = controller;
+
+    var node = addTurn('agent', '');
+    node.classList.add('sw-typing');
+    el('sw-interrupt').disabled = false;
+
+    /* Record the classification now, not when the sentence finishes. The
+       product classifies the turn on arrival, and a caller who hangs up
+       mid-reply must not erase what they asked for. */
+    var record = { who: 'agent', text: reply, intent: intent, complete: false };
+    state.turns.push(record);
+    el('sw-summary').textContent = did;
+
+    var index = 0;
+    var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var step = reduced ? reply.length : 2;
+
+    function write() {
+      // The generation guard: an interrupted reply is dropped, never finished.
+      if (isStale(state, generation)) {
+        node.classList.remove('sw-typing');
+        node.appendChild(document.createTextNode('— cut off'));
+        node.style.opacity = '.45';
+        return;
+      }
+      index = Math.min(reply.length, index + step);
+      node.textContent = '';
+      var label = document.createElement('span');
+      label.className = 'sw-who';
+      label.textContent = 'RUMBO';
+      node.appendChild(label);
+      node.appendChild(document.createTextNode(reply.slice(0, index)));
+      transcript.scrollTop = transcript.scrollHeight;
+
+      if (index < reply.length) {
+        state.pending = setTimeout(write, 18);
+        return;
+      }
+      node.classList.remove('sw-typing');
+      el('sw-interrupt').disabled = true;
+      state.inFlight = null;
+      record.complete = true;
+    }
+    write();
+  }
+
+  function say(text) {
+    if (!state.live || !text.trim()) return;
+
+    // A new turn while the agent is talking is itself an interruption.
+    if (state.inFlight || state.pending) { interrupt(true); }
+
+    addTurn('caller', text);
+    state.turns.push({ who: 'caller', text: text });
+
+    // The product's own detector, on every turn, before anything else.
+    if (containsOptOut(text)) {
+      state.suppressed = true;
+      fireRule('optout', true);
+      addTurn('system', 'Opt-out detected — suppressed on every channel');
+      speak('Understood. I have taken you off the list and no one will contact you again.',
+            'Suppressed by phone number and email. Survives this contact arriving again as a new lead.',
+            'opt_out');
+      return;
+    }
+
+    var matched = null;
+    for (var i = 0; i < SCRIPT.length; i += 1) {
+      if (SCRIPT[i].test.test(text.toLowerCase())) { matched = SCRIPT[i]; break; }
+    }
+    var chosen = matched || FALLBACK;
+    if (chosen.intent === 'transfer' || chosen.intent === 'sales') fireRule('approval');
+    speak(chosen.reply, chosen.did, chosen.intent);
+  }
+
+  function interrupt(silent) {
+    if (!state.inFlight && !state.pending) return;
+    clearTimeout(state.pending);
+    state.pending = null;
+    abortTurn(state);
+    el('sw-interrupt').disabled = true;
+    fireRule('bargein');
+    if (!silent) addTurn('system', 'You interrupted — the reply was discarded');
+    // Re-render the cut-off turn state on the next frame.
+    var turns = transcript.querySelectorAll('.sw-turn.agent.sw-typing');
+    Array.prototype.forEach.call(turns, function (node) {
+      node.classList.remove('sw-typing');
+      node.style.opacity = '.45';
+    });
+  }
+
+  function hangUp() {
+    clearTimeout(state.pending);
+    state.pending = null;
+    clearInterval(state.timer);
+    abortTurn(state);
+    setLive(false);
+    el('sw-interrupt').disabled = true;
+
+    var callerTurns = state.turns.filter(function (turn) { return turn.who === 'caller'; });
+    if (state.suppressed) {
+      el('sw-summary').textContent = 'Caller asked not to be contacted. Suppressed across all channels, and the request is on the record.';
+    } else if (!callerTurns.length) {
+      el('sw-summary').textContent = 'The caller said nothing. Logged as a missed opportunity for someone to call back.';
+    } else {
+      var asked = callerTurns[0].text;
+      var needsPerson = state.turns.some(function (turn) { return turn.intent === 'transfer' || turn.intent === 'sales'; });
+      el('sw-summary').textContent = 'Caller asked: “' + asked + '”. '
+        + (needsPerson ? 'Needs a person to follow up.' : 'Handled without needing anyone.')
+        + ' Recorded against the contact.';
+    }
+    addTurn('system', 'Call ended');
+  }
+
+  // ── wiring ─────────────────────────────────────────────────────────────
+  var rules = el('sw-rules');
+  RULES.forEach(function (rule) {
+    var row = document.createElement('div');
+    row.className = 'sw-rule';
+    row.setAttribute('data-rule', rule.key);
+    row.innerHTML = '<span class="sw-rule-mark" aria-hidden="true"></span>'
+      + '<span class="sw-rule-name"></span>';
+    var name = row.querySelector('.sw-rule-name');
+    name.textContent = rule.name;
+    var law = document.createElement('span');
+    law.className = 'sw-rule-law';
+    law.textContent = rule.law;
+    name.appendChild(law);
+    rules.appendChild(row);
+  });
+
+  var chips = el('sw-chips');
+  CHIPS.forEach(function (text) {
+    var chip = document.createElement('button');
+    chip.type = 'button';
+    chip.className = 'sw-chip';
+    chip.textContent = text;
+    chip.disabled = true;
+    chip.addEventListener('click', function () { say(text); });
+    chips.appendChild(chip);
+  });
+
+  el('sw-call').addEventListener('click', startCall);
+  el('sw-hangup').addEventListener('click', hangUp);
+  el('sw-interrupt').addEventListener('click', function () { interrupt(false); });
+  el('sw-send').addEventListener('click', function () {
+    var input = el('sw-input');
+    say(input.value);
+    input.value = '';
+    input.focus();
+  });
+  el('sw-input').addEventListener('keydown', function (event) {
+    if (event.key !== 'Enter') return;
+    event.preventDefault();
+    say(event.target.value);
+    event.target.value = '';
+  });
+
+  setLive(false);
+})();
+</script>
+
+
+<script>
+/* The swarm — a WebGL view of a year of enquiries.
+ *
+ * Every point is one enquiry. Green points were answered; orange ones fell
+ * through and are drifting away. The counts come from the calculator above, so
+ * the visitor is looking at their own numbers in three dimensions rather than
+ * at a stock animation.
+ *
+ * No libraries: the page loads nothing from a network, so the matrix maths and
+ * the shaders are here. Rotate by dragging; on a phone, by tilting it.
+ */
+(function () {
+  var canvas = document.getElementById('swarm-canvas');
+  if (!canvas) return;
+
+  var status = document.getElementById('swarm-status');
+  var caught = document.getElementById('swarm-caught');
+  var lost = document.getElementById('swarm-lost');
+  var tiltButton = document.getElementById('swarm-tilt');
+  var fallback = document.getElementById('swarm-fallback');
+
+  var gl = canvas.getContext('webgl', { antialias: true, alpha: true, powerPreference: 'low-power' })
+        || canvas.getContext('experimental-webgl');
+  if (!gl) {
+    // No WebGL: the numbers still have to reach the visitor.
+    canvas.hidden = true;
+    if (fallback) fallback.hidden = false;
+    if (status) status.textContent = 'Your browser cannot draw this, so here are the numbers instead.';
+    return;
+  }
+
+  var reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ── minimal matrix maths ────────────────────────────────────────────────
+  function perspective(fovy, aspect, near, far) {
+    var f = 1 / Math.tan(fovy / 2);
+    var nf = 1 / (near - far);
+    return [f / aspect, 0, 0, 0, 0, f, 0, 0, 0, 0, (far + near) * nf, -1, 0, 0, 2 * far * near * nf, 0];
+  }
+  function multiply(a, b) {
+    var out = new Array(16);
+    for (var i = 0; i < 4; i += 1) {
+      for (var j = 0; j < 4; j += 1) {
+        out[i * 4 + j] = a[i * 4] * b[j] + a[i * 4 + 1] * b[4 + j] + a[i * 4 + 2] * b[8 + j] + a[i * 4 + 3] * b[12 + j];
+      }
+    }
+    return out;
+  }
+  function rotationY(angle) {
+    var c = Math.cos(angle), s = Math.sin(angle);
+    return [c, 0, -s, 0, 0, 1, 0, 0, s, 0, c, 0, 0, 0, 0, 1];
+  }
+  function rotationX(angle) {
+    var c = Math.cos(angle), s = Math.sin(angle);
+    return [1, 0, 0, 0, 0, c, s, 0, 0, -c === 0 ? 0 : -s, c, 0, 0, 0, 0, 1];
+  }
+  function translation(x, y, z) {
+    return [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, x, y, z, 1];
+  }
+
+  // ── shaders ─────────────────────────────────────────────────────────────
+  var VERTEX = [
+    'attribute vec3 seed;',      // stable position on the sphere
+    'attribute float caught;',   // 1 answered, 0 lost
+    'attribute float phase;',
+    'uniform mat4 projection;',
+    'uniform mat4 view;',
+    'uniform float time;',
+    'uniform float pixelRatio;',
+    'varying float vCaught;',
+    'varying float vDepth;',
+    'void main() {',
+    '  vec3 position = seed;',
+    // Answered enquiries hold formation and breathe; lost ones drift outward
+    // and fall, which is the whole point of the picture.
+    '  float drift = (1.0 - caught) * (0.25 + 0.75 * fract(phase + time * 0.05));',
+    '  position *= 1.0 + drift * 1.9;',
+    '  position.y -= drift * drift * 2.4;',
+    '  position += 0.045 * sin(time * 0.8 + phase * 6.283) * caught;',
+    '  vec4 eye = view * vec4(position, 1.0);',
+    '  vDepth = -eye.z;',
+    '  vCaught = caught * (1.0 - drift);',
+    '  gl_Position = projection * eye;',
+    '  gl_PointSize = pixelRatio * (2.2 + 7.0 / max(vDepth, 0.6)) * (0.55 + 0.45 * caught);',
+    '}'
+  ].join('\n');
+
+  var FRAGMENT = [
+    'precision mediump float;',
+    'varying float vCaught;',
+    'varying float vDepth;',
+    'void main() {',
+    '  vec2 offset = gl_PointCoord - vec2(0.5);',
+    '  float radius = dot(offset, offset);',
+    '  if (radius > 0.25) discard;',
+    '  float edge = smoothstep(0.25, 0.02, radius);',
+    '  vec3 answered = vec3(0.0, 0.784, 0.588);',   // --green
+    '  vec3 missed   = vec3(1.0, 0.271, 0.0);',     // --orange
+    '  vec3 colour = mix(missed, answered, vCaught);',
+    '  float fade = clamp(1.6 / max(vDepth, 0.5), 0.15, 1.0);',
+    '  gl_FragColor = vec4(colour, edge * fade * (0.35 + 0.65 * vCaught));',
+    '}'
+  ].join('\n');
+
+  function compile(type, source) {
+    var shader = gl.createShader(type);
+    gl.shaderSource(shader, source);
+    gl.compileShader(shader);
+    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+      throw new Error(gl.getShaderInfoLog(shader) || 'shader failed');
+    }
+    return shader;
+  }
+
+  var program;
+  try {
+    program = gl.createProgram();
+    gl.attachShader(program, compile(gl.VERTEX_SHADER, VERTEX));
+    gl.attachShader(program, compile(gl.FRAGMENT_SHADER, FRAGMENT));
+    gl.linkProgram(program);
+    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) throw new Error('link failed');
+  } catch (error) {
+    canvas.hidden = true;
+    if (fallback) fallback.hidden = false;
+    return;
+  }
+  gl.useProgram(program);
+
+  var attr = {
+    seed: gl.getAttribLocation(program, 'seed'),
+    caught: gl.getAttribLocation(program, 'caught'),
+    phase: gl.getAttribLocation(program, 'phase')
+  };
+  var uniform = {
+    projection: gl.getUniformLocation(program, 'projection'),
+    view: gl.getUniformLocation(program, 'view'),
+    time: gl.getUniformLocation(program, 'time'),
+    pixelRatio: gl.getUniformLocation(program, 'pixelRatio')
+  };
+
+  /* A phone does not need — and cannot comfortably draw — as many points as a
+     desktop. Fewer points is better than a slideshow. */
+  var COUNT = window.innerWidth < 700 ? 1400 : 2600;
+
+  var seeds = new Float32Array(COUNT * 3);
+  var caughtFlags = new Float32Array(COUNT);
+  var phases = new Float32Array(COUNT);
+
+  for (var i = 0; i < COUNT; i += 1) {
+    // Even distribution on a sphere: the golden-angle spiral, so no clumping
+    // at the poles.
+    var t = (i + 0.5) / COUNT;
+    var inclination = Math.acos(1 - 2 * t);
+    var azimuth = Math.PI * (1 + Math.sqrt(5)) * i;
+    seeds[i * 3] = Math.sin(inclination) * Math.cos(azimuth);
+    seeds[i * 3 + 1] = Math.sin(inclination) * Math.sin(azimuth);
+    seeds[i * 3 + 2] = Math.cos(inclination);
+    phases[i] = t;
+  }
+
+  function buffer(data, size, location) {
+    var handle = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, handle);
+    gl.bufferData(gl.ARRAY_BUFFER, data, gl.DYNAMIC_DRAW);
+    gl.enableVertexAttribArray(location);
+    gl.vertexAttribPointer(location, size, gl.FLOAT, false, 0, 0);
+    return handle;
+  }
+  buffer(seeds, 3, attr.seed);
+  var caughtBuffer = buffer(caughtFlags, 1, attr.caught);
+  buffer(phases, 1, attr.phase);
+
+  gl.enable(gl.BLEND);
+  gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
+  gl.disable(gl.DEPTH_TEST);
+
+  // ── what the calculator says ────────────────────────────────────────────
+  function readCalculator() {
+    function value(id, fallbackValue) {
+      var field = document.getElementById(id);
+      var parsed = field ? Number(field.value) : NaN;
+      return isFinite(parsed) ? parsed : fallbackValue;
+    }
+    var missedShare = Math.min(100, Math.max(0, value('calc-missed', 30))) / 100;
+    var closeShare = Math.min(100, Math.max(0, value('calc-convert', 20))) / 100;
+    // The share of a year's enquiries that is actually lost business.
+    return Math.min(1, missedShare * closeShare);
+  }
+
+  var lostShare = -1;
+  function applyShare() {
+    var share = readCalculator();
+    if (Math.abs(share - lostShare) < 0.0005) return;
+    lostShare = share;
+    var lostCount = 0;
+    for (var index = 0; index < COUNT; index += 1) {
+      // Deterministic: the same inputs always paint the same picture.
+      var isLost = phases[index] < share;
+      caughtFlags[index] = isLost ? 0 : 1;
+      if (isLost) lostCount += 1;
+    }
+    gl.bindBuffer(gl.ARRAY_BUFFER, caughtBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, caughtFlags, gl.DYNAMIC_DRAW);
+    if (caught) caught.textContent = String(COUNT - lostCount);
+    if (lost) lost.textContent = String(lostCount);
+  }
+
+  ['calc-missed', 'calc-convert', 'calc-missed-range', 'calc-convert-range'].forEach(function (id) {
+    var field = document.getElementById(id);
+    if (field) field.addEventListener('input', applyShare);
+  });
+
+  // ── camera ──────────────────────────────────────────────────────────────
+  var camera = { yaw: 0.4, pitch: -0.15, targetYaw: 0.4, targetPitch: -0.15, distance: 4.2 };
+  var dragging = false;
+  var lastPoint = null;
+
+  function pointerDown(event) {
+    dragging = true;
+    lastPoint = event.touches ? event.touches[0] : event;
+  }
+  function pointerMove(event) {
+    if (!dragging) return;
+    var point = event.touches ? event.touches[0] : event;
+    if (lastPoint) {
+      camera.targetYaw += (point.clientX - lastPoint.clientX) * 0.006;
+      camera.targetPitch = Math.max(-1.2, Math.min(1.2, camera.targetPitch + (point.clientY - lastPoint.clientY) * 0.006));
+    }
+    lastPoint = point;
+    if (event.cancelable) event.preventDefault();
+  }
+  function pointerUp() { dragging = false; lastPoint = null; }
+
+  canvas.addEventListener('mousedown', pointerDown);
+  window.addEventListener('mousemove', pointerMove);
+  window.addEventListener('mouseup', pointerUp);
+  canvas.addEventListener('touchstart', pointerDown, { passive: true });
+  canvas.addEventListener('touchmove', pointerMove, { passive: false });
+  canvas.addEventListener('touchend', pointerUp);
+
+  // Keyboard: the view must be reachable without a pointer.
+  canvas.addEventListener('keydown', function (event) {
+    var step = 0.22;
+    if (event.key === 'ArrowLeft') camera.targetYaw -= step;
+    else if (event.key === 'ArrowRight') camera.targetYaw += step;
+    else if (event.key === 'ArrowUp') camera.targetPitch = Math.max(-1.2, camera.targetPitch - step);
+    else if (event.key === 'ArrowDown') camera.targetPitch = Math.min(1.2, camera.targetPitch + step);
+    else return;
+    event.preventDefault();
+  });
+
+  /* Tilt-to-look. On a phone this is the thing that makes it feel like a place
+     rather than a picture. iOS requires an explicit gesture before it will
+     hand over the sensor, which is why this is a button and not automatic. */
+  var tiltActive = false;
+  function onOrientation(event) {
+    if (event.gamma === null || event.beta === null) return;
+    camera.targetYaw = 0.4 + (event.gamma / 90) * 1.1;
+    camera.targetPitch = Math.max(-1.0, Math.min(1.0, ((event.beta - 45) / 90) * 1.0));
+  }
+  if (tiltButton) {
+    var hasSensor = typeof window.DeviceOrientationEvent !== 'undefined';
+    if (!hasSensor) {
+      tiltButton.hidden = true;
+    } else {
+      tiltButton.addEventListener('click', function () {
+        if (tiltActive) {
+          window.removeEventListener('deviceorientation', onOrientation);
+          tiltActive = false;
+          tiltButton.textContent = 'Tilt to look around';
+          tiltButton.setAttribute('aria-pressed', 'false');
+          return;
+        }
+        var request = window.DeviceOrientationEvent.requestPermission;
+        var start = function () {
+          window.addEventListener('deviceorientation', onOrientation);
+          tiltActive = true;
+          tiltButton.textContent = 'Stop tilt control';
+          tiltButton.setAttribute('aria-pressed', 'true');
+        };
+        if (typeof request === 'function') {
+          request().then(function (state) {
+            if (state === 'granted') start();
+            else tiltButton.textContent = 'Tilt needs permission';
+          }).catch(function () { tiltButton.textContent = 'Tilt unavailable'; });
+        } else {
+          start();
+        }
+      });
+    }
+  }
+
+  // ── draw ────────────────────────────────────────────────────────────────
+  var visible = true;
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(function (entries) {
+      visible = entries[0].isIntersecting;
+    }, { threshold: 0.05 }).observe(canvas);
+  }
+
+  function resize() {
+    var ratio = Math.min(window.devicePixelRatio || 1, 2);
+    var width = Math.floor(canvas.clientWidth * ratio);
+    var height = Math.floor(canvas.clientHeight * ratio);
+    if (canvas.width === width && canvas.height === height) return ratio;
+    canvas.width = width;
+    canvas.height = height;
+    gl.viewport(0, 0, width, height);
+    return ratio;
+  }
+
+  var startedAt = Date.now();
+  function frame() {
+    if (!visible) { requestAnimationFrame(frame); return; }
+    var ratio = resize();
+    var aspect = canvas.clientWidth / Math.max(1, canvas.clientHeight);
+    var seconds = reducedMotion ? 0 : (Date.now() - startedAt) / 1000;
+
+    // Ease towards the target so a flick of the wrist does not jolt the view.
+    camera.yaw += (camera.targetYaw - camera.yaw) * 0.09;
+    camera.pitch += (camera.targetPitch - camera.pitch) * 0.09;
+    if (!dragging && !tiltActive && !reducedMotion) camera.targetYaw += 0.0016;
+
+    var view = multiply(
+      translation(0, 0, -camera.distance),
+      multiply(rotationX(camera.pitch), rotationY(camera.yaw))
+    );
+
+    gl.clearColor(0, 0, 0, 0);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.uniformMatrix4fv(uniform.projection, false, new Float32Array(perspective(1.05, aspect, 0.1, 40)));
+    gl.uniformMatrix4fv(uniform.view, false, new Float32Array(view));
+    gl.uniform1f(uniform.time, seconds);
+    gl.uniform1f(uniform.pixelRatio, ratio);
+    gl.drawArrays(gl.POINTS, 0, COUNT);
+
+    /* Diagnostics. The drawing buffer is cleared after every frame, so there
+       is no way to look at the pixels afterwards and tell a working renderer
+       from a blank one — this is what the tests assert against instead. */
+    window.__swarm = window.__swarm || {};
+    window.__swarm.frames = (window.__swarm.frames || 0) + 1;
+    window.__swarm.points = COUNT;
+    window.__swarm.error = gl.getError();
+
+    requestAnimationFrame(frame);
+  }
+
+  applyShare();
+  if (status) {
+    status.textContent = reducedMotion
+      ? 'Motion is reduced, so the swarm is still. Drag or use the arrow keys to look around.'
+      : 'Drag to look around. On a phone, tilt it.';
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+
+</body>
+</html>
