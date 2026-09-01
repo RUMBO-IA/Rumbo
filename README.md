@@ -16,6 +16,12 @@ RUMBO IA is bootstrapped, founder-operated in Argentina and currently pre-revenu
 - AI Workflow Reliability Reference: https://sebastian-ai-workflow-reliability.miniup.app/
 - Public proof: https://rumbo-public-proof.vercel.app/
 
+## Commercial entry
+
+Revenue Recovery Sprint: one bounded commercial workflow, 14 calendar days, USD 149 one-time before kickoff. Scope is written before execution, a baseline is established before outcome claims, sensitive actions remain human-supervised, and no ROI is guaranteed. Any continuation is agreed separately.
+
+Pilot intake: https://form.typeform.com/to/Tu3D3tVo
+
 ## Founder
 
 Sebastián Federico
