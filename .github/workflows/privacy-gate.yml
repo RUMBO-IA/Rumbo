@@ -4,7 +4,9 @@ on:
   pull_request:
     branches: [main]
   push:
-    branches: [main]
+    branches:
+      - main
+      - feat/openai-rumbo-plugin-marketplace-v014
   workflow_dispatch:
 
 permissions:
