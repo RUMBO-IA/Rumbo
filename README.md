@@ -24,6 +24,8 @@ Pilot intake: https://form.typeform.com/to/Tu3D3tVo
 ## Founder
 
 Sebastián
+
+Founder | Product & AI Systems Operator
 ## Contact
 
 sebastian@rumbo.verso.fans
