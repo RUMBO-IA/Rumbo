@@ -1,0 +1,32 @@
+name: RUMBO Plugin Validation
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.agents/plugins/**'
+      - 'plugins/rumbo-coding-agent-reliability/**'
+      - 'scripts/verify_rumbo_plugin_marketplace.py'
+  push:
+    branches: [main]
+    paths:
+      - '.agents/plugins/**'
+      - 'plugins/rumbo-coding-agent-reliability/**'
+      - 'scripts/verify_rumbo_plugin_marketplace.py'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - name: Validate RUMBO plugin marketplace
+        run: python scripts/verify_rumbo_plugin_marketplace.py
+      - name: Validate YAML and JSON presence
+        run: python -c "import json; json.load(open('.agents/plugins/marketplace.json')); json.load(open('plugins/rumbo-coding-agent-reliability/.codex-plugin/plugin.json'))"
