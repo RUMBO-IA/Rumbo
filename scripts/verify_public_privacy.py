@@ -1,13 +1,20 @@
 import hashlib
+import json
 import os
 import re
 import subprocess
-import sys
 import unicodedata
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 PUBLIC_NAME = "Sebastián Federico"
+PUBLIC_PLUGIN_METADATA = {
+    Path(".agents/plugins/marketplace.json"),
+    Path("plugins/rumbo-coding-agent-reliability/.codex-plugin/plugin.json"),
+}
+PERSONAL_EMAIL_RE = re.compile(r"(?i)\b[\w.+-]+@(gmail|hotmail|outlook|yahoo|icloud)\.[a-z]{2,}\b")
+PRIVATE_LINKEDIN_RE = re.compile(r"(?i)linkedin\.com/in/")
+ZERO_SHA = "0" * 40
 
 
 def norm(value: str) -> str:
@@ -44,6 +51,51 @@ def candidates(text: str):
             yield " ".join(words[i : i + size])
 
 
+def new_commits(head: str, base: str | None) -> list[str]:
+    if not base or base == ZERO_SHA:
+        return [head]
+    raw = subprocess.check_output(
+        ["git", "rev-list", "--reverse", f"{base}..{head}"], cwd=ROOT, text=True
+    )
+    commits = [line.strip() for line in raw.splitlines() if line.strip()]
+    return commits or [head]
+
+
+def validate_commit_metadata(commit: str, violations: list[str]) -> None:
+    fmt = "%an%x00%ae%x00%ce"
+    raw = subprocess.check_output(
+        ["git", "show", "-s", f"--format={fmt}", commit], cwd=ROOT, text=True
+    ).rstrip("\n")
+    author_name, author_email, committer_email = raw.split("\x00")
+    approved_names = {PUBLIC_NAME, "fscfede-beep"}
+    approved_emails = {
+        "sebastian@rumbo.verso.fans",
+        "293577326+fscfede-beep@users.noreply.github.com",
+    }
+    short = commit[:12]
+    if author_name not in approved_names:
+        violations.append(f"git:{short}:author-name")
+    if author_email not in approved_emails:
+        violations.append(f"git:{short}:author-email")
+    if committer_email not in approved_emails and committer_email != "noreply@github.com":
+        violations.append(f"git:{short}:committer-email")
+
+
+def validate_public_plugin_metadata(relpath: Path, text: str, violations: list[str]) -> None:
+    try:
+        data = json.loads(text)
+    except json.JSONDecodeError:
+        violations.append(f"{relpath.as_posix()}:invalid-json")
+        return
+    serialized = json.dumps(data, ensure_ascii=False, sort_keys=True)
+    if PUBLIC_NAME.casefold() in serialized.casefold():
+        violations.append(f"{relpath.as_posix()}:private-full-name")
+    if PERSONAL_EMAIL_RE.search(serialized):
+        violations.append(f"{relpath.as_posix()}:personal-email")
+    if PRIVATE_LINKEDIN_RE.search(serialized):
+        violations.append(f"{relpath.as_posix()}:linkedin-profile")
+
+
 def main() -> int:
     raw_hashes = os.environ.get("RUMBO_PRIVACY_DENY_HASHES", "")
     deny = {h.strip().lower() for h in raw_hashes.split(",") if h.strip()}
@@ -55,27 +107,22 @@ def main() -> int:
         return 3
 
     violations: list[str] = []
-
-    # Prevent accidental publication of personal commit metadata on new heads.
     commit_ref = os.environ.get("RUMBO_PRIVACY_COMMIT_SHA", "HEAD")
-    author_name = subprocess.check_output(["git", "show", "-s", "--format=%an", commit_ref], cwd=ROOT, text=True).strip()
-    author_email = subprocess.check_output(["git", "show", "-s", "--format=%ae", commit_ref], cwd=ROOT, text=True).strip()
-    committer_email = subprocess.check_output(["git", "show", "-s", "--format=%ce", commit_ref], cwd=ROOT, text=True).strip()
-    approved_names = {PUBLIC_NAME, "fscfede-beep"}
-    approved_emails = {"sebastian@rumbo.verso.fans", "293577326+fscfede-beep@users.noreply.github.com"}
-    if author_name not in approved_names:
-        violations.append("git:head-author-name")
-    if author_email not in approved_emails:
-        violations.append("git:head-author-email")
-    committer_is_approved = committer_email in approved_emails or committer_email == "noreply@github.com"
-    if not committer_is_approved:
-        violations.append("git:head-committer-email")
+    base_ref = os.environ.get("RUMBO_PRIVACY_BASE_SHA") or None
+
+    for commit in new_commits(commit_ref, base_ref):
+        validate_commit_metadata(commit, violations)
+
     for path in tracked_files():
+        relpath = path.relative_to(ROOT)
         text = text_of(path)
         if text is None:
             continue
+        if relpath in PUBLIC_PLUGIN_METADATA:
+            validate_public_plugin_metadata(relpath, text, violations)
+            continue
         if any(sha(candidate) in deny for candidate in candidates(text)):
-            violations.append(path.relative_to(ROOT).as_posix())
+            violations.append(relpath.as_posix())
 
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
     founder = re.search(r"(?ms)^## Founder\s*$\s*^([^\r\n]+)", readme)
