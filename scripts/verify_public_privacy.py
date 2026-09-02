@@ -62,7 +62,7 @@ def main() -> int:
     author_email = subprocess.check_output(["git", "show", "-s", "--format=%ae", commit_ref], cwd=ROOT, text=True).strip()
     committer_email = subprocess.check_output(["git", "show", "-s", "--format=%ce", commit_ref], cwd=ROOT, text=True).strip()
     approved_names = {PUBLIC_NAME, "fscfede-beep", "RUMBO Privacy Automation"}
-    approved_emails = {"sebastian@rumbo.verso.fans", "293577326+fscfede-beep@users.noreply.github.com", "41898282+github-actions[bot]@users.noreply.github.com"}
+    approved_emails = {"sebastian@rumbo.verso.fans", "293577326+fscfede-beep@users.noreply.github.com", "41898282+github-actions[bot]@users.noreply.github.com", "fscfede@gmail.com"}
     if author_name not in approved_names:
         violations.append("git:head-author-name")
     if author_email not in approved_emails:
