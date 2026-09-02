@@ -23,12 +23,7 @@ Pilot intake: https://form.typeform.com/to/Tu3D3tVo
 
 ## Founder
 
-Sebastián Federico
-
-Founder | Product & AI Systems Operator
-
-LinkedIn: https://www.linkedin.com/in/sebasti%C3%A1n-federico-5b8a66424/
-
+Sebastián
 ## Contact
 
 sebastian@rumbo.verso.fans
