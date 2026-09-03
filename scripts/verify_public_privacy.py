@@ -8,6 +8,15 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 PUBLIC_NAME = "Sebastián"
+APPROVED_NAMES = {PUBLIC_NAME, "fscfede-beep", "RUMBO Privacy Automation"}
+APPROVED_AUTHOR_EMAILS = {
+    "sebastian@rumbo.verso.fans",
+    "293577326+fscfede-beep@users.noreply.github.com",
+    "41898282+github-actions[bot]@users.noreply.github.com",
+}
+APPROVED_COMMITTER_EMAILS = APPROVED_AUTHOR_EMAILS | {"noreply@github.com"}
+APPROVED_PUBLIC_TEXT_EMAILS = APPROVED_COMMITTER_EMAILS
+EMAIL_RE = re.compile(r"(?i)(?<![a-z0-9._%+-])[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,63}(?![a-z0-9._%+-])")
 
 
 def norm(value: str) -> str:
@@ -44,6 +53,24 @@ def candidates(text: str):
             yield " ".join(words[i : i + size])
 
 
+def email_candidates(text: str):
+    yield from EMAIL_RE.findall(text)
+
+
+def is_denied(value: str, deny: set[str]) -> bool:
+    return sha(value) in deny
+
+
+def text_has_denied_value(text: str, deny: set[str]) -> bool:
+    return any(is_denied(value, deny) for value in candidates(text)) or any(
+        is_denied(email, deny) for email in email_candidates(text)
+    )
+
+
+def text_has_unapproved_email(text: str) -> bool:
+    return any(email not in APPROVED_PUBLIC_TEXT_EMAILS for email in email_candidates(text))
+
+
 def main() -> int:
     raw_hashes = os.environ.get("RUMBO_PRIVACY_DENY_HASHES", "")
     deny = {h.strip().lower() for h in raw_hashes.split(",") if h.strip()}
@@ -61,21 +88,21 @@ def main() -> int:
     author_name = subprocess.check_output(["git", "show", "-s", "--format=%an", commit_ref], cwd=ROOT, text=True).strip()
     author_email = subprocess.check_output(["git", "show", "-s", "--format=%ae", commit_ref], cwd=ROOT, text=True).strip()
     committer_email = subprocess.check_output(["git", "show", "-s", "--format=%ce", commit_ref], cwd=ROOT, text=True).strip()
-    approved_names = {PUBLIC_NAME, "fscfede-beep", "RUMBO Privacy Automation"}
-    approved_emails = {"sebastian@rumbo.verso.fans", "293577326+fscfede-beep@users.noreply.github.com", "41898282+github-actions[bot]@users.noreply.github.com", "fscfede@gmail.com"}
-    if author_name not in approved_names:
+    if author_name not in APPROVED_NAMES or is_denied(author_name, deny):
         violations.append("git:head-author-name")
-    if author_email not in approved_emails:
+    if author_email not in APPROVED_AUTHOR_EMAILS or is_denied(author_email, deny):
         violations.append("git:head-author-email")
-    committer_is_approved = committer_email in approved_emails or committer_email == "noreply@github.com"
-    if not committer_is_approved:
+    if committer_email not in APPROVED_COMMITTER_EMAILS or is_denied(committer_email, deny):
         violations.append("git:head-committer-email")
     for path in tracked_files():
         text = text_of(path)
         if text is None:
             continue
-        if any(sha(candidate) in deny for candidate in candidates(text)):
-            violations.append(path.relative_to(ROOT).as_posix())
+        relpath = path.relative_to(ROOT).as_posix()
+        if text_has_unapproved_email(text):
+            violations.append(f"{relpath}:unapproved-email")
+        if text_has_denied_value(text, deny):
+            violations.append(f"{relpath}:denied-value")
 
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
     founder = re.search(r"(?ms)^## Founder\s*$\s*^([^\r\n]+)", readme)
