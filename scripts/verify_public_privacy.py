@@ -1,4 +1,5 @@
 import hashlib
+import json
 import os
 import re
 import subprocess
@@ -16,7 +17,14 @@ APPROVED_AUTHOR_EMAILS = {
 }
 APPROVED_COMMITTER_EMAILS = APPROVED_AUTHOR_EMAILS | {"noreply@github.com"}
 APPROVED_PUBLIC_TEXT_EMAILS = APPROVED_COMMITTER_EMAILS
-EMAIL_RE = re.compile(r"(?i)(?<![a-z0-9._%+-])[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,63}(?![a-z0-9._%+-])")
+EMAIL_RE = re.compile(
+    r"(?i)(?<![a-z0-9._%+-])[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,63}(?![a-z0-9._%+-])"
+)
+
+PUBLIC_PLUGIN_METADATA_HASHES = {
+    Path(".agents/plugins/marketplace.json"): "5e02d4f3b7fb21b33c6834b40ec8cf5d1cc21c4857a3a86f4f82dc9f9a987ae3",
+    Path("plugins/rumbo-coding-agent-reliability/.codex-plugin/plugin.json"): "e9b6ba6c570a9e8f76faa846ff020a25c80b4febcd1e603eb264fef55eeaae68",
+}
 
 
 def norm(value: str) -> str:
@@ -71,6 +79,23 @@ def text_has_unapproved_email(text: str) -> bool:
     return any(email not in APPROVED_PUBLIC_TEXT_EMAILS for email in email_candidates(text))
 
 
+def approved_plugin_metadata(relpath: Path, text: str, violations: list[str]) -> bool:
+    expected_hash = PUBLIC_PLUGIN_METADATA_HASHES.get(relpath)
+    if expected_hash is None:
+        return False
+    try:
+        actual = json.loads(text)
+    except json.JSONDecodeError:
+        violations.append(f"{relpath.as_posix()}:invalid-json")
+        return False
+    canonical = json.dumps(actual, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    actual_hash = hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+    if actual_hash != expected_hash:
+        violations.append(f"{relpath.as_posix()}:metadata-drift")
+        return False
+    return True
+
+
 def main() -> int:
     raw_hashes = os.environ.get("RUMBO_PRIVACY_DENY_HASHES", "")
     deny = {h.strip().lower() for h in raw_hashes.split(",") if h.strip()}
@@ -82,25 +107,35 @@ def main() -> int:
         return 3
 
     violations: list[str] = []
-
-    # Prevent accidental publication of personal commit metadata on new heads.
     commit_ref = os.environ.get("RUMBO_PRIVACY_COMMIT_SHA", "HEAD")
-    author_name = subprocess.check_output(["git", "show", "-s", "--format=%an", commit_ref], cwd=ROOT, text=True).strip()
-    author_email = subprocess.check_output(["git", "show", "-s", "--format=%ae", commit_ref], cwd=ROOT, text=True).strip()
-    committer_email = subprocess.check_output(["git", "show", "-s", "--format=%ce", commit_ref], cwd=ROOT, text=True).strip()
+    author_name = subprocess.check_output(
+        ["git", "show", "-s", "--format=%an", commit_ref], cwd=ROOT, text=True
+    ).strip()
+    author_email = subprocess.check_output(
+        ["git", "show", "-s", "--format=%ae", commit_ref], cwd=ROOT, text=True
+    ).strip()
+    committer_email = subprocess.check_output(
+        ["git", "show", "-s", "--format=%ce", commit_ref], cwd=ROOT, text=True
+    ).strip()
+
     if author_name not in APPROVED_NAMES or is_denied(author_name, deny):
         violations.append("git:head-author-name")
     if author_email not in APPROVED_AUTHOR_EMAILS or is_denied(author_email, deny):
         violations.append("git:head-author-email")
     if committer_email not in APPROVED_COMMITTER_EMAILS or is_denied(committer_email, deny):
         violations.append("git:head-committer-email")
+
     for path in tracked_files():
         text = text_of(path)
         if text is None:
             continue
-        relpath = path.relative_to(ROOT).as_posix()
+        relpath_obj = path.relative_to(ROOT)
+        relpath = relpath_obj.as_posix()
+        metadata_approved = approved_plugin_metadata(relpath_obj, text, violations)
         if text_has_unapproved_email(text):
             violations.append(f"{relpath}:unapproved-email")
+        if metadata_approved:
+            continue
         if text_has_denied_value(text, deny):
             violations.append(f"{relpath}:denied-value")
 
