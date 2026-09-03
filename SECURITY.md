@@ -12,4 +12,8 @@ RUMBO IA treats public identity, credentials, and deployment configuration as co
 
 ## Reporting
 
-For responsible reports about this public surface, use `sebastian@rumbo.verso.fans` and avoid including secrets or unnecessary personal data in public issues.
+Use GitHub's **Report a vulnerability** flow under the repository Security tab for undisclosed security issues. Private vulnerability reporting is enabled for this repository.
+
+If the GitHub private-reporting channel is unavailable, use `sebastian@rumbo.verso.fans`. Do not include secrets, private client data, or exploit details in public issues.
+
+GitHub secret scanning and push protection are enabled on this public repository as an additional guard against accidental credential disclosure.

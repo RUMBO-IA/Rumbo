@@ -1,8 +1,21 @@
 # RUMBO IA
 
+[![Public privacy gate](https://github.com/fscfede-beep/Rumbo/actions/workflows/privacy-gate.yml/badge.svg?branch=main)](https://github.com/fscfede-beep/Rumbo/actions/workflows/privacy-gate.yml)
+
 Human-controlled AI CRM and automation for small businesses in Latin America.
 
 RUMBO IA helps small businesses organize customer conversations, leads, follow-ups, approved business knowledge and commercial workflows while keeping humans in control of sensitive decisions.
+
+## Engineering controls
+
+The public repository keeps consequential behavior behind explicit verification boundaries:
+
+- sensitive business actions remain human-supervised;
+- the public privacy gate runs on branch pushes and on pull requests targeting `main`;
+- CI checks public privacy invariants, commercial-offer coherence, and security-header configuration;
+- repository security and reporting rules are documented in [`SECURITY.md`](SECURITY.md).
+
+The latest published `main` baseline passed the public privacy gate before this documentation update.
 
 ## Current status
 
@@ -23,9 +36,10 @@ Pilot intake: https://form.typeform.com/to/Tu3D3tVo
 
 ## Founder
 
-Sebastián
+Sebastián Federico
 
-Founder | Product & AI Systems Operator
+Founder · AI Systems & Agent Reliability Engineer
+
 ## Contact
 
 sebastian@rumbo.verso.fans
