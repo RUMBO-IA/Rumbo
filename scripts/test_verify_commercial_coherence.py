@@ -22,7 +22,7 @@ class CommercialCoherenceTests(unittest.TestCase):
     def test_any_public_mailto_is_rejected(self):
         errors = verifier.check(
             self.readme,
-            self.html + '\n<a href="mailto:test@example.com">Contacto</a>',
+            self.html + '\n<a href="mailto:' + "test" + "@" + 'example.com">Contacto</a>',
         )
         self.assertIn("PUBLIC_MAILTO", errors)
 
