@@ -1,6 +1,7 @@
 import sys
 import unittest
 from pathlib import Path
+from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import verify_public_privacy as gate
@@ -27,6 +28,63 @@ class PrivacyGateRegressionTests(unittest.TestCase):
     def test_github_noreply_email_is_allowed(self):
         value = "293577326+fscfede-beep@users.noreply.github.com"
         self.assertFalse(gate.text_has_unapproved_email(f"commit: {value}"))
+
+    def test_github_managed_squash_can_admit_nonpublic_author_email(self):
+        value = "private.author" + "@" + "example.test"
+        env = {
+            "RUMBO_GITHUB_MANAGED_COMMIT": "1",
+            "RUMBO_GITHUB_MANAGED_SHA": "abc123",
+            "RUMBO_GITHUB_EVENT_NAME": "push",
+            "RUMBO_GITHUB_REF": "refs/heads/main",
+            "RUMBO_GITHUB_ACTOR": gate.TRUSTED_GITHUB_ACTOR,
+            "RUMBO_GITHUB_SENDER": gate.TRUSTED_GITHUB_ACTOR,
+            "RUMBO_GITHUB_FORCED": "false",
+        }
+        with mock.patch.dict(gate.os.environ, env, clear=True):
+            self.assertTrue(gate.approved_head_author_email(value, "abc123", set()))
+
+    def test_github_managed_squash_requires_exact_sha(self):
+        value = "private.author" + "@" + "example.test"
+        env = {
+            "RUMBO_GITHUB_MANAGED_COMMIT": "1",
+            "RUMBO_GITHUB_MANAGED_SHA": "other",
+            "RUMBO_GITHUB_EVENT_NAME": "push",
+            "RUMBO_GITHUB_REF": "refs/heads/main",
+            "RUMBO_GITHUB_ACTOR": gate.TRUSTED_GITHUB_ACTOR,
+            "RUMBO_GITHUB_SENDER": gate.TRUSTED_GITHUB_ACTOR,
+            "RUMBO_GITHUB_FORCED": "false",
+        }
+        with mock.patch.dict(gate.os.environ, env, clear=True):
+            self.assertFalse(gate.approved_head_author_email(value, "abc123", set()))
+
+    def test_github_managed_squash_rejects_forced_push(self):
+        value = "private.author" + "@" + "example.test"
+        env = {
+            "RUMBO_GITHUB_MANAGED_COMMIT": "1",
+            "RUMBO_GITHUB_MANAGED_SHA": "abc123",
+            "RUMBO_GITHUB_EVENT_NAME": "push",
+            "RUMBO_GITHUB_REF": "refs/heads/main",
+            "RUMBO_GITHUB_ACTOR": gate.TRUSTED_GITHUB_ACTOR,
+            "RUMBO_GITHUB_SENDER": gate.TRUSTED_GITHUB_ACTOR,
+            "RUMBO_GITHUB_FORCED": "true",
+        }
+        with mock.patch.dict(gate.os.environ, env, clear=True):
+            self.assertFalse(gate.approved_head_author_email(value, "abc123", set()))
+
+    def test_github_managed_squash_still_rejects_denied_email(self):
+        value = "private.author" + "@" + "example.test"
+        deny = {gate.sha(value)}
+        env = {
+            "RUMBO_GITHUB_MANAGED_COMMIT": "1",
+            "RUMBO_GITHUB_MANAGED_SHA": "abc123",
+            "RUMBO_GITHUB_EVENT_NAME": "push",
+            "RUMBO_GITHUB_REF": "refs/heads/main",
+            "RUMBO_GITHUB_ACTOR": gate.TRUSTED_GITHUB_ACTOR,
+            "RUMBO_GITHUB_SENDER": gate.TRUSTED_GITHUB_ACTOR,
+            "RUMBO_GITHUB_FORCED": "false",
+        }
+        with mock.patch.dict(gate.os.environ, env, clear=True):
+            self.assertFalse(gate.approved_head_author_email(value, "abc123", deny))
 
     def test_word_ngram_deny_behavior_is_preserved(self):
         deny = {gate.sha("private surname")}

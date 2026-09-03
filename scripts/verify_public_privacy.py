@@ -8,7 +8,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 PUBLIC_NAME = "Sebastián Federico"
-APPROVED_NAMES = {PUBLIC_NAME, "Sebastián", "fscfede-beep", "RUMBO Privacy Automation"}
+TRUSTED_GITHUB_ACTOR = "fscfede-beep"
+APPROVED_NAMES = {PUBLIC_NAME, "Sebastián", TRUSTED_GITHUB_ACTOR, "RUMBO Privacy Automation"}
 APPROVED_AUTHOR_EMAILS = {
     "sebastian@rumbo.verso.fans",
     "293577326+fscfede-beep@users.noreply.github.com",
@@ -71,6 +72,27 @@ def text_has_unapproved_email(text: str) -> bool:
     return any(email not in APPROVED_PUBLIC_TEXT_EMAILS for email in email_candidates(text))
 
 
+def approved_head_author_email(author_email: str, commit_ref: str, deny: set[str]) -> bool:
+    if is_denied(author_email, deny):
+        return False
+    if author_email in APPROVED_AUTHOR_EMAILS:
+        return True
+
+    # GitHub squash merges can preserve the authenticated user's private author
+    # email while GitHub itself creates and verifies the commit. Do not widen the
+    # email allowlist. Admit that case only when the workflow has independently
+    # proven a GitHub-managed, verified web-flow commit for this exact main SHA.
+    return (
+        os.environ.get("RUMBO_GITHUB_MANAGED_COMMIT") == "1"
+        and os.environ.get("RUMBO_GITHUB_MANAGED_SHA") == commit_ref
+        and os.environ.get("RUMBO_GITHUB_EVENT_NAME") == "push"
+        and os.environ.get("RUMBO_GITHUB_REF") == "refs/heads/main"
+        and os.environ.get("RUMBO_GITHUB_ACTOR") == TRUSTED_GITHUB_ACTOR
+        and os.environ.get("RUMBO_GITHUB_SENDER") == TRUSTED_GITHUB_ACTOR
+        and os.environ.get("RUMBO_GITHUB_FORCED", "").casefold() == "false"
+    )
+
+
 def main() -> int:
     raw_hashes = os.environ.get("RUMBO_PRIVACY_DENY_HASHES", "")
     deny = {h.strip().lower() for h in raw_hashes.split(",") if h.strip()}
@@ -90,7 +112,7 @@ def main() -> int:
     committer_email = subprocess.check_output(["git", "show", "-s", "--format=%ce", commit_ref], cwd=ROOT, text=True).strip()
     if author_name not in APPROVED_NAMES or is_denied(author_name, deny):
         violations.append("git:head-author-name")
-    if author_email not in APPROVED_AUTHOR_EMAILS or is_denied(author_email, deny):
+    if not approved_head_author_email(author_email, commit_ref, deny):
         violations.append("git:head-author-email")
     if committer_email not in APPROVED_COMMITTER_EMAILS or is_denied(committer_email, deny):
         violations.append("git:head-committer-email")
