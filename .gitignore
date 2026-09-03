@@ -1,0 +1,17 @@
+.env
+.env.*
+!.env.example
+.vercel
+node_modules
+dist
+build
+*.log
+*.zip
+*.bundle
+.DS_Store
+Thumbs.db
+credentials*
+secrets*
+private*
+backup*
+backups*

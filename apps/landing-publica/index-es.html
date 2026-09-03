@@ -1,0 +1,1365 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RUMBO IA — el sistema con IA que responde cada consulta</title>
+<meta name="description" content="RUMBO atiende el teléfono, hace seguimiento de presupuestos y agenda turnos por llamada, WhatsApp y email, con una persona aprobando lo sensible. Planes desde USD 149 al mes.">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#07070D">
+
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://rumbo.verso.fans/es">
+<meta property="og:title" content="RUMBO IA — el sistema con IA que responde cada consulta">
+<meta property="og:description" content="Atiende llamadas, sigue presupuestos y agenda turnos. Una persona aprueba lo sensible. Desde USD 149 al mes.">
+<meta property="og:image" content="https://rumbo.verso.fans/og-image.jpg">
+<meta property="og:locale" content="es">
+<meta property="og:site_name" content="Rumbo IA">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@rumbo_ia">
+<meta name="twitter:title" content="RUMBO IA — el sistema con IA que responde cada consulta">
+<meta name="twitter:description" content="Atiende llamadas, sigue presupuestos y agenda turnos. Una persona aprueba lo sensible. Desde USD 149 al mes.">
+<meta name="twitter:image" content="https://rumbo.verso.fans/og-image.jpg">
+
+<link rel="canonical" href="https://rumbo.verso.fans/es">
+<link rel="alternate" hreflang="es" href="/es">
+<link rel="alternate" hreflang="en" href="/">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Rumbo IA",
+  "url": "https://rumbo.verso.fans",
+  "logo": "https://rumbo.verso.fans/logo.png",
+  "description": "Partner tecnológico estratégico para empresas. Soluciones de IA: web, chatbots, automatización y marketing.",
+  "areaServed": "Worldwide",
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "contactType": "customer service",
+    "email": "sebastian@rumbo.verso.fans",
+    "availableLanguage": ["English", "Spanish"]
+  }
+}
+
+</script>
+
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+
+:root{
+  --bg:#07070D;
+  --bg2:#0B0B16;
+  --surface:#0F0F1E;
+  --border:rgba(255,255,255,0.07);
+  --b2:rgba(255,255,255,0.13);
+  --white:#EDE9E0;
+  --w2:#A09B92;
+  --w3:#8B857E;
+  --orange:#FF4500;
+  --o-bg:rgba(255,69,0,0.07);
+  --o-bdr:rgba(255,69,0,0.3);
+  --blue:#0B1D52;
+  --gold:#C8922A;
+  --green:#00C896;
+  --fd:'Syne',sans-serif;
+  --fb:'DM Sans',sans-serif;
+  --fm:'DM Mono',monospace;
+  --px:56px;
+}
+
+html{scroll-behavior:smooth}
+html{overflow-x:hidden}
+[hidden]{display:none !important}
+a{color:inherit}
+body{background:var(--bg);color:var(--white);font-family:var(--fb);font-weight:300;overflow-x:hidden}
+
+:focus-visible{outline:2px solid var(--orange);outline-offset:3px;border-radius:2px}
+
+/* NAV */
+.site-header{position:fixed;top:0;left:0;right:0;z-index:100;transition:background .4s,border-color .4s}
+.site-header.scrolled{background:rgba(7,7,13,0.93);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+
+nav{height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 var(--px)}
+
+.nav-logo{display:flex;align-items:center;gap:12px;text-decoration:none}
+.nav-brand{font-family:var(--fd);font-size:17px;font-weight:800;letter-spacing:-.5px;color:var(--white)}
+.nav-brand span{color:var(--orange)}
+
+.nav-links{display:flex;gap:36px;list-style:none}
+.nav-links a{font-size:13px;color:var(--w2);text-decoration:none;font-weight:400;transition:color .2s}
+.nav-links a:hover{color:var(--white)}
+
+.nav-cta{padding:10px 24px;background:var(--orange);color:#07070D !important;border-radius:3px;font-weight:700 !important;font-family:var(--fd);font-size:13px !important;transition:opacity .2s !important}
+.nav-cta:hover{opacity:.88}
+
+.nav-toggle{display:none;background:none;border:1px solid var(--border);border-radius:3px;padding:7px 9px;cursor:pointer;flex-direction:column;gap:4px}
+.nav-toggle span{display:block;width:18px;height:1.5px;background:var(--white);transition:transform .3s,opacity .3s}
+.nav-toggle[aria-expanded="true"] span:nth-child(1){transform:translateY(5.5px) rotate(45deg)}
+.nav-toggle[aria-expanded="true"] span:nth-child(2){opacity:0;transform:scaleX(0)}
+.nav-toggle[aria-expanded="true"] span:nth-child(3){transform:translateY(-5.5px) rotate(-45deg)}
+
+/* HERO */
+.hero{min-height:100vh;display:flex;align-items:center;padding:120px var(--px) 80px;position:relative;overflow:hidden}
+.hero-canvas{position:absolute;inset:0;pointer-events:none}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,0.022) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.022) 1px,transparent 1px);background-size:80px 80px;mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black,transparent)}
+.hero-glow-1{position:absolute;width:800px;height:800px;background:radial-gradient(circle,rgba(11,29,82,.5) 0%,transparent 70%);top:-200px;right:-200px;border-radius:50%;animation:glowPulse1 8s ease-in-out infinite}
+.hero-glow-2{position:absolute;width:500px;height:500px;background:radial-gradient(circle,rgba(255,69,0,.07) 0%,transparent 70%);bottom:-100px;left:-100px;border-radius:50%;animation:glowPulse2 6s ease-in-out infinite}
+.particles{position:absolute;inset:0;overflow:hidden}
+.particle{position:absolute;width:2px;height:2px;background:var(--orange);border-radius:50%;opacity:0;animation:particleFloat linear infinite}
+
+.hero-content{width:100%;max-width:min(1120px,92vw);position:relative;z-index:2;container-type:inline-size}
+.hero-badge{display:inline-flex;align-items:center;gap:10px;padding:8px 16px;border:1px solid var(--o-bdr);border-radius:2px;background:var(--o-bg);margin-bottom:40px;opacity:0;animation:fadeUp .7s .2s ease forwards}
+.hero-badge-dot{width:6px;height:6px;background:var(--orange);border-radius:50%;animation:badgePulse 2s infinite;flex-shrink:0}
+.hero-badge-text{font-family:var(--fm);font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--orange)}
+
+.hero-title{font-family:var(--fd);font-weight:800;line-height:.9;letter-spacing:-4px;margin-bottom:40px;opacity:0;animation:fadeUp .9s .35s ease forwards}
+.hero-title .line-1{display:block;font-size:clamp(38px,7.4cqw,92px);color:var(--white)}
+.hero-title .line-2{display:block;font-size:clamp(38px,7.4cqw,92px);color:transparent;-webkit-text-stroke:2px var(--orange)}
+.hero-title .line-3{display:block;font-size:clamp(24px,4.2cqw,52px);color:var(--w2);font-weight:700;letter-spacing:-1.5px;margin-top:12px}
+
+.hero-desc{font-size:clamp(15px,1.8vw,18px);color:var(--w2);max-width:560px;line-height:1.75;margin-bottom:52px;opacity:0;animation:fadeUp .8s .5s ease forwards}
+.hero-desc strong{color:var(--white);font-weight:500}
+
+.hero-actions{display:flex;gap:14px;align-items:center;flex-wrap:wrap;opacity:0;animation:fadeUp .8s .65s ease forwards}
+
+.hero-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:32px 40px;margin-top:64px;padding-top:44px;border-top:1px solid var(--border);opacity:0;animation:fadeUp .8s .8s ease forwards}
+.hero-stat-num{font-family:var(--fd);font-size:clamp(28px,3vw,36px);font-weight:800;color:var(--white);letter-spacing:-2px;line-height:1;margin-bottom:6px}
+.hero-stat-num span{color:var(--orange);font-size:.62em;letter-spacing:-.5px}
+.hero-stat-label{font-size:13px;color:var(--w3);line-height:1.4}
+
+.scroll-indicator{position:absolute;bottom:40px;left:var(--px);display:flex;align-items:center;gap:12px;opacity:0;animation:fadeIn 1s 1.2s ease forwards}
+.scroll-line{width:1px;height:48px;background:linear-gradient(to bottom,transparent,var(--orange),transparent);animation:scrollAnim 2s ease-in-out infinite}
+.scroll-text{font-family:var(--fm);font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--w3);writing-mode:vertical-rl;transform:rotate(180deg)}
+
+/* TICKER */
+.ticker{overflow:hidden;border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:14px 0;background:var(--bg2)}
+.ticker:hover .ticker-track{animation-play-state:paused}
+.ticker-track{display:flex;width:max-content;animation:tickerScroll 30s linear infinite}
+.ticker-item{display:flex;align-items:center;gap:20px;padding:0 40px;white-space:nowrap;font-family:var(--fm);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--w3)}
+.ticker-dot{width:4px;height:4px;background:var(--orange);border-radius:50%;flex-shrink:0}
+
+/* SECTIONS */
+main section{padding:120px var(--px);position:relative}
+.section-eyebrow{display:flex;align-items:center;gap:14px;margin-bottom:24px}
+.eyebrow-line{width:32px;height:1px;background:var(--orange);flex-shrink:0}
+.eyebrow-text{font-family:var(--fm);font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--orange);font-weight:500}
+.section-title{font-family:var(--fd);font-size:clamp(32px,5vw,64px);font-weight:800;letter-spacing:-2.5px;line-height:1;color:var(--white);margin-bottom:20px;overflow-wrap:break-word}
+.section-sub{font-size:17px;color:var(--w2);max-width:560px;line-height:1.75}
+
+/* BUTTONS */
+.btn-primary{color:#07070D !important;display:inline-flex;align-items:center;gap:10px;padding:16px 32px;background:var(--orange);color:#fff;text-decoration:none;font-family:var(--fd);font-size:15px;font-weight:700;letter-spacing:-.3px;border-radius:3px;border:none;transition:transform .2s,box-shadow .2s}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 16px 48px rgba(255,69,0,.3)}
+.btn-secondary{display:inline-flex;align-items:center;gap:10px;padding:16px 32px;border:1px solid var(--b2);color:var(--white);text-decoration:none;font-family:var(--fd);font-size:15px;font-weight:600;letter-spacing:-.3px;border-radius:3px;transition:border-color .2s,background .2s}
+.btn-secondary:hover{border-color:var(--orange);background:var(--o-bg)}
+
+/* SERVICES */
+#servicios{background:var(--bg2);border-top:1px solid var(--border)}
+.services-header{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:80px;align-items:end;margin-bottom:80px}
+.services-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:4px;overflow:hidden}
+.service-card{background:var(--bg2);padding:56px 48px;position:relative;overflow:hidden;transition:background .4s}
+.service-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--orange),transparent);transform:scaleX(0);transform-origin:left;transition:transform .4s ease}
+.service-card:hover{background:var(--surface)}
+.service-card:hover::before{transform:scaleX(1)}
+.service-number{font-family:var(--fd);font-size:72px;font-weight:800;color:rgba(255,255,255,.03);line-height:1;position:absolute;top:20px;right:28px;transition:color .4s;user-select:none;aria-hidden:true}
+.service-card:hover .service-number{color:rgba(255,69,0,.07)}
+.service-icon{width:52px;height:52px;border:1px solid var(--b2);border-radius:4px;display:flex;align-items:center;justify-content:center;margin-bottom:32px;transition:border-color .3s,background .3s}
+.service-card:hover .service-icon{border-color:var(--o-bdr);background:var(--o-bg)}
+.service-name{font-family:var(--fd);font-size:22px;font-weight:700;color:var(--white);letter-spacing:-.5px;margin-bottom:16px}
+.service-desc{font-size:15px;color:var(--w2);line-height:1.75;margin-bottom:28px}
+.service-features{display:flex;flex-direction:column;gap:8px;margin-bottom:32px}
+.sf{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w3)}
+.sf::before{content:'';width:4px;height:4px;background:var(--orange);border-radius:50%;flex-shrink:0}
+.service-price{display:inline-flex;align-items:center;gap:6px;font-family:var(--fm);font-size:12px;letter-spacing:1px;color:var(--orange);padding:7px 14px;border:1px solid var(--o-bdr);border-radius:2px;background:var(--o-bg)}
+
+/* PROCESS */
+#proceso{border-top:1px solid var(--border)}
+.process-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:100px;align-items:center;margin-top:80px}
+.process-steps{list-style:none;display:flex;flex-direction:column}
+.process-step{display:flex;gap:28px;padding:36px 0;border-bottom:1px solid var(--border);transition:padding-left .3s}
+.process-step:first-child{padding-top:0}
+.process-step:last-child{border-bottom:none}
+.process-step:hover{padding-left:12px}
+.ps-num{font-family:var(--fd);font-size:11px;font-weight:800;color:var(--orange);width:32px;flex-shrink:0;margin-top:4px;opacity:.7}
+.ps-title{font-family:var(--fd);font-size:20px;font-weight:700;color:var(--white);letter-spacing:-.5px;margin-bottom:10px}
+.ps-desc{font-size:14px;color:var(--w2);line-height:1.75}
+.process-visual{position:relative;height:480px;display:flex;align-items:center;justify-content:center}
+.pv-circle-outer{width:380px;height:380px;border:1px solid rgba(255,255,255,.05);border-radius:50%;position:absolute;animation:rotateOrbit 20s linear infinite}
+.pv-circle-mid{width:270px;height:270px;border:1px solid rgba(255,69,0,.12);border-radius:50%;position:absolute;animation:rotateOrbit 14s linear infinite reverse}
+.pv-circle-inner{width:160px;height:160px;border:1px solid rgba(22,44,122,.4);border-radius:50%;position:absolute;animation:rotateOrbit 8s linear infinite}
+.pv-circle-mid::before{content:'';position:absolute;top:-5px;left:50%;width:9px;height:9px;background:var(--orange);border-radius:50%;box-shadow:0 0 16px var(--orange);transform:translateX(-50%)}
+.pv-core{width:90px;height:90px;background:radial-gradient(circle at 40% 35%,rgba(255,107,53,.3),rgba(255,69,0,.08) 60%);border:1px solid rgba(255,69,0,.25);border-radius:50%;display:flex;align-items:center;justify-content:center;position:relative;z-index:5;box-shadow:0 0 60px rgba(255,69,0,.12)}
+.pv-orbit-labels{position:absolute;inset:0;animation:counterRotate 20s linear infinite}
+
+/* HERRAMIENTAS */
+#herramientas{background:var(--bg2);border-top:1px solid var(--border)}
+.os-showcase{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:100px;align-items:center;margin-top:80px}
+.os-tag{display:inline-flex;align-items:center;gap:8px;font-family:var(--fm);font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--green);border:1px solid rgba(0,200,150,.3);background:rgba(0,200,150,.06);padding:6px 12px;border-radius:2px;margin-bottom:28px}
+.os-tag-dot{width:5px;height:5px;background:var(--green);border-radius:50%;animation:badgePulse 2s infinite}
+.os-title{font-family:var(--fd);font-size:clamp(32px,4.5vw,60px);font-weight:800;letter-spacing:-2.5px;line-height:1;margin-bottom:24px}
+.os-title span{color:var(--orange)}
+.os-desc{font-size:16px;color:var(--w2);line-height:1.8;margin-bottom:36px;max-width:480px}
+.os-pillars{display:flex;flex-direction:column;gap:14px;margin-bottom:40px}
+.os-pillar{display:flex;align-items:flex-start;gap:16px;padding:18px 20px;border:1px solid var(--border);border-radius:3px;background:var(--surface);transition:border-color .3s,background .3s}
+.os-pillar:hover{border-color:var(--o-bdr);background:rgba(255,69,0,.03)}
+.os-pillar-icon{font-size:20px;flex-shrink:0;margin-top:1px}
+.os-pillar-name{font-family:var(--fd);font-size:14px;font-weight:700;color:var(--white);letter-spacing:-.2px;margin-bottom:3px}
+.os-pillar-desc{font-size:12px;color:var(--w3);line-height:1.5}
+.os-screen{background:var(--bg);border:1px solid var(--b2);border-radius:8px;overflow:hidden;box-shadow:0 32px 80px rgba(0,0,0,.5),0 0 0 1px rgba(255,255,255,.04)}
+.os-screen-bar{height:44px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 16px}
+.os-dots{display:flex;gap:6px}
+.os-dot{width:10px;height:10px;border-radius:50%}
+.os-dot-r{background:#FF5F57}
+.os-dot-y{background:#FEBC2E}
+.os-dot-g{background:#28C840}
+.os-screen-title{font-family:var(--fm);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--w3)}
+.os-screen-body{padding:24px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
+.os-tool-pill{padding:14px 16px;border:1px solid var(--border);border-radius:4px;background:var(--surface);transition:all .25s}
+.os-tool-pill:hover{border-color:var(--o-bdr);background:var(--o-bg);transform:translateY(-2px)}
+.os-tool-pill.active{border-color:rgba(0,200,150,.3);background:rgba(0,200,150,.05)}
+.os-pill-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.os-pill-icon{font-size:16px}
+.os-status{font-family:var(--fm);font-size:7px;letter-spacing:1.5px;text-transform:uppercase;padding:2px 7px;border-radius:2px}
+.os-status.on{color:var(--green);background:rgba(0,200,150,.1);border:1px solid rgba(0,200,150,.25)}
+.os-status.dev{color:var(--gold);background:rgba(200,146,42,.1);border:1px solid rgba(200,146,42,.25)}
+.os-pill-name{font-family:var(--fd);font-size:12px;font-weight:700;color:var(--white);letter-spacing:-.2px}
+.os-pill-sub{font-size:10px;color:var(--w3);margin-top:2px}
+
+/* RESULTS */
+#resultados{background:linear-gradient(135deg,var(--blue) 0%,var(--bg) 60%);border-top:1px solid rgba(22,44,122,.4);border-bottom:1px solid rgba(22,44,122,.4)}
+.results-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:rgba(255,255,255,.04);border-radius:4px;overflow:hidden;margin-top:72px}
+.result-card{padding:52px 40px;background:rgba(7,7,13,.7);text-align:center;position:relative;overflow:hidden;transition:background .3s}
+.result-card:hover{background:rgba(11,29,82,.5)}
+.result-card::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:40px;height:2px;background:var(--orange);border-radius:2px;opacity:0;transition:opacity .3s}
+.result-card:hover::after{opacity:1}
+.rc-num{font-family:var(--fd);font-size:clamp(40px,5vw,72px);font-weight:800;letter-spacing:-3px;line-height:1;margin-bottom:12px}
+.rc-num span{color:var(--orange)}
+.rc-label{font-size:14px;color:var(--w2);line-height:1.5;max-width:160px;margin:0 auto}
+
+/* INDUSTRIES */
+#industrias{border-top:1px solid var(--border);background:var(--bg2)}
+.industries-layout{display:grid;grid-template-columns:minmax(0,380px) minmax(0,1fr);gap:100px;align-items:start;margin-top:80px}
+.industries-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.industry-card{padding:24px 20px;border:1px solid var(--border);border-radius:3px;background:var(--surface);transition:all .3s;text-align:center}
+.industry-card:hover{border-color:var(--o-bdr);background:var(--o-bg);transform:translateY(-3px)}
+.industry-icon{font-size:28px;display:block;margin-bottom:10px}
+.industry-name{font-family:var(--fd);font-size:13px;font-weight:700;color:var(--white);display:block;margin-bottom:6px}
+.industry-desc{font-size:11px;color:var(--w3);line-height:1.5}
+
+/* PRICING */
+#precios{border-top:1px solid var(--border)}
+.pricing-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:16px;margin-top:72px;align-items:start}
+.pricing-card{grid-column:span 2;padding:40px 30px;border:1px solid var(--border);border-radius:4px;background:var(--surface);position:relative;transition:transform .3s,border-color .3s}
+.pricing-card:nth-child(4){grid-column:2/4}
+.pricing-card:nth-child(5){grid-column:4/6}
+.pricing-card:hover{transform:translateY(-6px)}
+.pricing-card.featured{border-color:var(--o-bdr);background:linear-gradient(160deg,rgba(255,69,0,.05) 0%,var(--surface) 50%)}
+.pricing-card.featured::before{content:'RECOMENDADO';position:absolute;top:-12px;left:50%;transform:translateX(-50%);font-family:var(--fm);font-size:9px;letter-spacing:3px;color:#fff;background:var(--orange);padding:5px 14px;border-radius:2px;white-space:nowrap}
+.pc-tier{font-family:var(--fm);font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:14px}
+.pc-name{font-family:var(--fd);font-size:24px;font-weight:800;letter-spacing:-1px;margin-bottom:8px;color:var(--white)}
+.pc-desc{font-size:13px;color:var(--w2);line-height:1.6;margin-bottom:28px;padding-bottom:28px;border-bottom:1px solid var(--border)}
+.pc-price{margin-bottom:32px}
+.pc-amount{font-family:var(--fd);font-size:44px;font-weight:800;letter-spacing:-2px;color:var(--white);line-height:1}
+.pc-amount .currency{font-size:22px;color:var(--orange);vertical-align:super}
+.pc-amount .period{font-size:14px;color:var(--w3);font-weight:400;letter-spacing:0}
+.pc-features{display:flex;flex-direction:column;gap:12px;margin-bottom:36px}
+.pc-feature{display:flex;align-items:flex-start;gap:12px;font-size:13px;color:var(--w2);line-height:1.5}
+.pc-feature-icon{width:18px;height:18px;background:rgba(0,200,150,.12);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.btn-plan{display:block;text-align:center;padding:13px 24px;border-radius:3px;font-family:var(--fd);font-size:14px;font-weight:700;letter-spacing:-.2px;text-decoration:none;transition:all .2s}
+.btn-plan.outline{border:1px solid var(--b2);color:var(--white)}
+.btn-plan.outline:hover{border-color:var(--orange);background:var(--o-bg)}
+.btn-plan.filled{background:var(--orange);color:#fff}
+.btn-plan.filled:hover{transform:translateY(-1px);box-shadow:0 8px 32px rgba(255,69,0,.3)}
+.pc-setup{font-family:var(--fm);font-size:11px;letter-spacing:.5px;color:var(--w3);margin-top:10px}
+.pc-usage-note{font-size:11px;line-height:1.5;color:var(--w3);margin:-22px 0 26px;padding-top:14px;border-top:1px solid var(--border)}
+.pricing-footnote{margin-top:32px;text-align:center;font-size:12px;line-height:1.7;color:var(--w3);max-width:720px;margin-left:auto;margin-right:auto}
+
+/* TESTIMONIALS */
+#testimonios{background:var(--bg2);border-top:1px solid var(--border)}
+.testimonials-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:72px}
+.testimonial-card{padding:40px 36px;border:1px solid var(--border);border-radius:4px;background:var(--surface);transition:border-color .3s,transform .3s}
+.testimonial-card:hover{border-color:var(--b2);transform:translateY(-4px)}
+.tc-quote{font-size:32px;color:var(--orange);opacity:.4;font-family:Georgia,serif;line-height:1;margin-bottom:20px;aria-hidden:true}
+.tc-text{font-size:15px;color:var(--w2);line-height:1.8;margin-bottom:28px;font-style:italic}
+.tc-author{display:flex;align-items:center;gap:14px;padding-top:24px;border-top:1px solid var(--border)}
+.tc-avatar{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:16px;font-weight:800;color:#fff;flex-shrink:0}
+.tc-name{font-family:var(--fd);font-size:15px;font-weight:700;color:var(--white);letter-spacing:-.3px;margin-bottom:3px}
+.tc-role{font-size:12px;color:var(--w3)}
+.tc-stars{display:flex;gap:3px;margin-bottom:20px}
+.star{color:var(--gold);font-size:14px}
+
+/* FAQ */
+#faq{border-top:1px solid var(--border)}
+.faq-layout{display:grid;grid-template-columns:minmax(0,380px) minmax(0,1fr);gap:100px;margin-top:80px;align-items:start}
+.faq-item{border-bottom:1px solid var(--border);overflow:hidden}
+.faq-question{width:100%;display:flex;align-items:center;justify-content:space-between;padding:24px 0;background:transparent;border:none;color:var(--white);font-family:var(--fd);font-size:16px;font-weight:600;letter-spacing:-.3px;text-align:left;cursor:pointer;transition:color .2s;gap:20px}
+.faq-question:hover{color:var(--orange)}
+.faq-icon{width:24px;height:24px;border:1px solid var(--b2);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .3s;color:var(--w3)}
+.faq-item.open .faq-icon{background:var(--orange);border-color:var(--orange);color:#fff;transform:rotate(45deg)}
+.faq-answer{max-height:0;overflow:hidden;transition:max-height .4s ease,padding .3s;font-size:14px;color:var(--w2);line-height:1.8}
+.faq-item.open .faq-answer{max-height:200px;padding-bottom:24px}
+
+/* CONTACT */
+#contacto{background:linear-gradient(135deg,var(--blue) 0%,var(--bg) 70%);border-top:1px solid rgba(22,44,122,.5);text-align:center;position:relative;overflow:hidden}
+#contacto::before{content:'';position:absolute;top:-200px;left:50%;transform:translateX(-50%);width:600px;height:600px;background:radial-gradient(circle,rgba(255,69,0,.07) 0%,transparent 70%);border-radius:50%;pointer-events:none}
+.cta-label{font-family:var(--fm);font-size:10px;letter-spacing:5px;text-transform:uppercase;color:var(--orange);margin-bottom:28px;display:flex;align-items:center;justify-content:center;gap:12px}
+.cta-label::before,.cta-label::after{content:'';width:32px;height:1px;background:var(--orange);opacity:.5}
+.cta-title{font-family:var(--fd);font-size:clamp(36px,6vw,80px);font-weight:800;letter-spacing:-3px;line-height:1;margin-bottom:24px;position:relative;z-index:1}
+.cta-title .highlight{color:var(--orange)}
+.cta-sub{font-size:clamp(15px,1.8vw,18px);color:var(--w2);max-width:520px;margin:0 auto 52px;line-height:1.75;position:relative;z-index:1}
+.contact-form{max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:12px;position:relative;z-index:1}
+.form-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
+.form-input{width:100%;padding:14px 18px;background:rgba(255,255,255,.04);border:1px solid var(--b2);border-radius:3px;color:var(--white);font-family:var(--fb);font-size:14px;font-weight:300;outline:none;transition:border-color .2s,background .2s}
+.form-input:focus{border-color:rgba(255,69,0,.5);background:rgba(255,69,0,.04)}
+.form-input::placeholder{color:var(--w3)}
+.form-select{width:100%;padding:14px 18px;background:rgba(255,255,255,.04);border:1px solid var(--b2);border-radius:3px;color:var(--w2);font-family:var(--fb);font-size:14px;outline:none;transition:border-color .2s;appearance:none}
+.form-select:focus{border-color:rgba(255,69,0,.5)}
+.form-select option{background:var(--bg2)}
+.form-submit{padding:16px 32px;background:var(--orange);border:none;border-radius:3px;color:#07070D;font-family:var(--fd);font-size:15px;font-weight:700;letter-spacing:-.3px;cursor:pointer;transition:transform .2s,box-shadow .2s;width:100%}
+.form-submit:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(255,69,0,.35)}
+.form-note{font-size:12px;color:var(--w3);text-align:center;margin-top:4px}
+.form-divider{display:flex;align-items:center;gap:10px;justify-content:center;margin-top:8px}
+.form-divider::before,.form-divider::after{content:'';height:1px;flex:1;background:var(--border)}
+.form-divider-text{font-family:var(--fm);font-size:9px;letter-spacing:2px;color:var(--w3);text-transform:uppercase}
+.wa-form-btn{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:12px;padding:14px;border:1px solid rgba(37,211,102,.3);border-radius:3px;background:rgba(37,211,102,.06);text-decoration:none;transition:background .2s}
+.wa-form-btn:hover{background:rgba(37,211,102,.12)}
+.wa-form-label{font-family:var(--fd);font-size:13px;font-weight:700;color:#25D366}
+.wa-form-sub{font-size:12px;color:var(--w3)}
+
+/* FOOTER */
+.site-footer{padding:56px var(--px);border-top:1px solid var(--border);background:var(--bg)}
+.footer-top{display:grid;grid-template-columns:minmax(0,260px) repeat(4,minmax(0,1fr));gap:40px;margin-bottom:56px}
+.footer-top nav{display:block;height:auto;padding:0;align-items:initial;justify-content:initial}
+.footer-brand-name{font-family:var(--fd);font-size:18px;font-weight:800;letter-spacing:-.5px;color:var(--white)}
+.footer-brand-name span{color:var(--orange)}
+.footer-brand-desc{font-size:13px;color:var(--w3);line-height:1.75;margin:20px 0 24px}
+.footer-col-title{font-family:var(--fd);font-size:13px;font-weight:700;color:var(--white);letter-spacing:-.2px;margin-bottom:20px}
+.footer-links{list-style:none;display:flex;flex-direction:column;gap:10px}
+.footer-links a{font-size:13px;color:var(--w3);text-decoration:none;transition:color .2s}
+.footer-links a:hover{color:var(--orange)}
+.footer-bottom{display:flex;align-items:center;justify-content:space-between;padding-top:32px;border-top:1px solid var(--border)}
+.footer-copy{font-family:var(--fm);font-size:11px;letter-spacing:1px;color:var(--w3)}
+.footer-socials{display:flex;gap:10px}
+.social-link{width:34px;height:34px;border:1px solid var(--border);border-radius:3px;display:flex;align-items:center;justify-content:center;color:var(--w3);text-decoration:none;font-size:12px;transition:all .2s}
+.social-link:hover{border-color:var(--orange);color:var(--orange);background:var(--o-bg)}
+
+/* WHATSAPP FAB */
+.wa-fab{position:fixed;bottom:28px;right:28px;z-index:200;display:flex;align-items:center;gap:10px;padding:13px 20px;background:#25D366;border-radius:40px;text-decoration:none;box-shadow:0 8px 32px rgba(37,211,102,.35);transition:transform .3s,box-shadow .3s;animation:waPop .5s 1.5s ease both}
+.wa-fab:hover{transform:translateY(-3px);box-shadow:0 16px 48px rgba(37,211,102,.45)}
+.wa-fab-icon{width:22px;height:22px;fill:#fff;flex-shrink:0}
+.wa-fab-text{font-family:var(--fd);font-size:13px;font-weight:700;color:#fff;letter-spacing:-.2px;white-space:nowrap}
+.wa-fab-sub{font-size:10px;color:rgba(255,255,255,.75);font-weight:400}
+
+/* REVEAL */
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.reveal-delay-1{transition-delay:.1s}
+.reveal-delay-2{transition-delay:.2s}
+.reveal-delay-3{transition-delay:.3s}
+.reveal-delay-4{transition-delay:.4s}
+
+/* KEYFRAMES */
+@keyframes glowPulse1{0%,100%{transform:scale(1) translate(0,0)}50%{transform:scale(1.1) translate(-30px,20px)}}
+@keyframes glowPulse2{0%,100%{transform:scale(1)}50%{transform:scale(1.2)}}
+@keyframes badgePulse{0%,100%{box-shadow:0 0 0 0 rgba(255,69,0,.5)}50%{box-shadow:0 0 0 5px rgba(255,69,0,0)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes rotateOrbit{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes counterRotate{from{transform:rotate(0deg)}to{transform:rotate(-360deg)}}
+@keyframes tickerScroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes scrollAnim{0%,100%{transform:scaleY(1);opacity:.6}50%{transform:scaleY(1.2);opacity:1}}
+@keyframes waPop{from{opacity:0;transform:scale(.7) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}}
+@keyframes particleFloat{0%{opacity:0;transform:translateY(100vh)}10%{opacity:.6}90%{opacity:.3}100%{opacity:0;transform:translateY(-100px) translateX(var(--drift))}}
+
+/* REDUCED MOTION */
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important}
+  html{scroll-behavior:auto}
+  .hero-badge,.hero-title,.hero-desc,.hero-actions,.hero-stats,.scroll-indicator{animation:none;opacity:1;transform:none}
+  .reveal{opacity:1;transform:none}
+  .wa-fab{animation:none;opacity:1;transform:none}
+}
+
+/* The inline menu ran out of room well before the old 768px switch: at
+   1045px the brand and the links sat 4px apart. The compact menu now takes
+   over while there is still breathing room. */
+@media (max-width:1100px){
+  .nav-links{display:none;position:absolute;top:64px;left:0;right:0;background:rgba(7,7,13,.97);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);flex-direction:column;gap:0;padding:12px 0;transition:opacity .2s}
+  .nav-links.open{display:flex}
+  .nav-links li{width:100%}
+  .nav-links a{display:block;padding:12px 24px}
+  .nav-toggle{display:flex}
+}
+
+
+/* --- leak calculator ------------------------------------------------- */
+.calc-layout{display:grid;grid-template-columns:minmax(0,0.9fr) minmax(0,1.1fr);gap:72px;align-items:center}
+.calc-fields{display:flex;flex-direction:column;gap:28px}
+.calc-field label{display:block;font-size:13px;color:var(--w2);margin-bottom:10px}
+.calc-row{display:flex;align-items:baseline;gap:10px}
+.calc-row input[type=number]{width:120px;background:var(--surface);border:1px solid var(--b2);border-radius:3px;color:var(--white);font-family:var(--fd);font-size:26px;font-weight:800;padding:8px 12px;letter-spacing:-1px}
+.calc-row input[type=number]:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
+.calc-unit{font-family:var(--fm);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--w3)}
+.calc-field input[type=range]{width:100%;margin-top:14px;accent-color:var(--orange)}
+.calc-field input[type=range]:focus-visible{outline:2px solid var(--orange);outline-offset:4px}
+.calc-result{background:linear-gradient(160deg,rgba(255,69,0,.06) 0%,var(--surface) 55%);border:1px solid var(--o-bdr);border-radius:4px;padding:44px 40px}
+.calc-eyebrow{font-family:var(--fm);font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:18px}
+.calc-amount{font-family:var(--fd);font-weight:800;font-size:clamp(30px,7.5vw,72px);line-height:.95;letter-spacing:-2px;color:var(--white);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.calc-amount .calc-currency{color:var(--orange);font-size:.44em;letter-spacing:-1px;margin-right:10px}
+.calc-period{font-size:13px;color:var(--w2);margin-top:14px}
+.calc-bar{height:6px;background:rgba(255,255,255,.07);border-radius:99px;margin:30px 0 12px;overflow:hidden}
+.calc-bar-fill{height:100%;background:var(--orange);border-radius:99px;transition:width .35s ease}
+.calc-split{display:flex;justify-content:space-between;font-family:var(--fm);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--w3)}
+.calc-plan{margin-top:32px;padding-top:26px;border-top:1px solid var(--border);font-size:14px;color:var(--w2);line-height:1.7}
+.calc-plan strong{color:var(--white)}
+.calc-assumption{margin-top:26px;font-size:12px;color:var(--w3);line-height:1.7}
+.calc-assumption summary{cursor:pointer;color:var(--w2)}
+.calc-assumption summary:focus-visible{outline:2px solid var(--orange);outline-offset:3px}
+@media (prefers-reduced-motion: reduce){.calc-bar-fill{transition:none}}
+@media (max-width:1100px){.calc-layout{grid-template-columns:minmax(0,1fr);gap:44px}}
+
+/* MOBILE */
+@media (max-width:1024px){
+  :root{--px:40px}
+  .industries-layout{grid-template-columns:minmax(0,1fr);gap:48px}
+  .faq-layout{grid-template-columns:minmax(0,1fr);gap:48px}
+  .pricing-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .pricing-card:nth-child(4){grid-column:span 2}
+  .pricing-card:nth-child(5){grid-column:2/4}
+}
+
+@media (max-width:768px){
+  :root{--px:20px}
+
+  .nav-links{display:none;position:absolute;top:64px;left:0;right:0;background:rgba(7,7,13,.97);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);flex-direction:column;gap:0;padding:12px 0;transition:opacity .2s}
+  .nav-links.open{display:flex}
+  .nav-links li a{display:block;padding:14px var(--px);font-size:15px;color:var(--w2);border-bottom:1px solid var(--border)}
+  .nav-links li:last-child a{border-bottom:none}
+  .nav-links .nav-cta{margin:12px var(--px);display:block;text-align:center;border-radius:3px}
+  .nav-toggle{display:flex}
+
+  .hero{padding:88px var(--px) 56px}
+  .hero-title{letter-spacing:-2px}
+  .hero-title .line-1,.hero-title .line-2{font-size:clamp(22px,8.2cqw,54px)}
+  .hero-stats{gap:24px}
+  .scroll-indicator{display:none}
+
+  main section{padding:72px var(--px)}
+
+  .services-header{grid-template-columns:minmax(0,1fr);gap:24px}
+  .services-grid{grid-template-columns:minmax(0,1fr)}
+  .service-card{padding:36px 24px}
+  .service-number{display:none}
+
+  .process-layout{grid-template-columns:minmax(0,1fr);gap:48px}
+  .process-visual{display:none}
+
+  .os-showcase{grid-template-columns:minmax(0,1fr);gap:48px}
+
+  .results-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+
+  .industries-layout{gap:32px}
+  .industries-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+
+  .pricing-grid{grid-template-columns:minmax(0,1fr)}
+  .pricing-card,.pricing-card:nth-child(4),.pricing-card:nth-child(5){grid-column:auto}
+
+  .testimonials-grid{grid-template-columns:minmax(0,1fr)}
+
+  .faq-layout{gap:32px}
+
+  .form-row{grid-template-columns:minmax(0,1fr)}
+
+  .footer-top{grid-template-columns:repeat(2,minmax(0,1fr));gap:40px}
+
+  .wa-fab-text,.wa-fab-sub{display:none}
+  .wa-fab{padding:14px;border-radius:50%}
+}
+
+@media (max-width:480px){
+  .results-grid{grid-template-columns:minmax(0,1fr)}
+  .industries-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .footer-top{grid-template-columns:minmax(0,1fr)}
+  .hero-actions{flex-direction:column;align-items:flex-start}
+  .btn-primary,.btn-secondary{width:100%;justify-content:center}
+}
+
+/* NAV active section highlight */
+.nav-links a.active{color:var(--white)}
+
+/* Form input invalid state */
+.form-input:invalid:not(:placeholder-shown){border-color:rgba(255,80,80,.5)}
+.form-input:valid:not(:placeholder-shown){border-color:rgba(0,200,150,.3)}
+
+/* Pricing card active highlight */
+.pricing-card.featured{position:relative}
+
+/* Service list fix */
+.service-features{list-style:none}
+.pc-features{list-style:none}
+
+/* Footer logo missing hover */
+.footer-logo:hover .footer-brand-name span{opacity:.8}
+
+/* Smooth nav open */
+@media (max-width:768px){
+  .nav-links{opacity:0;pointer-events:none;transition:opacity .2s ease}
+  .nav-links.open{opacity:1;pointer-events:all}
+}
+
+/* FOOTER LOGO */
+.footer-logo{display:flex;align-items:center;gap:12px;text-decoration:none}
+</style>
+<link rel="preload" href="fonts/syne-800-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/dm-sans-400-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="fonts/fonts.css">
+</head>
+<body>
+
+<a href="#main-content" class="sr-only" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden">Saltar al contenido principal</a>
+
+<a href="mailto:sebastian@rumbo.verso.fans?subject=RUMBO%20IA%20Consulta&body=Hola%20RUMBO%20IA%2C%20quiero%20saber%20m%C3%A1s%20sobre%20sus%20servicios"
+   target="_blank"
+   rel="noopener noreferrer"
+   class="wa-fab"
+   aria-label="Escribinos por WhatsApp — Respondemos en minutos">
+  <svg class="wa-fab-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+  </svg>
+  <div>
+    <div class="wa-fab-text">WhatsApp</div>
+    <div class="wa-fab-sub">Respondemos en minutos</div>
+  </div>
+</a>
+
+<header class="site-header" id="site-header">
+  <nav aria-label="Navegación principal">
+    <a href="#inicio" class="nav-logo" aria-label="Rumbo IA — Inicio">
+      <svg width="28" height="28" viewBox="0 0 40 40" fill="none" aria-hidden="true" focusable="false">
+        <path d="M8 28L20 10L32 28" stroke="#FF4500" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="20" cy="10" r="3" fill="#FF4500"/>
+        <line x1="20" y1="13" x2="20" y2="31" stroke="rgba(255,69,0,0.45)" stroke-width="1.5" stroke-dasharray="3 3"/>
+      </svg>
+      <span class="nav-brand">RUMBO <span>IA</span></span>
+    </a>
+    <button class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Abrir menú">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links" id="navLinks" role="list">
+      <li><a href="#servicios">Servicios</a></li>
+      <li><a href="#proceso">Proceso</a></li>
+      <li><a href="#herramientas">Herramientas</a></li>
+      <li><a href="#precios">Precios</a></li>
+      <li><a href="#faq">FAQ</a></li>
+      <li><a href="/" hreflang="en" aria-label="View this page in English">EN</a></li>
+      <li><a href="#contacto" class="nav-cta">Hablemos →</a></li>
+    </ul>
+  </nav>
+</header>
+
+<main id="main-content">
+
+<section class="hero" id="inicio" aria-labelledby="hero-heading">
+  <div class="hero-canvas" aria-hidden="true">
+    <div class="hero-grid"></div>
+    <div class="hero-glow-1"></div>
+    <div class="hero-glow-2"></div>
+    <div class="particles" id="particles"></div>
+  </div>
+  <div class="hero-content">
+    <div class="hero-badge" role="status">
+      <span class="hero-badge-dot" aria-hidden="true"></span>
+      <span class="hero-badge-text">Sistema operativo comercial con IA</span>
+    </div>
+    <h1 class="hero-title" id="hero-heading">
+      <span class="line-1">CADA CONSULTA</span>
+      <span class="line-2">RESPONDIDA</span>
+      <span class="line-3">incluso las que nunca llegaste a atender.</span>
+    </h1>
+    <p class="hero-desc">
+      RUMBO atiende el teléfono, hace seguimiento de los presupuestos y agenda turnos &mdash; por llamada, WhatsApp y email &mdash; y le pasa a tu equipo las conversaciones que necesitan una persona. <strong>Planes desde USD 149 al mes.</strong>
+    </p>
+    <div class="hero-actions">
+      <a href="#contacto" class="btn-primary">
+        Ver cómo funciona
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+      <a href="#servicios" class="btn-secondary">Ver servicios</a>
+    </div>
+    <div class="hero-stats" aria-label="Estadísticas">
+      <div>
+        <div class="hero-stat-num">24<span>/7</span></div>
+        <div class="hero-stat-label">Atendiendo cuando tu equipo no puede</div>
+      </div>
+      <div>
+        <div class="hero-stat-num">4<span> canales</span></div>
+        <div class="hero-stat-label">Teléfono, WhatsApp, email y web en una bandeja</div>
+      </div>
+      <div>
+        <div class="hero-stat-num">0<span></span></div>
+        <div class="hero-stat-label">Mensajes sensibles enviados sin que una persona apruebe</div>
+      </div>
+      <div>
+        <div class="hero-stat-num"><span>USD </span>149</div>
+        <div class="hero-stat-label">Plan de entrada, por mes</div>
+      </div>
+    </div>
+  </div>
+  <div class="scroll-indicator" aria-hidden="true">
+    <div class="scroll-line"></div>
+    <span class="scroll-text">Scroll</span>
+  </div>
+</section>
+
+<div class="ticker" aria-hidden="true">
+  <div class="ticker-track" id="tickerTrack">
+    <span class="ticker-item"><span class="ticker-dot"></span>Sitios Web &amp; Apps</span>
+    <span class="ticker-item"><span class="ticker-dot"></span>Chatbots IA</span>
+    <span class="ticker-item"><span class="ticker-dot"></span>Automatización de Procesos</span>
+    <span class="ticker-item"><span class="ticker-dot"></span>Marketing con IA</span>
+    <span class="ticker-item"><span class="ticker-dot"></span>RUMBO OS — Sistema Operativo</span>
+    <span class="ticker-item"><span class="ticker-dot"></span>NEXO 3.0 — Agente IA</span>
+    <span class="ticker-item"><span class="ticker-dot"></span>Estrategia Digital</span>
+    <span class="ticker-item"><span class="ticker-dot"></span>Transformación Empresarial</span>
+    <span class="ticker-item"><span class="ticker-dot"></span>Partner Tecnológico</span>
+    <span class="ticker-item"><span class="ticker-dot"></span>Alcance Global</span>
+    <span class="ticker-item"><span class="ticker-dot"></span>Sitios Web &amp; Apps</span>
+    <span class="ticker-item"><span class="ticker-dot"></span>Chatbots IA</span>
+    <span class="ticker-item"><span class="ticker-dot"></span>Automatización de Procesos</span>
+    <span class="ticker-item"><span class="ticker-dot"></span>Marketing con IA</span>
+    <span class="ticker-item"><span class="ticker-dot"></span>RUMBO OS — Sistema Operativo</span>
+    <span class="ticker-item"><span class="ticker-dot"></span>NEXO 3.0 — Agente IA</span>
+    <span class="ticker-item"><span class="ticker-dot"></span>Estrategia Digital</span>
+    <span class="ticker-item"><span class="ticker-dot"></span>Transformación Empresarial</span>
+    <span class="ticker-item"><span class="ticker-dot"></span>Partner Tecnológico</span>
+    <span class="ticker-item"><span class="ticker-dot"></span>Alcance Global</span>
+  </div>
+</div>
+
+<section id="servicios" aria-labelledby="servicios-heading">
+  <div class="services-header reveal">
+    <div>
+      <div class="section-eyebrow">
+        <span class="eyebrow-line" aria-hidden="true"></span>
+        <span class="eyebrow-text">Nuestros servicios</span>
+      </div>
+      <h2 class="section-title" id="servicios-heading">Cuatro pilares.<br>Un solo socio.</h2>
+    </div>
+    <div>
+      <p class="section-sub">No tenés que coordinar múltiples proveedores. Nosotros integramos web, IA, automatización y marketing en una estrategia cohesiva que hace crecer tu negocio.</p>
+    </div>
+  </div>
+  <div class="services-grid">
+    <article class="service-card reveal">
+      <div class="service-number" aria-hidden="true">01</div>
+      <div class="service-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FF4500" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><rect x="3" y="3" width="18" height="14" rx="2"/><path d="M7 21h10M12 17v4"/><path d="M8 8l2 2 4-4"/></svg>
+      </div>
+      <h3 class="service-name">Sitios Web &amp; Apps</h3>
+      <p class="service-desc">Desarrollamos tu presencia digital desde cero o mejoramos la que ya tenés. Landing pages que convierten, sitios corporativos que impresionan, apps que resuelven problemas reales.</p>
+      <ul class="service-features" aria-label="Incluye">
+        <li class="sf">Landing pages de alta conversión</li>
+        <li class="sf">Sitios corporativos 3-5 páginas</li>
+        <li class="sf">E-commerce y tiendas online</li>
+        <li class="sf">Optimización SEO y velocidad</li>
+        <li class="sf">Diseño responsive y mobile-first</li>
+      </ul>
+      <span class="service-price">Incluido desde RUMBO Capture</span>
+    </article>
+    <article class="service-card reveal reveal-delay-1">
+      <div class="service-number" aria-hidden="true">02</div>
+      <div class="service-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FF4500" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/><circle cx="9" cy="10" r="1" fill="#FF4500"/><circle cx="12" cy="10" r="1" fill="#FF4500"/><circle cx="15" cy="10" r="1" fill="#FF4500"/></svg>
+      </div>
+      <h3 class="service-name">Chatbots &amp; Asistentes IA</h3>
+      <p class="service-desc">Tu negocio atiende, califica y vende las 24 horas sin que intervenga tu equipo. Chatbots inteligentes integrados en WhatsApp, tu web o cualquier plataforma que uses.</p>
+      <ul class="service-features" aria-label="Incluye">
+        <li class="sf">Integración WhatsApp Business API</li>
+        <li class="sf">Chatbot web con IA entrenada</li>
+        <li class="sf">Calificación automática de leads</li>
+        <li class="sf">Flujos de venta automatizados</li>
+        <li class="sf">Panel de administración incluido</li>
+      </ul>
+      <span class="service-price">Incluido desde RUMBO Front Desk AI</span>
+    </article>
+    <article class="service-card reveal reveal-delay-2">
+      <div class="service-number" aria-hidden="true">03</div>
+      <div class="service-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FF4500" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><rect x="2" y="7" width="6" height="5" rx="1"/><rect x="16" y="7" width="6" height="5" rx="1"/><rect x="9" y="14" width="6" height="5" rx="1"/><path d="M8 9.5h3M16 9.5h-3"/><path d="M5 12v3l7 0M19 12v3l-7 0"/></svg>
+      </div>
+      <h3 class="service-name">Automatización de Procesos</h3>
+      <p class="service-desc">Eliminamos las tareas manuales y repetitivas que consumen tiempo de tu equipo. Conectamos tus sistemas y diseñamos flujos automáticos que trabajan solos.</p>
+      <ul class="service-features" aria-label="Incluye">
+        <li class="sf">Integración y sincronización de CRM</li>
+        <li class="sf">Flujos de email marketing automáticos</li>
+        <li class="sf">Reportes y dashboards automáticos</li>
+        <li class="sf">Notificaciones y alertas inteligentes</li>
+        <li class="sf">Onboarding de clientes automatizado</li>
+      </ul>
+      <span class="service-price">Incluido desde RUMBO Recovery</span>
+    </article>
+    <article class="service-card reveal reveal-delay-3">
+      <div class="service-number" aria-hidden="true">04</div>
+      <div class="service-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FF4500" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><polyline points="4,17 9,12 13,16 19,8"/><polyline points="15,8 19,8 19,12"/></svg>
+      </div>
+      <h3 class="service-name">Marketing con IA</h3>
+      <p class="service-desc">Estrategias de contenido, publicidad y email marketing potenciadas por inteligencia artificial. Más impacto en menos tiempo, con reportes claros de lo que se hizo y qué resultó.</p>
+      <ul class="service-features" aria-label="Incluye">
+        <li class="sf">Estrategia y calendario de contenidos</li>
+        <li class="sf">30 publicaciones mensuales con IA</li>
+        <li class="sf">Campañas de email automatizadas</li>
+        <li class="sf">Análisis de competencia con IA</li>
+        <li class="sf">Reportes de performance mensual</li>
+      </ul>
+      <span class="service-price">Incluido desde RUMBO Growth Engine</span>
+    </article>
+  </div>
+</section>
+
+<section id="proceso" aria-labelledby="proceso-heading">
+  <div class="section-eyebrow reveal">
+    <span class="eyebrow-line" aria-hidden="true"></span>
+    <span class="eyebrow-text">Cómo trabajamos</span>
+  </div>
+  <h2 class="section-title reveal" id="proceso-heading">Simple. Rápido. Efectivo.</h2>
+  <div class="process-layout">
+    <ol class="process-steps reveal">
+      <li class="process-step">
+        <span class="ps-num" aria-hidden="true">01</span>
+        <div>
+          <h3 class="ps-title">Diagnóstico inicial</h3>
+          <p class="ps-desc">En una sesión de 60 minutos analizamos tu negocio, tus objetivos y tus problemas actuales. Identificamos las oportunidades más grandes y el mejor punto de entrada.</p>
+        </div>
+      </li>
+      <li class="process-step">
+        <span class="ps-num" aria-hidden="true">02</span>
+        <div>
+          <h3 class="ps-title">Propuesta personalizada</h3>
+          <p class="ps-desc">En menos de 48 horas te presentamos un plan concreto: qué vamos a hacer, cómo, con qué herramientas y qué resultados podés esperar. Sin vaguedades.</p>
+        </div>
+      </li>
+      <li class="process-step">
+        <span class="ps-num" aria-hidden="true">03</span>
+        <div>
+          <h3 class="ps-title">Implementación ágil</h3>
+          <p class="ps-desc">Ejecutamos el plan en sprints cortos de 1-2 semanas. Ves avances reales desde el primer día. Vos no tenés que hacer nada técnico — nosotros lo construimos todo.</p>
+        </div>
+      </li>
+      <li class="process-step">
+        <span class="ps-num" aria-hidden="true">04</span>
+        <div>
+          <h3 class="ps-title">Medición y optimización</h3>
+          <p class="ps-desc">Cada entrega va acompañada de métricas claras. Medimos, optimizamos y mejoramos continuamente. El trabajo no termina cuando entregamos — termina cuando ves los resultados.</p>
+        </div>
+      </li>
+    </ol>
+    <div class="process-visual reveal reveal-delay-2" aria-hidden="true">
+      <div class="pv-circle-outer"></div>
+      <div class="pv-circle-mid"></div>
+      <div class="pv-circle-inner"></div>
+      <div class="pv-core">
+        <svg width="40" height="40" viewBox="0 0 48 48" fill="none"><path d="M10 34L24 10L38 34" stroke="#FF4500" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="24" cy="10" r="3.5" fill="#FF4500"/><line x1="24" y1="13.5" x2="24" y2="36" stroke="rgba(255,69,0,0.45)" stroke-width="1.5" stroke-dasharray="3 4"/></svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="herramientas" aria-labelledby="herramientas-heading">
+  <div class="reveal">
+    <div class="section-eyebrow">
+      <span class="eyebrow-line" aria-hidden="true"></span>
+      <span class="eyebrow-text">Nuestras herramientas propias</span>
+    </div>
+    <h2 class="section-title" id="herramientas-heading">No solo te damos soluciones. También las <span style="color:var(--orange)">herramientas.</span></h2>
+  </div>
+  <div class="os-showcase">
+    <div class="reveal">
+      <div class="os-tag"><span class="os-tag-dot" aria-hidden="true"></span>RUMBO OS · 13 herramientas, 13/13 tests en verde</div>
+      <p class="os-desc">Construimos nuestro propio ecosistema de herramientas de IA — RUMBO OS — para gestionar, entregar y hacer crecer proyectos tecnológicos con más velocidad. Más de 14 herramientas especializadas, cada una diseñada para resolver un problema concreto.</p>
+      <ul class="os-pillars" style="list-style:none">
+        <li class="os-pillar">
+          <span class="os-pillar-icon" aria-hidden="true">🧠</span>
+          <div>
+            <div class="os-pillar-name">NEXO 3.0 — Agente IA Central</div>
+            <div class="os-pillar-desc">Chat inteligente con contexto completo del negocio, gestión de clientes y generación de estrategias en segundos.</div>
+          </div>
+        </li>
+        <li class="os-pillar">
+          <span class="os-pillar-icon" aria-hidden="true">📄</span>
+          <div>
+            <div class="os-pillar-name">Generador de Propuestas</div>
+            <div class="os-pillar-desc">Propuestas comerciales completas, personalizadas y listas para enviar en minutos — no en días.</div>
+          </div>
+        </li>
+        <li class="os-pillar">
+          <span class="os-pillar-icon" aria-hidden="true">🌐</span>
+          <div>
+            <div class="os-pillar-name">Constructor de Landings</div>
+            <div class="os-pillar-desc">Del briefing al HTML listo para deploy. Sin tocar código, sin esperar semanas.</div>
+          </div>
+        </li>
+        <li class="os-pillar">
+          <span class="os-pillar-icon" aria-hidden="true">📱</span>
+          <div>
+            <div class="os-pillar-name">Generador de Contenido IA</div>
+            <div class="os-pillar-desc">Calendarios de contenido completos, posts y reels adaptados a la voz de cada marca del cliente.</div>
+          </div>
+        </li>
+      </ul>
+      <a href="#contacto" class="btn-primary" style="display:inline-flex">Quiero acceso anticipado →</a>
+    </div>
+    <div class="reveal reveal-delay-2">
+      <div class="os-screen" role="img" aria-label="Vista previa de RUMBO OS con 8 herramientas">
+        <div class="os-screen-bar" aria-hidden="true">
+          <div class="os-dots">
+            <div class="os-dot os-dot-r"></div>
+            <div class="os-dot os-dot-y"></div>
+            <div class="os-dot os-dot-g"></div>
+          </div>
+          <div class="os-screen-title">RUMBO OS · v1.0</div>
+          <div style="width:48px"></div>
+        </div>
+        <div class="os-screen-body" aria-hidden="true">
+          <div class="os-tool-pill active"><div class="os-pill-top"><span class="os-pill-icon">🧠</span><span class="os-status on">Activo</span></div><div class="os-pill-name">NEXO 3.0</div><div class="os-pill-sub">Agente IA central</div></div>
+          <div class="os-tool-pill active"><div class="os-pill-top"><span class="os-pill-icon">📱</span><span class="os-status on">Activo</span></div><div class="os-pill-name">Kit de Contenido</div><div class="os-pill-sub">Posts &amp; redes sociales</div></div>
+          <div class="os-tool-pill active"><div class="os-pill-top"><span class="os-pill-icon">📄</span><span class="os-status on">Construida</span></div><div class="os-pill-name">Propuestas</div><div class="os-pill-sub">Generador comercial</div></div>
+          <div class="os-tool-pill active"><div class="os-pill-top"><span class="os-pill-icon">🌐</span><span class="os-status on">Construida</span></div><div class="os-pill-name">Constructor Web</div><div class="os-pill-sub">Landings automáticas</div></div>
+          <div class="os-tool-pill active"><div class="os-pill-top"><span class="os-pill-icon">🤖</span><span class="os-status on">Construida</span></div><div class="os-pill-name">Chatbots</div><div class="os-pill-sub">Diseñador de flujos IA</div></div>
+          <div class="os-tool-pill active"><div class="os-pill-top"><span class="os-pill-icon">⚙️</span><span class="os-status on">Construida</span></div><div class="os-pill-name">Automatizaciones</div><div class="os-pill-sub">Mapeador de procesos</div></div>
+          <div class="os-tool-pill active"><div class="os-pill-top"><span class="os-pill-icon">💰</span><span class="os-status on">Construida</span></div><div class="os-pill-name">Presupuestos</div><div class="os-pill-sub">Calculadora inteligente</div></div>
+          <div class="os-tool-pill active"><div class="os-pill-top"><span class="os-pill-icon">📊</span><span class="os-status on">Construida</span></div><div class="os-pill-name">Reportes</div><div class="os-pill-sub">Métricas automáticas</div></div>
+        </div>
+      </div>
+      <div style="margin-top:14px;padding:16px 20px;border:1px solid var(--border);border-radius:3px;background:var(--surface);display:flex;align-items:center;gap:14px">
+        <span aria-hidden="true" style="font-size:18px">🚀</span>
+        <div>
+          <div style="font-family:var(--fd);font-size:13px;font-weight:700;color:var(--white);letter-spacing:-.2px">14 herramientas · creciendo cada semana</div>
+          <div style="font-size:11px;color:var(--w3);margin-top:2px">El ecosistema se expande con cada proyecto nuevo</div>
+        </div>
+        <div style="margin-left:auto;font-family:var(--fm);font-size:8px;letter-spacing:2px;color:var(--orange);text-transform:uppercase;flex-shrink:0">RUMBO OS</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section id="industrias" aria-labelledby="industrias-heading">
+  <div class="industries-layout">
+    <div class="reveal">
+      <div class="section-eyebrow">
+        <span class="eyebrow-line" aria-hidden="true"></span>
+        <span class="eyebrow-text">Industrias</span>
+      </div>
+      <h2 class="section-title" id="industrias-heading">Trabajamos con cualquier industria.</h2>
+      <p class="section-sub" style="margin-top:20px">Si tu negocio tiene clientes, procesos y objetivos de crecimiento, Rumbo IA tiene soluciones para vos. Nos adaptamos a tu industria, no al revés.</p>
+    </div>
+    <ul class="industries-grid reveal reveal-delay-1" style="list-style:none" aria-label="Industrias que atendemos">
+      <li class="industry-card"><span class="industry-icon" aria-hidden="true">🛍️</span><span class="industry-name">Retail</span><span class="industry-desc">E-commerce y automatización de ventas</span></li>
+      <li class="industry-card"><span class="industry-icon" aria-hidden="true">🏥</span><span class="industry-name">Salud</span><span class="industry-desc">Chatbots para agendas y consultas</span></li>
+      <li class="industry-card"><span class="industry-icon" aria-hidden="true">🎓</span><span class="industry-name">Educación</span><span class="industry-desc">Plataformas y marketing digital</span></li>
+      <li class="industry-card"><span class="industry-icon" aria-hidden="true">🏗️</span><span class="industry-name">Construcción</span><span class="industry-desc">Presencia digital y automatización</span></li>
+      <li class="industry-card"><span class="industry-icon" aria-hidden="true">🍕</span><span class="industry-name">Gastronomía</span><span class="industry-desc">Reservas y marketing con IA</span></li>
+      <li class="industry-card"><span class="industry-icon" aria-hidden="true">⚖️</span><span class="industry-name">Legal</span><span class="industry-desc">Captación y gestión de clientes</span></li>
+      <li class="industry-card"><span class="industry-icon" aria-hidden="true">🏠</span><span class="industry-name">Inmobiliaria</span><span class="industry-desc">CRM y chatbots para propiedades</span></li>
+      <li class="industry-card"><span class="industry-icon" aria-hidden="true">💼</span><span class="industry-name">Servicios B2B</span><span class="industry-desc">Estrategia digital corporativa</span></li>
+      <li class="industry-card"><span class="industry-icon" aria-hidden="true">🚀</span><span class="industry-name">Startups</span><span class="industry-desc">Crecimiento acelerado con IA</span></li>
+    </ul>
+  </div>
+</section>
+
+
+<section id="calculadora" aria-labelledby="calculadora-heading">
+  <div style="text-align:center" class="reveal">
+    <div class="section-eyebrow" style="justify-content:center">
+      <span class="eyebrow-line" aria-hidden="true"></span>
+      <span class="eyebrow-text">La cuenta</span>
+      <span class="eyebrow-line" aria-hidden="true"></span>
+    </div>
+    <h2 class="section-title" id="calculadora-heading">Cuánto cuesta la fuga,<br>con tus propios números.</h2>
+    <p class="section-sub" style="margin:0 auto 64px;text-align:center">Tres cifras que ya conocés. Nada de esto es una afirmación sobre nuestro producto: es tu aritmética, y todos los supuestos están a la vista y se pueden editar.</p>
+  </div>
+  <div class="calc-layout reveal">
+    <div class="calc-fields">
+      <div class="calc-field">
+        <label for="calc-enquiries">Consultas que recibís por semana</label>
+        <div class="calc-row">
+          <input type="number" id="calc-enquiries" value="25" min="1" max="5000" step="1" inputmode="numeric">
+          <span class="calc-unit">por semana</span>
+        </div>
+      </div>
+      <div class="calc-field">
+        <label for="calc-missed">De esas, cuántas no respondés el mismo día</label>
+        <div class="calc-row">
+          <input type="number" id="calc-missed" value="30" min="0" max="100" step="1" inputmode="numeric">
+          <span class="calc-unit">por ciento</span>
+        </div>
+        <input type="range" id="calc-missed-range" value="30" min="0" max="100" step="1" aria-label="De esas, cuántas no respondés el mismo día">
+      </div>
+      <div class="calc-field">
+        <label for="calc-ticket">Cuánto vale un cliente promedio para vos</label>
+        <div class="calc-row">
+          <span class="calc-unit">USD</span>
+          <input type="number" id="calc-ticket" value="450" min="1" max="1000000" step="10" inputmode="numeric">
+        </div>
+      </div>
+      <div class="calc-field">
+        <label for="calc-convert">De las respondidas tarde, cuántas habrías cerrado</label>
+        <div class="calc-row">
+          <input type="number" id="calc-convert" value="20" min="0" max="100" step="1" inputmode="numeric">
+          <span class="calc-unit">por ciento</span>
+        </div>
+        <input type="range" id="calc-convert-range" value="20" min="0" max="100" step="1" aria-label="De las respondidas tarde, cuántas habrías cerrado">
+      </div>
+    </div>
+
+    <div class="calc-result">
+      <div class="calc-eyebrow">Se va por año</div>
+      <p class="calc-amount" id="calc-amount" aria-live="polite" aria-atomic="true">
+        <span class="calc-currency">USD</span><span id="calc-amount-value">35.100</span>
+      </p>
+      <p class="calc-period">Estimado, a partir de las tres cifras de arriba.</p>
+      <div class="calc-bar"><div class="calc-bar-fill" id="calc-bar" style="width:6%"></div></div>
+      <div class="calc-split"><span>Se escapa</span><span>Cerrás hoy</span></div>
+      <p class="calc-plan">El plan que cubre esto: <strong id="calc-plan">RUMBO Recovery</strong> <span id="calc-plan-price">— USD 349/mo</span></p>
+      <details class="calc-assumption">
+        <summary>Cómo se calcula</summary>
+        <p>Consultas semanales × 52, por la proporción que no respondés el mismo día, por la proporción de esas que habrías cerrado, por el valor de un cliente. La última cifra es el único supuesto y podés cambiarla. Responder tarde no siempre significa perder la venta: por eso es un porcentaje y no todas.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<section id="precios" aria-labelledby="precios-heading">
+  <div style="text-align:center" class="reveal">
+    <div class="section-eyebrow" style="justify-content:center">
+      <span class="eyebrow-line" aria-hidden="true"></span>
+      <span class="eyebrow-text">Planes</span>
+      <span class="eyebrow-line" aria-hidden="true"></span>
+    </div>
+    <h2 class="section-title" id="precios-heading">Cinco planes.<br>Un sistema operativo.</h2>
+    <p class="section-sub" style="margin:0 auto;text-align:center">Todos los planes incluyen la plataforma RUMBO m&aacute;s un onboarding inicial por &uacute;nica vez. Empez&aacute;s donde est&aacute; tu negocio hoy y sub&iacute;s de plan cuando lo necesit&aacute;s.</p>
+  </div>
+  <div class="pricing-grid">
+    <article class="pricing-card reveal reveal-delay-1">
+      <div class="pc-tier">Plan 01</div>
+      <div class="pc-name">RUMBO Capture</div>
+      <p class="pc-desc">Negocios que reciben consultas y las pierden en el seguimiento.</p>
+      <div class="pc-price">
+        <div class="pc-amount"><span class="currency">$</span>149 <span class="period">/ mes</span></div>
+        <div class="pc-setup">+ USD 390 de implementación (pago único)</div>
+        <div class="pc-setup">Hasta 3 usuarios &middot; 1,500 contactos &middot; 1,000 interacciones de IA &middot; 3 flujos</div>
+      </div>
+      <ul class="pc-features" style="list-style:none">
+        <li class="pc-feature"><div class="pc-feature-icon"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#00C896" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></div>Bandeja compartida y CRM</li>
+        <li class="pc-feature"><div class="pc-feature-icon"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#00C896" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></div>Captura web y por canales</li>
+        <li class="pc-feature"><div class="pc-feature-icon"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#00C896" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></div>Lead Vault</li>
+        <li class="pc-feature"><div class="pc-feature-icon"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#00C896" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></div>Borradores con IA</li>
+        <li class="pc-feature"><div class="pc-feature-icon"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#00C896" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></div>Tareas, alertas y reportes</li>
+      </ul>
+      <p class="pc-usage-note">Mensajería y proveedores externos se facturan según consumo.</p>
+      <a href="#contacto" class="btn-plan outline">Empezar &rarr;</a>
+    </article>
+    <article class="pricing-card reveal reveal-delay-2 featured">
+      <div class="pc-tier">Plan 02</div>
+      <div class="pc-name">RUMBO Recovery</div>
+      <p class="pc-desc">Equipos que ya tienen demanda y la pierden entre el presupuesto y la venta.</p>
+      <div class="pc-price">
+        <div class="pc-amount"><span class="currency">$</span>349 <span class="period">/ mes</span></div>
+        <div class="pc-setup">+ USD 750 de implementación (pago único)</div>
+        <div class="pc-setup">Hasta 6 usuarios &middot; 4,000 contactos &middot; 3,500 interacciones de IA &middot; 8 flujos</div>
+      </div>
+      <ul class="pc-features" style="list-style:none">
+        <li class="pc-feature"><div class="pc-feature-icon"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#00C896" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></div>Todo Capture</li>
+        <li class="pc-feature"><div class="pc-feature-icon"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#00C896" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></div>Seguimiento de presupuestos</li>
+        <li class="pc-feature"><div class="pc-feature-icon"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#00C896" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></div>Recuperación de no-shows</li>
+        <li class="pc-feature"><div class="pc-feature-icon"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#00C896" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></div>Reactivación de clientes</li>
+        <li class="pc-feature"><div class="pc-feature-icon"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#00C896" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></div>Agenda de turnos</li>
+        <li class="pc-feature"><div class="pc-feature-icon"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#00C896" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></div>Base de conocimiento, aprobaciones y analítica</li>
+      </ul>
+      <p class="pc-usage-note">Incluye la plataforma; el consumo de canales y modelos se informa por separado.</p>
+      <a href="#contacto" class="btn-plan">Empezar &rarr;</a>
+    </article>
+    <article class="pricing-card reveal reveal-delay-3">
+      <div class="pc-tier">Plan 03</div>
+      <div class="pc-name">RUMBO Front Desk AI</div>
+      <p class="pc-desc">Negocios que pierden llamadas que no pueden atender, dentro y fuera de horario.</p>
+      <div class="pc-price">
+        <div class="pc-amount"><span class="currency">$</span>599 <span class="period">/ mes</span></div>
+        <div class="pc-setup">+ USD 1,200 de implementación (pago único)</div>
+        <div class="pc-setup">Hasta 10 usuarios &middot; 7,500 contactos &middot; 6,000 interacciones de IA &middot; 12 flujos</div>
+      </div>
+      <ul class="pc-features" style="list-style:none">
+        <li class="pc-feature"><div class="pc-feature-icon"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#00C896" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></div>Todo Recovery</li>
+        <li class="pc-feature"><div class="pc-feature-icon"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#00C896" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></div>Recepcionista IA 24/7</li>
+        <li class="pc-feature"><div class="pc-feature-icon"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#00C896" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></div>Recuperación de llamadas perdidas</li>
+        <li class="pc-feature"><div class="pc-feature-icon"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#00C896" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></div>Agenda y transferencias</li>
+        <li class="pc-feature"><div class="pc-feature-icon"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#00C896" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></div>Registro de llamada y scoring por intención</li>
+      </ul>
+      <p class="pc-usage-note">Minutos de telefonía, voz y mensajería se facturan según consumo.</p>
+      <a href="#contacto" class="btn-plan outline">Empezar &rarr;</a>
+    </article>
+    <article class="pricing-card reveal reveal-delay-4">
+      <div class="pc-tier">Plan 04</div>
+      <div class="pc-name">RUMBO Growth Engine</div>
+      <p class="pc-desc">Empresas que necesitan generar demanda nueva, no sólo atender la que llega.</p>
+      <div class="pc-price">
+        <div class="pc-amount"><span class="currency">$</span>999 <span class="period">/ mes</span></div>
+        <div class="pc-setup">+ USD 1,500 de implementación (pago único)</div>
+        <div class="pc-setup">Hasta 15 usuarios &middot; 20,000 contactos &middot; 12,000 interacciones de IA &middot; 20 flujos</div>
+      </div>
+      <ul class="pc-features" style="list-style:none">
+        <li class="pc-feature"><div class="pc-feature-icon"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#00C896" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></div>Todo Front Desk</li>
+        <li class="pc-feature"><div class="pc-feature-icon"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#00C896" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></div>Opportunity Scanner 24/7</li>
+        <li class="pc-feature"><div class="pc-feature-icon"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#00C896" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></div>Enriquecimiento de contacto público y scoring por reglas</li>
+        <li class="pc-feature"><div class="pc-feature-icon"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#00C896" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></div>Campañas con revisión humana</li>
+        <li class="pc-feature"><div class="pc-feature-icon"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#00C896" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></div>Webhook de salida y canales oficiales</li>
+      </ul>
+      <p class="pc-usage-note">Búsquedas, enriquecimiento, email, WhatsApp y voz se facturan según uso real.</p>
+      <a href="#contacto" class="btn-plan outline">Empezar &rarr;</a>
+    </article>
+    <article class="pricing-card reveal reveal-delay-4">
+      <div class="pc-tier">Plan 05</div>
+      <div class="pc-name">RUMBO Managed AI Operations</div>
+      <p class="pc-desc">Empresas que quieren delegar la operación y su mejora continua.</p>
+      <div class="pc-price">
+        <div class="pc-amount"><span class="currency">$</span>1,500 <span class="period">/ mes</span></div>
+        <div class="pc-setup">+ USD 2,500 de implementación (pago único)</div>
+        <div class="pc-setup">Usuarios, contactos y flujos sin límite</div>
+      </div>
+      <ul class="pc-features" style="list-style:none">
+        <li class="pc-feature"><div class="pc-feature-icon"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#00C896" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></div>Todo Growth Engine</li>
+        <li class="pc-feature"><div class="pc-feature-icon"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#00C896" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></div>Optimización mensual (servicio, no software)</li>
+        <li class="pc-feature"><div class="pc-feature-icon"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#00C896" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></div>Revisión de conversaciones y prompts</li>
+        <li class="pc-feature"><div class="pc-feature-icon"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#00C896" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></div>Nuevas automatizaciones</li>
+        <li class="pc-feature"><div class="pc-feature-icon"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#00C896" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></div>Soporte prioritario y reporte ejecutivo</li>
+      </ul>
+      <p class="pc-usage-note">El alcance y el SLA se confirman por contrato; el consumo externo no está incluido.</p>
+      <a href="#contacto" class="btn-plan outline">Hablar con el equipo &rarr;</a>
+    </article>
+  </div>
+  <p class="pricing-footnote reveal">Todos los montos est&aacute;n en USD y corresponden a la suscripci&oacute;n de la plataforma y su onboarding. El consumo variable &mdash; minutos de telefon&iacute;a, mensajer&iacute;a, email y uso de modelos de IA &mdash; se factura aparte seg&uacute;n uso real.</p>
+</section>
+
+
+<section id="faq" aria-labelledby="faq-heading">
+  <div class="faq-layout">
+    <div class="reveal">
+      <div class="section-eyebrow">
+        <span class="eyebrow-line" aria-hidden="true"></span>
+        <span class="eyebrow-text">Preguntas frecuentes</span>
+      </div>
+      <h2 class="section-title" id="faq-heading">Todo lo que necesitás saber.</h2>
+      <p class="section-sub" style="margin-top:20px">¿Todavía tenés dudas? Escribinos directamente — respondemos en menos de 24 horas.</p>
+      <a href="#contacto" class="btn-primary" style="margin-top:32px;display:inline-flex">Contactar ahora →</a>
+    </div>
+    <div class="faq-list reveal reveal-delay-1">
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)" aria-expanded="false">¿Necesito saber de tecnología para trabajar con ustedes?<div class="faq-icon" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></div></button>
+        <div class="faq-answer">Para nada. Ese es exactamente nuestro rol. Vos nos contás qué querés lograr con tu negocio y nosotros nos encargamos de toda la parte técnica. Te explicamos todo en lenguaje simple, sin tecnicismos.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)" aria-expanded="false">¿En cuánto tiempo veo los primeros resultados?<div class="faq-icon" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></div></button>
+        <div class="faq-answer">La puesta en marcha es el onboarding que se paga una vez, y arranca apenas tenemos tus datos. Cuánto tarda en salir en vivo depende de aprobaciones que no controlamos &mdash; un número de teléfono, una cuenta de WhatsApp Business &mdash; así que te damos una fecha después de ver tu caso, no un número ahora.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)" aria-expanded="false">¿Trabajan solo con empresas grandes o también con pymes?<div class="faq-icon" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></div></button>
+        <div class="faq-answer">Trabajamos con ambas. Los planes arrancan en USD 149/mes con RUMBO Capture para negocios que recién empiezan, y llegan hasta USD 1.500/mes con RUMBO Managed AI Operations para empresas que quieren delegar la supervisión de toda su operación comercial. El tamaño de tu empresa no importa — lo que importa es que quieras crecer.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)" aria-expanded="false">¿En qué países operan?<div class="faq-icon" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></div></button>
+        <div class="faq-answer">Operamos 100% de forma remota, lo que nos permite trabajar con empresas de cualquier país. Coordinamos reuniones y entregas en tu franja horaria y trabajamos en español o inglés.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)" aria-expanded="false">¿Cómo son los pagos y contratos?<div class="faq-icon" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></div></button>
+        <div class="faq-answer">Cada plan tiene dos componentes: un onboarding inicial por única vez y una suscripción mensual, ambos en USD. El consumo variable — minutos de telefonía, mensajería, email y uso de modelos de IA — se factura aparte según uso real.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)" aria-expanded="false">¿Qué pasa después de entregar el proyecto?<div class="faq-icon" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></div></button>
+        <div class="faq-answer">No desaparecemos. Todos los proyectos incluyen un período de soporte post-entrega. Y si querés seguir creciendo, tenés la opción de un plan de mantenimiento y acompañamiento continuo. Somos socios de largo plazo.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="contacto" aria-labelledby="contacto-heading">
+  <div class="reveal">
+    <div class="cta-label">Empezá hoy</div>
+    <h2 class="cta-title" id="contacto-heading">¿Listo para darle<br><span class="highlight">Rumbo</span> a tu empresa?</h2>
+    <p class="cta-sub">El primer paso es gratis. Contanos qué necesitás y en menos de 24 horas te respondemos con un plan concreto.</p>
+  </div>
+  <div class="contact-form reveal reveal-delay-1">
+    <form id="contactForm" novalidate>
+    <div class="form-row">
+      <input type="text" name="nombre" class="form-input" placeholder="Tu nombre" required autocomplete="name" aria-label="Tu nombre">
+      <input type="text" name="empresa" class="form-input" placeholder="Nombre de tu empresa" autocomplete="organization" aria-label="Nombre de tu empresa">
+    </div>
+    <div class="form-row">
+      <input type="email" name="email" class="form-input" placeholder="Email de contacto" required autocomplete="email" aria-label="Email de contacto">
+      <input type="tel" name="whatsapp" class="form-input" placeholder="WhatsApp (opcional)" autocomplete="tel" aria-label="WhatsApp">
+    </div>
+    <select name="servicio" class="form-select" aria-label="Solución de interés">
+      <option value="" disabled selected>¿Qué solución te interesa?</option>
+      <option>Sitio web o landing page</option>
+      <option>Chatbot IA para WhatsApp/web</option>
+      <option>Automatización de procesos</option>
+      <option>Marketing con IA</option>
+      <option>Plan Growth completo</option>
+      <option>Acceso anticipado a RUMBO OS</option>
+      <option>Quiero que me asesoren</option>
+    </select>
+    <input type="text" name="mensaje" class="form-input" placeholder="Contanos brevemente qué necesitás..." aria-label="Mensaje">
+    <button type="submit" class="form-submit" onclick="handleSubmit(event,this)">Quiero empezar mi transformación →</button>
+    </form>
+    <p class="form-note">Respondemos en menos de 24h. Sin spam, sin presión. Usamos lo que nos mandás sólo para responderte — mirá la <a href="privacy.html">política de privacidad</a>.</p>
+    <div class="form-divider"><span class="form-divider-text">o escribinos directo</span></div>
+    <a href="mailto:sebastian@rumbo.verso.fans?subject=RUMBO%20IA%20Consulta%20gratuita&body=Hola%20RUMBO%20IA%2C%20quiero%20una%20consulta%20gratuita"
+       target="_blank"
+       rel="noopener noreferrer"
+       class="wa-form-btn"
+       aria-label="Escribir por WhatsApp — Respondemos en minutos">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="#25D366" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+      <span class="wa-form-label">Escribir por WhatsApp</span>
+      <span class="wa-form-sub">Respondemos en minutos</span>
+    </a>
+  </div>
+</section>
+
+</main>
+
+<footer class="site-footer" aria-label="Pie de página">
+  <div class="footer-top">
+    <div>
+      <a href="#inicio" class="footer-logo" aria-label="Rumbo IA — Volver al inicio">
+        <svg width="26" height="26" viewBox="0 0 40 40" fill="none" aria-hidden="true"><path d="M8 28L20 10L32 28" stroke="#FF4500" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="20" cy="10" r="3" fill="#FF4500"/><line x1="20" y1="13" x2="20" y2="30" stroke="rgba(255,69,0,0.4)" stroke-width="1.5" stroke-dasharray="3 3"/></svg>
+        <span class="footer-brand-name">RUMBO <span>IA</span></span>
+      </a>
+      <p class="footer-brand-desc">Atiende el teléfono, hace seguimiento de presupuestos y agenda turnos. Una persona aprueba lo sensible.</p>
+      <p style="font-family:var(--fm);font-size:10px;color:var(--w3);letter-spacing:2px">DISPONIBLE EN TODO EL MUNDO · INGLÉS Y ESPAÑOL</p>
+    </div>
+    <nav aria-label="Servicios">
+      <div class="footer-col-title">Servicios</div>
+      <ul class="footer-links">
+        <li><a href="#servicios">Sitios Web &amp; Apps</a></li>
+        <li><a href="#servicios">Chatbots IA</a></li>
+        <li><a href="#servicios">Automatización</a></li>
+        <li><a href="#servicios">Marketing con IA</a></li>
+        <li><a href="#precios">Ver precios</a></li>
+      </ul>
+    </nav>
+    <nav aria-label="Herramientas">
+      <div class="footer-col-title">Herramientas</div>
+      <ul class="footer-links">
+        <li><a href="#herramientas">RUMBO OS</a></li>
+        <li><a href="#herramientas">NEXO 3.0 — Agente IA</a></li>
+        <li><a href="#herramientas">Generador de Propuestas</a></li>
+        <li><a href="#herramientas">Constructor de Landings</a></li>
+        <li><a href="#herramientas">Kit de Contenido IA</a></li>
+      </ul>
+    </nav>
+    <nav aria-label="Contacto">
+      <div class="footer-col-title">Contacto</div>
+      <ul class="footer-links">
+        <li><a href="#contacto">Diagnóstico gratis</a></li>
+        <li><a href="mailto:sebastian@rumbo.verso.fans">sebastian@rumbo.verso.fans</a></li>
+        <li><a href="mailto:sebastian@rumbo.verso.fans?subject=RUMBO%20IA%20WhatsApp%20Request">WhatsApp directo</a></li>
+        <li><a href="https://www.linkedin.com" target="_blank" rel="noopener noreferrer">LinkedIn</a></li>
+        <li><a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer">Instagram</a></li>
+      </ul>
+    </nav>
+    <nav aria-label="Legal">
+      <div class="footer-col-title">Legal</div>
+      <ul class="footer-links">
+        <li><a href="privacy.html">Política de privacidad</a></li>
+        <li><a href="terms.html">Términos del servicio</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div class="footer-bottom">
+    <p class="footer-copy">© 2026 RUMBO IA — Todos los derechos reservados</p>
+    <div class="footer-socials">
+      <a href="https://www.linkedin.com" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="RUMBO IA en LinkedIn">in</a>
+      <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="RUMBO IA en Instagram">ig</a>
+      <a href="mailto:sebastian@rumbo.verso.fans" class="social-link" aria-label="WhatsApp de Rumbo IA">wa</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+const headerEl = document.getElementById('site-header');
+window.addEventListener('scroll', () => {
+  headerEl.classList.toggle('scrolled', window.scrollY > 40);
+}, { passive: true });
+
+const navToggle = document.getElementById('navToggle');
+const navLinks  = document.getElementById('navLinks');
+navToggle.addEventListener('click', () => {
+  const isOpen = navLinks.classList.toggle('open');
+  navToggle.setAttribute('aria-expanded', isOpen);
+  navToggle.setAttribute('aria-label', isOpen ? 'Cerrar menú' : 'Abrir menú');
+  document.body.style.overflow = isOpen ? 'hidden' : '';
+});
+navLinks.querySelectorAll('a').forEach(a => {
+  a.addEventListener('click', () => {
+    navLinks.classList.remove('open');
+    navToggle.setAttribute('aria-expanded', 'false');
+    document.body.style.overflow = '';
+  });
+});
+// Close nav on outside click
+document.addEventListener('click', e => {
+  if (navLinks.classList.contains('open') && !navLinks.contains(e.target) && !navToggle.contains(e.target)) {
+    navLinks.classList.remove('open');
+    navToggle.setAttribute('aria-expanded', 'false');
+    document.body.style.overflow = '';
+  }
+});
+
+const particleContainer = document.getElementById('particles');
+if (window.matchMedia('(prefers-reduced-motion: no-preference)').matches) {
+  for (let i = 0; i < 20; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.left = (Math.random() * 100) + '%';
+    p.style.setProperty('--drift', (Math.random() * 100 - 50) + 'px');
+    p.style.animationDuration = (8 + Math.random() * 12) + 's';
+    p.style.animationDelay = (Math.random() * 10) + 's';
+    p.style.width = p.style.height = (1 + Math.random() * 2) + 'px';
+    particleContainer.appendChild(p);
+  }
+}
+
+const revealObserver = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('visible'); revealObserver.unobserve(e.target); }
+  });
+}, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+function toggleFaq(btn) {
+  const item = btn.parentElement;
+  const isOpen = item.classList.contains('open');
+  document.querySelectorAll('.faq-item.open').forEach(i => {
+    i.classList.remove('open');
+    i.querySelector('.faq-question').setAttribute('aria-expanded', 'false');
+  });
+  if (!isOpen) {
+    item.classList.add('open');
+    btn.setAttribute('aria-expanded', 'true');
+  }
+}
+
+function handleSubmit(e, btn) {
+  e.preventDefault();
+  const nombre = document.querySelector('input[name="nombre"]');
+  const email  = document.querySelector('input[name="email"]');
+  if (!nombre?.value.trim()) { nombre?.focus(); nombre?.reportValidity(); return; }
+  if (!email?.value.includes('@')) { email?.focus(); email?.reportValidity(); return; }
+  const orig = btn.textContent;
+  btn.textContent = '✓ ¡Mensaje enviado! Te respondemos en 24h.';
+  btn.style.background = 'var(--green)';
+  btn.disabled = true;
+  setTimeout(() => { btn.textContent = orig; btn.style.background = ''; btn.disabled = false; }, 5000);
+}
+// Active nav link on scroll
+const navSections = document.querySelectorAll('main section[id]');
+const navAnchors  = document.querySelectorAll('.nav-links a[href^="#"]');
+const activateNav = () => {
+  let current = '';
+  navSections.forEach(s => {
+    if (window.scrollY >= s.offsetTop - 120) current = s.id;
+  });
+  navAnchors.forEach(a => {
+    a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+  });
+};
+window.addEventListener('scroll', activateNav, { passive: true });
+activateNav();
+
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const t = document.querySelector(a.getAttribute('href'));
+    if (t) { e.preventDefault(); t.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+  });
+});
+</script>
+
+<script>
+/* The leak calculator. Plain arithmetic on the visitor's own figures — no
+   claim about the product is encoded here, which is what makes it credible
+   when someone checks the maths. */
+(function () {
+  var byId = function (id) { return document.getElementById(id); };
+  var enquiries = byId('calc-enquiries');
+  if (!enquiries) return;
+  var missed = byId('calc-missed');
+  var missedRange = byId('calc-missed-range');
+  var ticket = byId('calc-ticket');
+  var convert = byId('calc-convert');
+  var convertRange = byId('calc-convert-range');
+  var amount = byId('calc-amount-value');
+  var bar = byId('calc-bar');
+  var planName = byId('calc-plan');
+  var planPrice = byId('calc-plan-price');
+  var locale = 'es-ES';
+
+  /* Plans mirror domain/product-catalog.json. A visitor who lands on a number
+     here and a different one at the pricing table stops trusting both. */
+  var PLANS = [
+    { name: 'RUMBO Capture', monthly: 149, upTo: 12000 },
+    { name: 'RUMBO Recovery', monthly: 349, upTo: 60000 },
+    { name: 'RUMBO Front Desk AI', monthly: 599, upTo: 150000 },
+    { name: 'RUMBO Growth Engine', monthly: 999, upTo: 400000 },
+    { name: 'RUMBO Managed AI Operations', monthly: 1500, upTo: Infinity }
+  ];
+
+  var clamp = function (input) {
+    var value = Number(input.value);
+    var min = Number(input.min);
+    var max = Number(input.max);
+    if (!isFinite(value)) return min;
+    if (value > max) { input.value = String(max); return max; }
+    return Math.max(min, value);
+  };
+
+  function update() {
+    var perYear = clamp(enquiries) * 52;
+    var lostShare = clamp(missed) / 100;
+    var closeShare = clamp(convert) / 100;
+    var value = clamp(ticket);
+    var lost = perYear * lostShare * closeShare * value;
+
+    amount.textContent = Math.round(lost).toLocaleString(locale);
+
+    /* The bar shows the share of the year's enquiry value that leaks, so it
+       stays meaningful whatever the absolute numbers are. */
+    var total = perYear * value;
+    var share = total > 0 ? Math.min(100, (lost / total) * 100) : 0;
+    bar.style.width = share.toFixed(1) + '%';
+
+    var plan = PLANS[PLANS.length - 1];
+    for (var i = 0; i < PLANS.length; i += 1) { if (lost <= PLANS[i].upTo) { plan = PLANS[i]; break; } }
+    planName.textContent = plan.name;
+    planPrice.textContent = '— USD ' + plan.monthly + '/mes';
+  }
+
+  /* Number field and slider are two views of one value; each keeps the other
+     honest so a keyboard user and a pointer user see the same thing. */
+  function pair(field, range) {
+    if (!range) return;
+    field.addEventListener('input', function () { range.value = clamp(field); update(); });
+    range.addEventListener('input', function () { field.value = range.value; update(); });
+  }
+  pair(missed, missedRange);
+  pair(convert, convertRange);
+  [enquiries, ticket].forEach(function (field) { field.addEventListener('input', update); });
+  [enquiries, missed, ticket, convert].forEach(function (field) {
+    field.addEventListener('blur', function () { field.value = clamp(field); update(); });
+  });
+
+  update();
+})();
+</script>
+
+</body>
+</html>
