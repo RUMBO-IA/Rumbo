@@ -11,7 +11,7 @@ RUMBO IA helps small businesses organize customer conversations, leads, follow-u
 The public repository keeps consequential behavior behind explicit verification boundaries:
 
 - sensitive business actions remain human-supervised;
-- the public privacy gate runs on pull requests and pushes to `main`;
+- the public privacy gate runs on branch pushes and on pull requests targeting `main`;
 - CI checks public privacy invariants, commercial-offer coherence, and security-header configuration;
 - repository security and reporting rules are documented in [`SECURITY.md`](SECURITY.md).
 
