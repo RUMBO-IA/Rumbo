@@ -7,8 +7,8 @@ import unicodedata
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-PUBLIC_NAME = "Sebastián"
-APPROVED_NAMES = {PUBLIC_NAME, "fscfede-beep", "RUMBO Privacy Automation"}
+PUBLIC_NAME = "Sebastián Federico"
+APPROVED_NAMES = {PUBLIC_NAME, "Sebastián", "fscfede-beep", "RUMBO Privacy Automation"}
 APPROVED_AUTHOR_EMAILS = {
     "sebastian@rumbo.verso.fans",
     "293577326+fscfede-beep@users.noreply.github.com",
