@@ -114,6 +114,11 @@ def main() -> int:
     if not footer or footer.group(1).strip() != PUBLIC_NAME:
         violations.append("index.html:founder-attribution")
 
+    landing_en = (ROOT / "apps/landing-publica/index-en-openai.html").read_text(encoding="utf-8")
+    landing_founder = re.search(r"RUMBO IA is developed by\s+([^<\r\n]+)", landing_en)
+    if not landing_founder or landing_founder.group(1).strip() != PUBLIC_NAME:
+        violations.append("apps/landing-publica/index-en-openai.html:founder-attribution")
+
     if violations:
         print(f"PRIVACY_GATE_FAIL: {len(violations)} public-surface violation(s)")
         for item in sorted(set(violations)):

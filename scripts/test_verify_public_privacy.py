@@ -33,5 +33,12 @@ class PrivacyGateRegressionTests(unittest.TestCase):
         self.assertTrue(gate.text_has_denied_value("hello private surname world", deny))
 
 
+    def test_openai_landing_founder_uses_public_name(self):
+        text = (Path(__file__).resolve().parents[1] / "apps/landing-publica/index-en-openai.html").read_text(encoding="utf-8")
+        match = gate.re.search(r"RUMBO IA is developed by\s+([^<\r\n]+)", text)
+        self.assertIsNotNone(match)
+        self.assertEqual(match.group(1).strip(), gate.PUBLIC_NAME)
+
+
 if __name__ == "__main__":
     unittest.main()
