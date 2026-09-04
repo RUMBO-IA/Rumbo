@@ -8,11 +8,25 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 INDEX = ROOT / "index.html"
 README = ROOT / "README.md"
+PUBLIC_VARIANTS = (
+    ROOT / "apps" / "landing-publica" / "index.html",
+    ROOT / "apps" / "landing-publica" / "index-es.html",
+)
 TYPEFORM = "https://form.typeform.com/to/Tu3D3tVo"
 TYPEFORM_PREFIX = "https://form.typeform.com/to/"
 TYPEFORM_URL = re.compile(r"https://form\.typeform\.com/to/[A-Za-z0-9]+")
 MONTHLY_PRICE = re.compile(
     r"(?:USD|\$)\s*\d+(?:[.,]\d+)?\s*/\s*(?:mes|month)\b",
+    re.I,
+)
+RECURRING_PUBLIC_PRICE = re.compile(
+    r"(?:USD|\$)\s*[0-9][0-9.,]*.{0,80}?"
+    r"(?:/\s*(?:mes|month|mo)\b|(?:a|al|per)\s+(?:mes|month)\b)",
+    re.I | re.S,
+)
+RECURRING_CATALOG = re.compile(r"\bmonthly\s*:\s*[0-9]", re.I)
+RECURRING_SUBSCRIPTION = re.compile(
+    r"\b(?:monthly subscription|suscripci[oó]n mensual)\b",
     re.I,
 )
 
@@ -89,8 +103,31 @@ def check(readme: str, html: str) -> list[str]:
     return sorted(set(errors))
 
 
+def check_public_variant(path: Path, html: str) -> list[str]:
+    errors: list[str] = []
+    label = path.relative_to(ROOT).as_posix()
+    folded = html.casefold()
+
+    for value in ("Revenue Recovery Sprint", "USD 149"):
+        if value.casefold() not in folded:
+            errors.append(f"PUBLIC_VARIANT_MISSING:{label}:{value}")
+
+    if "one-time" not in folded and "pago único" not in folded:
+        errors.append(f"PUBLIC_VARIANT_ONE_TIME_MISSING:{label}")
+
+    if RECURRING_PUBLIC_PRICE.search(html):
+        errors.append(f"PUBLIC_VARIANT_RECURRING_PRICE:{label}")
+    if RECURRING_CATALOG.search(html):
+        errors.append(f"PUBLIC_VARIANT_RECURRING_CATALOG:{label}")
+    if RECURRING_SUBSCRIPTION.search(html):
+        errors.append(f"PUBLIC_VARIANT_RECURRING_SUBSCRIPTION:{label}")
+
+    return sorted(set(errors))
+
+
 def main() -> int:
-    if not README.is_file() or not INDEX.is_file():
+    required = (README, INDEX, *PUBLIC_VARIANTS)
+    if any(not path.is_file() for path in required):
         print("COMMERCIAL_COHERENCE_FAIL: REQUIRED_PUBLIC_SURFACE_MISSING")
         return 1
 
@@ -98,6 +135,9 @@ def main() -> int:
         README.read_text(encoding="utf-8"),
         INDEX.read_text(encoding="utf-8"),
     )
+    for path in PUBLIC_VARIANTS:
+        errors.extend(check_public_variant(path, path.read_text(encoding="utf-8")))
+    errors = sorted(set(errors))
     if errors:
         print(f"COMMERCIAL_COHERENCE_FAIL: {len(errors)} violation(s)")
         for error in errors:
