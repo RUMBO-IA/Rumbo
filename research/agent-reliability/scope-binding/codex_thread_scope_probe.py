@@ -66,8 +66,14 @@ def evaluate_payload(payload: dict[str, Any]) -> dict[str, Any]:
     if permission_evidence is not None:
         if not isinstance(permission_evidence, dict):
             return _fail("PERMISSION_EVIDENCE_INVALID")
-        if not str(permission_evidence.get("source") or "").strip():
+        permission_source = str(permission_evidence.get("source") or "").strip()
+        if not permission_source:
             return _fail("PERMISSION_EVIDENCE_SOURCE_REQUIRED")
+        expected_permission_source = str(authority.get("permission_source") or "").strip()
+        if not expected_permission_source:
+            return _fail("PERMISSION_AUTHORITY_SOURCE_REQUIRED")
+        if permission_source != expected_permission_source:
+            return _fail("PERMISSION_EVIDENCE_SOURCE_MISMATCH")
         raw_writable = permission_evidence.get("writableRoots")
         if not isinstance(raw_writable, list):
             return _fail("PERMISSION_WRITABLE_ROOTS_INVALID")

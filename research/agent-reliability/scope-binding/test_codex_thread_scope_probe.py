@@ -94,6 +94,7 @@ class CodexThreadScopePayloadTests(unittest.TestCase):
         from codex_thread_scope_probe import evaluate_payload
         authority = dict(AUTHORITY)
         authority["required_writable_roots"] = ["/work/project-b"]
+        authority["permission_source"] = "effective-permission-profile"
         payload = {
             "authority": authority,
             "thread": THREAD,
@@ -105,3 +106,39 @@ class CodexThreadScopePayloadTests(unittest.TestCase):
         }
         result = evaluate_payload(payload)
         self.assertEqual("RUNTIME_SCOPE_BOUND", result["decision"])
+
+class PermissionSourceAuthorityTests(unittest.TestCase):
+    def test_permission_source_must_match_external_authority(self):
+        from codex_thread_scope_probe import evaluate_payload
+        authority = dict(AUTHORITY)
+        authority["required_writable_roots"] = ["/work/project-b"]
+        authority["permission_source"] = "trusted-effective-permission-profile"
+        payload = {
+            "authority": authority,
+            "thread": THREAD,
+            "environmentStatuses": {"env-b": {"status": "ready"}},
+            "permissionEvidence": {
+                "source": "self-declared",
+                "writableRoots": ["/work/project-b"],
+            },
+        }
+        result = evaluate_payload(payload)
+        self.assertFalse(result["ok"])
+        self.assertIn("PERMISSION_EVIDENCE_SOURCE_MISMATCH", result["errors"])
+
+    def test_permission_evidence_requires_authorized_source_identity(self):
+        from codex_thread_scope_probe import evaluate_payload
+        authority = dict(AUTHORITY)
+        authority["required_writable_roots"] = ["/work/project-b"]
+        payload = {
+            "authority": authority,
+            "thread": THREAD,
+            "environmentStatuses": {"env-b": {"status": "ready"}},
+            "permissionEvidence": {
+                "source": "effective-permission-profile",
+                "writableRoots": ["/work/project-b"],
+            },
+        }
+        result = evaluate_payload(payload)
+        self.assertFalse(result["ok"])
+        self.assertIn("PERMISSION_AUTHORITY_SOURCE_REQUIRED", result["errors"])
