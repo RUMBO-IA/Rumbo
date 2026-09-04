@@ -86,6 +86,17 @@ class PrivacyGateRegressionTests(unittest.TestCase):
         with mock.patch.dict(gate.os.environ, env, clear=True):
             self.assertFalse(gate.approved_head_author_email(value, "abc123", deny))
 
+    def test_public_founder_display_is_first_name_only(self):
+        self.assertEqual(gate.PUBLIC_NAME, "Sebasti\u00e1n")
+
+    def test_direct_person_profile_link_is_rejected(self):
+        link = "https://www.linkedin.com" + "/in/example"
+        self.assertTrue(gate.text_has_direct_person_profile(link))
+
+    def test_rel_me_identity_link_is_rejected(self):
+        marker = "rel=" + chr(34) + "me" + chr(34)
+        self.assertTrue(gate.text_has_direct_person_profile("<link " + marker + " href=https://example.test/profile>"))
+
     def test_word_ngram_deny_behavior_is_preserved(self):
         deny = {gate.sha("private surname")}
         self.assertTrue(gate.text_has_denied_value("hello private surname world", deny))

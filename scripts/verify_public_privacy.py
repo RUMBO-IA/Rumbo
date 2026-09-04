@@ -7,9 +7,9 @@ import unicodedata
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-PUBLIC_NAME = "Sebastián Federico"
+PUBLIC_NAME = "Sebasti\u00e1n"
 TRUSTED_GITHUB_ACTOR = "fscfede-beep"
-APPROVED_NAMES = {PUBLIC_NAME, "Sebastián", TRUSTED_GITHUB_ACTOR, "RUMBO Privacy Automation"}
+APPROVED_NAMES = {PUBLIC_NAME, TRUSTED_GITHUB_ACTOR, "RUMBO Privacy Automation"}
 APPROVED_AUTHOR_EMAILS = {
     "sebastian@rumbo.verso.fans",
     "293577326+fscfede-beep@users.noreply.github.com",
@@ -72,6 +72,14 @@ def text_has_unapproved_email(text: str) -> bool:
     return any(email not in APPROVED_PUBLIC_TEXT_EMAILS for email in email_candidates(text))
 
 
+def text_has_direct_person_profile(text: str) -> bool:
+    folded = text.casefold()
+    linkedin_profile = "linkedin.com" + "/in/"
+    rel_me_double = "rel=" + chr(34) + "me" + chr(34)
+    rel_me_single = "rel=" + chr(39) + "me" + chr(39)
+    return linkedin_profile in folded or rel_me_double in folded or rel_me_single in folded
+
+
 def approved_head_author_email(author_email: str, commit_ref: str, deny: set[str]) -> bool:
     if is_denied(author_email, deny):
         return False
@@ -125,6 +133,8 @@ def main() -> int:
             violations.append(f"{relpath}:unapproved-email")
         if text_has_denied_value(text, deny):
             violations.append(f"{relpath}:denied-value")
+        if text_has_direct_person_profile(text):
+            violations.append(f"{relpath}:direct-person-profile")
 
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
     founder = re.search(r"(?ms)^## Founder\s*$\s*^([^\r\n]+)", readme)
