@@ -68,6 +68,14 @@ def text_has_denied_value(text: str, deny: set[str]) -> bool:
     )
 
 
+def denied_line_numbers(text: str, deny: set[str]) -> list[int]:
+    return [
+        line_no
+        for line_no, line in enumerate(text.splitlines(), start=1)
+        if text_has_denied_value(line, deny)
+    ]
+
+
 def text_has_unapproved_email(text: str) -> bool:
     return any(email not in APPROVED_PUBLIC_TEXT_EMAILS for email in email_candidates(text))
 
@@ -124,6 +132,9 @@ def main() -> int:
         if text_has_unapproved_email(text):
             violations.append(f"{relpath}:unapproved-email")
         if text_has_denied_value(text, deny):
+            lines = denied_line_numbers(text, deny)
+            location = ",".join(map(str, lines)) if lines else "cross-line-or-unknown"
+            print(f"PRIVACY_DIAGNOSTIC_LINE={relpath}:{location}")
             violations.append(f"{relpath}:denied-value")
 
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
