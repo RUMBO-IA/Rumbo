@@ -57,6 +57,13 @@ class PrivacyGateRegressionTests(unittest.TestCase):
         with mock.patch.dict(gate.os.environ, env, clear=True):
             self.assertFalse(gate.approved_head_author_email(value, "abc123", set()))
 
+    def test_committer_name_must_be_public(self):
+        self.assertNotIn("Private Committer Name", gate.APPROVED_COMMITTER_NAMES)
+        self.assertIn("GitHub", gate.APPROVED_COMMITTER_NAMES)
+
+    def test_full_ancestry_metadata_scan_passes_current_clean_history(self):
+        self.assertEqual(gate.commit_metadata_violations("HEAD", set()), [])
+
     def test_public_founder_display_is_first_name_only(self):
         self.assertEqual(gate.PUBLIC_NAME, "Sebasti\u00e1n")
 

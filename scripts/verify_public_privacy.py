@@ -10,6 +10,7 @@ ROOT = Path(__file__).resolve().parents[1]
 PUBLIC_NAME = "Sebasti\u00e1n"
 TRUSTED_GITHUB_ACTOR = "fscfede-beep"
 APPROVED_NAMES = {PUBLIC_NAME, TRUSTED_GITHUB_ACTOR, "RUMBO Privacy Automation"}
+APPROVED_COMMITTER_NAMES = APPROVED_NAMES | {"GitHub"}
 APPROVED_AUTHOR_EMAILS = {
     "sebastian@rumbo.verso.fans",
     "293577326+fscfede-beep@users.noreply.github.com",
@@ -89,6 +90,30 @@ def approved_head_author_email(author_email: str, commit_ref: str, deny: set[str
     del commit_ref
     return author_email in APPROVED_AUTHOR_EMAILS and not is_denied(author_email, deny)
 
+def commit_metadata_violations(commit_ref: str, deny: set[str]) -> list[str]:
+    violations: list[str] = []
+    commits = subprocess.check_output(
+        ["git", "rev-list", commit_ref], cwd=ROOT, text=True
+    ).splitlines()
+    for commit_sha in commits:
+        raw = subprocess.check_output(
+            ["git", "show", "-s", "--format=%an%x00%ae%x00%cn%x00%ce", commit_sha],
+            cwd=ROOT,
+            text=True,
+        ).rstrip("\n")
+        author_name, author_email, committer_name, committer_email = raw.split("\x00")
+        prefix = f"git:commit:{commit_sha}"
+        if not approved_head_author_name(author_name, commit_sha, deny):
+            violations.append(f"{prefix}:author-name")
+        if not approved_head_author_email(author_email, commit_sha, deny):
+            violations.append(f"{prefix}:author-email")
+        if committer_name not in APPROVED_COMMITTER_NAMES or is_denied(committer_name, deny):
+            violations.append(f"{prefix}:committer-name")
+        if committer_email not in APPROVED_COMMITTER_EMAILS or is_denied(committer_email, deny):
+            violations.append(f"{prefix}:committer-email")
+    return violations
+
+
 def main() -> int:
     raw_hashes = os.environ.get("RUMBO_PRIVACY_DENY_HASHES", "")
     deny = {h.strip().lower() for h in raw_hashes.split(",") if h.strip()}
@@ -101,17 +126,10 @@ def main() -> int:
 
     violations: list[str] = []
 
-    # Prevent accidental publication of personal commit metadata on new heads.
+    # Every reachable commit is public history. Validate the full ancestry, not only HEAD,
+    # so a multi-commit push cannot hide private metadata behind a clean tip commit.
     commit_ref = os.environ.get("RUMBO_PRIVACY_COMMIT_SHA", "HEAD")
-    author_name = subprocess.check_output(["git", "show", "-s", "--format=%an", commit_ref], cwd=ROOT, text=True).strip()
-    author_email = subprocess.check_output(["git", "show", "-s", "--format=%ae", commit_ref], cwd=ROOT, text=True).strip()
-    committer_email = subprocess.check_output(["git", "show", "-s", "--format=%ce", commit_ref], cwd=ROOT, text=True).strip()
-    if not approved_head_author_name(author_name, commit_ref, deny):
-        violations.append("git:head-author-name")
-    if not approved_head_author_email(author_email, commit_ref, deny):
-        violations.append("git:head-author-email")
-    if committer_email not in APPROVED_COMMITTER_EMAILS or is_denied(committer_email, deny):
-        violations.append("git:head-committer-email")
+    violations.extend(commit_metadata_violations(commit_ref, deny))
     for path in tracked_files():
         text = text_of(path)
         if text is None:

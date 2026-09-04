@@ -17,7 +17,7 @@ jobs:
         with:
           persist-credentials: false
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
-          fetch-depth: 1
+          fetch-depth: 0
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
           python-version: '3.12'
@@ -27,11 +27,6 @@ jobs:
         env:
           RUMBO_PRIVACY_DENY_HASHES: ${{ secrets.RUMBO_PRIVACY_DENY_HASHES }}
           RUMBO_PRIVACY_COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
-          RUMBO_GITHUB_EVENT_NAME: ${{ github.event_name }}
-          RUMBO_GITHUB_REF: ${{ github.ref }}
-          RUMBO_GITHUB_ACTOR: ${{ github.actor }}
-          RUMBO_GITHUB_SENDER: ${{ github.event.sender.login }}
-          RUMBO_GITHUB_FORCED: ${{ github.event.forced }}
         run: python scripts/verify_public_privacy.py
       - name: Test commercial coherence verifier
         run: python -m unittest scripts/test_verify_commercial_coherence.py
