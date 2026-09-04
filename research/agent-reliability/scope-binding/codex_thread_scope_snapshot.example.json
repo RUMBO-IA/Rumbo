@@ -1,0 +1,24 @@
+{
+  "authority": {
+    "scope_id": "project-b",
+    "source": "trusted-project-selection",
+    "project_id": "project-b",
+    "environment_id": "env-b",
+    "resolved_cwd": "/work/project-b",
+    "resolved_workspace_roots": ["/work/project-b"]
+  },
+  "thread": {
+    "projectId": "project-b",
+    "cwd": "/work/project-b",
+    "environments": [
+      {
+        "environmentId": "env-b",
+        "cwd": "/work/project-b",
+        "runtimeWorkspaceRoots": ["/work/project-b"]
+      }
+    ]
+  },
+  "environmentStatuses": {
+    "env-b": {"status": "ready"}
+  }
+}
