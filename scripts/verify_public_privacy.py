@@ -80,16 +80,7 @@ def text_has_direct_person_profile(text: str) -> bool:
     return linkedin_profile in folded or rel_me_double in folded or rel_me_single in folded
 
 
-def approved_head_author_email(author_email: str, commit_ref: str, deny: set[str]) -> bool:
-    if is_denied(author_email, deny):
-        return False
-    if author_email in APPROVED_AUTHOR_EMAILS:
-        return True
-
-    # GitHub squash merges can preserve the authenticated user's private author
-    # email while GitHub itself creates and verifies the commit. Do not widen the
-    # email allowlist. Admit that case only when the workflow has independently
-    # proven a GitHub-managed, verified web-flow commit for this exact main SHA.
+def github_managed_main_commit(commit_ref: str) -> bool:
     return (
         os.environ.get("RUMBO_GITHUB_MANAGED_COMMIT") == "1"
         and os.environ.get("RUMBO_GITHUB_MANAGED_SHA") == commit_ref
@@ -99,6 +90,25 @@ def approved_head_author_email(author_email: str, commit_ref: str, deny: set[str
         and os.environ.get("RUMBO_GITHUB_SENDER") == TRUSTED_GITHUB_ACTOR
         and os.environ.get("RUMBO_GITHUB_FORCED", "").casefold() == "false"
     )
+
+
+def approved_head_author_name(author_name: str, commit_ref: str, deny: set[str]) -> bool:
+    if is_denied(author_name, deny):
+        return False
+    if author_name in APPROVED_NAMES:
+        return True
+    return github_managed_main_commit(commit_ref)
+
+
+def approved_head_author_email(author_email: str, commit_ref: str, deny: set[str]) -> bool:
+    if is_denied(author_email, deny):
+        return False
+    if author_email in APPROVED_AUTHOR_EMAILS:
+        return True
+
+    # GitHub squash merges can preserve authenticated account metadata while
+    # GitHub itself creates and verifies the commit. Do not widen allowlists.
+    return github_managed_main_commit(commit_ref)
 
 
 def main() -> int:
@@ -118,7 +128,7 @@ def main() -> int:
     author_name = subprocess.check_output(["git", "show", "-s", "--format=%an", commit_ref], cwd=ROOT, text=True).strip()
     author_email = subprocess.check_output(["git", "show", "-s", "--format=%ae", commit_ref], cwd=ROOT, text=True).strip()
     committer_email = subprocess.check_output(["git", "show", "-s", "--format=%ce", commit_ref], cwd=ROOT, text=True).strip()
-    if author_name not in APPROVED_NAMES or is_denied(author_name, deny):
+    if not approved_head_author_name(author_name, commit_ref, deny):
         violations.append("git:head-author-name")
     if not approved_head_author_email(author_email, commit_ref, deny):
         violations.append("git:head-author-email")
