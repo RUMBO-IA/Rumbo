@@ -65,3 +65,29 @@ A regression matrix for that class of failure should cover concurrent Project A 
 ## Codex source seam analysis
 
 See [`CODEX_WORKSPACE_SCOPE_SEAMS.md`](./CODEX_WORKSPACE_SCOPE_SEAMS.md) for the source-level admission, runtime, and persistence seams inspected in `openai/codex`.
+
+## Codex Thread.environments probe
+
+`codex_thread_scope_probe.py` consumes a sanitized app-server `Thread` snapshot,
+an independent scope-authority object, and `environment/status` results.
+
+OpenAI's protocol explicitly defines `Thread.environments` as **selection** data,
+independent of connection status. The probe therefore refuses to treat selection
+as runtime proof. The selected environment must also report `status=ready`.
+
+```bash
+python codex_thread_scope_probe.py codex_thread_scope_snapshot.example.json
+```
+
+Expected result for the included fixture:
+
+```json
+{"decision":"RUNTIME_SCOPE_BOUND","errors":[],"ok":true}
+```
+
+Pinned protocol references:
+- Thread selection field: openai/codex commit `2b554fd3f96a128be52e0d64b01f6adf16cc467a`
+- Current protocol seam inspected at `8e6a44b428e31f91b21edc97904fcdf4f0931ade`
+
+`pending`, `disconnected`, `unknown`, missing status, project mismatch, CWD mismatch,
+or environment mismatch fail closed rather than being promoted as executable scope.
