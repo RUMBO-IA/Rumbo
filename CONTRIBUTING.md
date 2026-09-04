@@ -20,4 +20,8 @@ This repository is a public product and engineering surface for RUMBO IA. It is 
 
 Run the public privacy regression tests, commercial-coherence tests, security-header verifier, and `git diff --check`. The protected `main` branch also requires the `privacy` and `Vercel` checks.
 
+## Promotion identity
+
+The privacy gate validates the exact HEAD commit identity. Promote a validated branch to main by protected fast-forward when the branch commit already uses the approved GitHub noreply identity. Do not rely on an unsigned GitHub-generated squash/rebase commit: an unsigned web-flow HEAD is expected to fail the privacy gate. A GitHub-managed commit is admissible only when the workflow independently proves the exact main SHA is verified and valid.
+
 Undisclosed security issues belong in GitHub's private **Report a vulnerability** flow.
