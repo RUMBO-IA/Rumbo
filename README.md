@@ -36,7 +36,7 @@ Pilot intake: https://form.typeform.com/to/Tu3D3tVo
 
 ## Founder
 
-Sebastián Federico
+Sebastián
 
 Founder · AI Systems & Agent Reliability Engineer
 

@@ -19,10 +19,16 @@ class SecurityPageTests(unittest.TestCase):
         self.assertIn('href="/security"', self.home)
 
     def test_security_page_uses_public_founder_identity(self):
-        self.assertIn("Founder: Sebastián Federico", self.security)
+        self.assertIn("Founder: Sebasti\u00e1n", self.security)
         self.assertNotIn("mailto:", self.security)
 
     def test_security_page_does_not_make_positive_unproven_service_claims(self):
         lower = self.security.lower()
         for forbidden in ("we provide managed soc", "we offer commercial pentesting", "we operate a certified red team"):
             self.assertNotIn(forbidden, lower)
+
+    def test_security_page_has_no_direct_person_profile_routing(self):
+        direct_profile = "linkedin.com" + "/in/"
+        rel_me = "rel=" + chr(34) + "me" + chr(34)
+        self.assertNotIn(direct_profile, self.security.casefold())
+        self.assertNotIn(rel_me, self.security.casefold())
