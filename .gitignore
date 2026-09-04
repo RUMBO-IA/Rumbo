@@ -17,3 +17,5 @@ secrets*
 private*
 backup*
 backups*
+__pycache__/
+*.py[cod]
