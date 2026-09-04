@@ -13,6 +13,7 @@ def evaluate_thread_environments(
     environments: list[dict[str, Any]] | None,
     *,
     runtime_connected: bool,
+    effective_writable_roots: list[str] | None = None,
 ) -> dict[str, Any]:
     if environments is None:
         return {
@@ -51,7 +52,7 @@ def evaluate_thread_environments(
         "session_meta_cwd": selected.get("cwd"),
         "first_turn_cwd": selected.get("cwd"),
         "workspace_roots": selected.get("runtimeWorkspaceRoots"),
-        "writable_roots": selected.get("runtimeWorkspaceRoots"),
+        "writable_roots": effective_writable_roots or [],
         "transport_advertised_online": True,
         "transport_handshake": True,
         "contaminated": False,

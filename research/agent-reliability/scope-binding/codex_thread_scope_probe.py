@@ -24,6 +24,8 @@ def evaluate_thread_snapshot(
     authority: dict[str, Any],
     thread: dict[str, Any],
     connected_environment_ids: set[str],
+    *,
+    effective_writable_roots: list[str] | None = None,
 ) -> dict[str, Any]:
     expected_project = str(authority.get("project_id") or "").strip()
     observed_project = str(thread.get("projectId") or "").strip()
@@ -45,6 +47,7 @@ def evaluate_thread_snapshot(
         authority,
         thread.get("environments"),
         runtime_connected=runtime_connected,
+        effective_writable_roots=effective_writable_roots,
     )
 
 
@@ -58,6 +61,18 @@ def evaluate_payload(payload: dict[str, Any]) -> dict[str, Any]:
     if not isinstance(thread, dict):
         return _fail("THREAD_SNAPSHOT_REQUIRED")
 
+    writable_roots: list[str] | None = None
+    permission_evidence = payload.get("permissionEvidence")
+    if permission_evidence is not None:
+        if not isinstance(permission_evidence, dict):
+            return _fail("PERMISSION_EVIDENCE_INVALID")
+        if not str(permission_evidence.get("source") or "").strip():
+            return _fail("PERMISSION_EVIDENCE_SOURCE_REQUIRED")
+        raw_writable = permission_evidence.get("writableRoots")
+        if not isinstance(raw_writable, list):
+            return _fail("PERMISSION_WRITABLE_ROOTS_INVALID")
+        writable_roots = [str(item) for item in raw_writable]
+
     expected_id = str(authority.get("environment_id") or "").strip()
     if isinstance(statuses, dict) and expected_id in statuses:
         raw_status = statuses[expected_id]
@@ -69,12 +84,22 @@ def evaluate_payload(payload: dict[str, Any]) -> dict[str, Any]:
                 "decision": "SELECTION_ONLY",
                 "errors": [f"ENVIRONMENT_STATUS_NOT_READY:{status or 'missing'}"],
             }
-        return evaluate_thread_snapshot(authority, thread, {expected_id})
+        return evaluate_thread_snapshot(
+            authority,
+            thread,
+            {expected_id},
+            effective_writable_roots=writable_roots,
+        )
 
     if not isinstance(connected, list):
         return _fail("CONNECTED_ENVIRONMENT_IDS_INVALID")
     connected_ids = {str(item).strip() for item in connected if str(item).strip()}
-    return evaluate_thread_snapshot(authority, thread, connected_ids)
+    return evaluate_thread_snapshot(
+        authority,
+        thread,
+        connected_ids,
+        effective_writable_roots=writable_roots,
+    )
 
 
 def main() -> int:
