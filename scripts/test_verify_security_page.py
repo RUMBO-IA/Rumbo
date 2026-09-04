@@ -18,6 +18,9 @@ class SecurityPageTests(unittest.TestCase):
         self.assertIn("verifiable-agent-control-plane", self.security)
         self.assertIn('href="/security"', self.home)
 
+    def test_security_page_uses_current_technical_portfolio(self):
+        self.assertIn("sebastian-agent-reliability-z32pvn.v2.appdeploy.ai", self.security)
+        self.assertNotIn("sebastian-ai-workflow-reliability.miniup.app", self.security)
     def test_security_page_uses_public_founder_identity(self):
         self.assertIn("Founder: Sebastián Federico", self.security)
         self.assertNotIn("mailto:", self.security)
