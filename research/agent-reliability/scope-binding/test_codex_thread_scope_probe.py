@@ -76,3 +76,32 @@ class CodexThreadScopePayloadTests(unittest.TestCase):
         self.assertFalse(result["ok"])
         self.assertEqual("SELECTION_ONLY", result["decision"])
         self.assertIn("ENVIRONMENT_STATUS_NOT_READY:pending", result["errors"])
+
+    def test_required_write_scope_needs_permission_evidence(self):
+        from codex_thread_scope_probe import evaluate_payload
+        authority = dict(AUTHORITY)
+        authority["required_writable_roots"] = ["/work/project-b"]
+        payload = {
+            "authority": authority,
+            "thread": THREAD,
+            "environmentStatuses": {"env-b": {"status": "ready"}},
+        }
+        result = evaluate_payload(payload)
+        self.assertFalse(result["ok"])
+        self.assertIn("REQUIRED_WRITABLE_ROOT_MISSING", result["errors"])
+
+    def test_permission_evidence_is_separate_from_workspace_roots(self):
+        from codex_thread_scope_probe import evaluate_payload
+        authority = dict(AUTHORITY)
+        authority["required_writable_roots"] = ["/work/project-b"]
+        payload = {
+            "authority": authority,
+            "thread": THREAD,
+            "environmentStatuses": {"env-b": {"status": "ready"}},
+            "permissionEvidence": {
+                "source": "effective-permission-profile",
+                "writableRoots": ["/work/project-b"],
+            },
+        }
+        result = evaluate_payload(payload)
+        self.assertEqual("RUNTIME_SCOPE_BOUND", result["decision"])
