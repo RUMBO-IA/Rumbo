@@ -9,6 +9,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import safe_merge_policy as policy
 import safe_merge_evidence as evidence
+import safe_merge_authority as authority
 import safe_merge_receipt as receipt
 
 
@@ -87,3 +88,81 @@ class EvidenceTests(unittest.TestCase):
         self.assertFalse(state["autoAssignCustomDomains"])
         self.assertIsNone(state["commandForIgnoringBuildStep"])
         self.assertEqual(state["productionBranch"], "main")
+
+
+BASE = "1" * 40
+HEAD = "2" * 40
+
+
+def merge_request(head=HEAD, base="main", repository="RUMBO-IA/Rumbo"):
+    return policy.MergeRequest(40, head, base, repository)
+
+
+class FakeEvidence:
+    def __init__(self, *, head=HEAD, base="main", repo="RUMBO-IA/Rumbo", checks=None,
+                 privacy=True, ancestor=True, vercel=None, target_sequence=None, ruleset=True):
+        self.head, self.base, self.repo = head, base, repo
+        self.check_states = checks if checks is not None else {"privacy": "SUCCESS", "Vercel": "SUCCESS"}
+        self.privacy, self.ancestor, self.ruleset = privacy, ancestor, ruleset
+        self.vercel = vercel or {"autoAssignCustomDomains": False, "commandForIgnoringBuildStep": None,
+                                 "productionBranch": "main", "liveDeployment": "dpl_live", "liveTarget": "production"}
+        self.targets = list(target_sequence or [BASE, BASE, HEAD])
+        self.push_calls = []
+
+    def pr(self, _number):
+        return {"state": "OPEN", "base": self.base, "head": self.head, "repo": self.repo, "cross": False}
+
+    def checks(self, _sha): return dict(self.check_states)
+    def target_sha(self, _target): return self.targets.pop(0) if len(self.targets) > 1 else self.targets[0]
+    def is_ancestor(self, _base, _candidate): return self.ancestor
+    def privacy_ok(self, _candidate): return self.privacy
+    def vercel_state(self): return dict(self.vercel)
+    def ruleset_ok(self): return self.ruleset
+    def fast_forward(self, target, expected_old, candidate):
+        self.push_calls.append((target, expected_old, candidate))
+        return evidence.CommandResult(("git", "push"), 0, "", "")
+
+
+class AuthorityGateTests(unittest.TestCase):
+    def test_stale_head_stops_at_g1(self):
+        out = authority.evaluate(merge_request(head="a" * 40), policy.DEFAULT_POLICY, FakeEvidence(head="b" * 40))
+        self.assertEqual((out.state, out.failed_gate), ("SAFE_STOP", "PR_IDENTITY"))
+
+    def test_wrong_repository_stops_at_g1(self):
+        out = authority.evaluate(merge_request(), policy.DEFAULT_POLICY, FakeEvidence(repo="other/repo"))
+        self.assertEqual(out.failed_gate, "PR_IDENTITY")
+
+    def test_missing_required_check_stops_at_g2(self):
+        out = authority.evaluate(merge_request(), policy.DEFAULT_POLICY, FakeEvidence(checks={"privacy": "SUCCESS"}))
+        self.assertEqual(out.failed_gate, "REQUIRED_CHECKS")
+
+    def test_privacy_violation_stops_at_g3(self):
+        out = authority.evaluate(merge_request(), policy.DEFAULT_POLICY, FakeEvidence(privacy=False))
+        self.assertEqual(out.failed_gate, "PRIVACY_ANCESTRY")
+
+    def test_non_descendant_stops_at_g3(self):
+        out = authority.evaluate(merge_request(), policy.DEFAULT_POLICY, FakeEvidence(ancestor=False))
+        self.assertEqual(out.failed_gate, "PRIVACY_ANCESTRY")
+    def test_vercel_drift_stops_at_g4(self):
+        bad = {
+            "autoAssignCustomDomains": True,
+            "commandForIgnoringBuildStep": None,
+            "productionBranch": "main",
+            "liveDeployment": "dpl_live",
+            "liveTarget": "production",
+        }
+        out = authority.evaluate(merge_request(), policy.DEFAULT_POLICY, FakeEvidence(vercel=bad))
+        self.assertEqual(out.failed_gate, "PRODUCTION_NO_GO")
+
+    def test_target_tip_drift_stops_at_g5(self):
+        ev = FakeEvidence(target_sequence=[BASE, "3" * 40])
+        out = authority.evaluate(merge_request(), policy.DEFAULT_POLICY, ev)
+        self.assertEqual(out.failed_gate, "FAST_FORWARD_ONLY")
+        self.assertFalse(ev.push_calls)
+
+    def test_clean_dry_run_passes_without_write(self):
+        ev = FakeEvidence(target_sequence=[BASE, BASE])
+        out = authority.evaluate(merge_request(), policy.DEFAULT_POLICY, ev)
+        self.assertEqual(out.state, "DRY_RUN_PASS")
+        self.assertIsNone(out.failed_gate)
+        self.assertFalse(ev.push_calls)
