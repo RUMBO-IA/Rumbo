@@ -1,6 +1,6 @@
 # RUMBO IA
 
-[![Public privacy gate](https://github.com/fscfede-beep/Rumbo/actions/workflows/privacy-gate.yml/badge.svg?branch=main)](https://github.com/fscfede-beep/Rumbo/actions/workflows/privacy-gate.yml)
+[![Public privacy gate](https://github.com/RUMBO-IA/Rumbo/actions/workflows/privacy-gate.yml/badge.svg?branch=main)](https://github.com/RUMBO-IA/Rumbo/actions/workflows/privacy-gate.yml)
 
 Human-controlled AI CRM and automation for small businesses in Latin America.
 
