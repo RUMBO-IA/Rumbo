@@ -209,11 +209,15 @@ def merge_request(head=HEAD, base="main", repository="RUMBO-IA/Rumbo"):
 
 
 class FakeEvidence:
-    def __init__(self, *, head=HEAD, base="main", repo="RUMBO-IA/Rumbo", checks=None,
-                 privacy=True, ancestor=True, vercel=None, target_sequence=None, ruleset=True, branch_protection=True):
-        self.head, self.base, self.repo = head, base, repo
+    def __init__(self, *, head=HEAD, base="main", repo="RUMBO-IA/Rumbo", head_branch="feature/head", checks=None,
+                 metadata=True, attestation_sequence=None, ancestor=True, vercel=None, target_sequence=None,
+                 ruleset=True, branch_protection=True):
+        self.head, self.base, self.repo, self.head_branch = head, base, repo, head_branch
         self.check_states = checks if checks is not None else {"privacy": "SUCCESS", "Vercel": "SUCCESS"}
-        self.privacy, self.ancestor, self.ruleset = privacy, ancestor, ruleset
+        self.metadata, self.ancestor, self.ruleset = metadata, ancestor, ruleset
+        self.attestations = list(attestation_sequence or [True, True])
+        self.metadata_calls = 0
+        self.attestation_calls = 0
         self.branch_protection = branch_protection
         self.vercel = vercel or {"autoAssignCustomDomains": False, "commandForIgnoringBuildStep": None,
                                  "productionBranch": "main", "liveDeployment": "dpl_live", "liveTarget": "production"}
@@ -221,12 +225,23 @@ class FakeEvidence:
         self.push_calls = []
 
     def pr(self, _number):
-        return {"state": "OPEN", "base": self.base, "head": self.head, "repo": self.repo, "cross": False}
+        return {"state": "OPEN", "base": self.base, "head": self.head, "head_branch": self.head_branch,
+                "repo": self.repo, "cross": False}
 
     def checks(self, _sha): return dict(self.check_states)
     def target_sha(self, _target): return self.targets.pop(0) if len(self.targets) > 1 else self.targets[0]
     def is_ancestor(self, _base, _candidate): return self.ancestor
-    def privacy_ok(self, _candidate): return self.privacy
+    def commit_metadata_ok(self, _candidate):
+        self.metadata_calls += 1
+        return self.metadata
+    def privacy_attestation(self, pr_number, candidate, target, head_branch):
+        self.attestation_calls += 1
+        current = self.attestations.pop(0) if len(self.attestations) > 1 else self.attestations[0]
+        if not current:
+            raise evidence.EvidenceError("attestation unavailable")
+        return {"workflow_id": policy.DEFAULT_POLICY.privacy_workflow_id, "run_id": 123,
+                "event": policy.attestation_event(target, policy.DEFAULT_POLICY), "head_sha": candidate,
+                "head_branch": head_branch, "pr_number": pr_number if target == "main" else None}
     def vercel_state(self): return dict(self.vercel)
     def ruleset_ok(self): return self.ruleset
     def branch_protection_ok(self, _target, _required): return self.branch_protection
@@ -248,9 +263,13 @@ class AuthorityGateTests(unittest.TestCase):
         out = authority.evaluate(merge_request(), policy.DEFAULT_POLICY, FakeEvidence(checks={"privacy": "SUCCESS"}))
         self.assertEqual(out.failed_gate, "REQUIRED_CHECKS")
 
-    def test_privacy_violation_stops_at_g3(self):
-        out = authority.evaluate(merge_request(), policy.DEFAULT_POLICY, FakeEvidence(privacy=False))
+    def test_metadata_violation_stops_at_g3(self):
+        out = authority.evaluate(merge_request(), policy.DEFAULT_POLICY, FakeEvidence(metadata=False))
         self.assertEqual(out.failed_gate, "PRIVACY_ANCESTRY")
+
+    def test_attestation_failure_stops_at_g3(self):
+        out = authority.evaluate(merge_request(), policy.DEFAULT_POLICY, FakeEvidence(attestation_sequence=[False]))
+        self.assertEqual((out.state, out.failed_gate), ("SAFE_STOP", "PRIVACY_ANCESTRY"))
 
     def test_non_descendant_stops_at_g3(self):
         out = authority.evaluate(merge_request(), policy.DEFAULT_POLICY, FakeEvidence(ancestor=False))
@@ -278,6 +297,9 @@ class AuthorityGateTests(unittest.TestCase):
         self.assertEqual(out.state, "DRY_RUN_PASS")
         self.assertIsNone(out.failed_gate)
         self.assertFalse(ev.push_calls)
+        self.assertEqual((ev.metadata_calls, ev.attestation_calls), (1, 1))
+        g3 = next(g for g in out.gates if g.name == "PRIVACY_ANCESTRY")
+        self.assertEqual(g3.evidence["privacy_attestation"]["run_id"], 123)
 
 
 class FastForwardTests(unittest.TestCase):
@@ -294,6 +316,7 @@ class FastForwardTests(unittest.TestCase):
         out = authority.evaluate(merge_request(base=target), policy.DEFAULT_POLICY, ev, mode="probe")
         self.assertEqual(out.state, "MERGED_SAFE")
         self.assertEqual(ev.push_calls, [(target, BASE, HEAD)])
+        self.assertEqual((ev.metadata_calls, ev.attestation_calls), (2, 2))
 
     def test_post_write_target_mismatch_never_rolls_back(self):
         target = "probe/safe-merge-test"
@@ -302,6 +325,13 @@ class FastForwardTests(unittest.TestCase):
         self.assertEqual(out.state, "POST_WRITE_VERIFY_FAILED")
         self.assertEqual(ev.push_calls, [(target, BASE, HEAD)])
 
+
+    def test_post_write_attestation_error_is_post_write_failure(self):
+        target = "probe/safe-merge-test"
+        ev = FakeEvidence(base=target, target_sequence=[BASE, BASE, HEAD], attestation_sequence=[True, False])
+        out = authority.evaluate(merge_request(base=target), policy.DEFAULT_POLICY, ev, mode="probe")
+        self.assertEqual((out.state, out.failed_gate), ("POST_WRITE_VERIFY_FAILED", "POST_WRITE_VERIFY"))
+        self.assertEqual(ev.push_calls, [(target, BASE, HEAD)])
 
     def test_post_write_branch_protection_drift_fails_without_rollback(self):
         target = "probe/safe-merge-test"
@@ -333,4 +363,7 @@ class CliTests(unittest.TestCase):
             self.assertEqual(stored["payload"]["state"], "DRY_RUN_PASS")
             self.assertEqual(stored["payload"]["invocation_id"], "inv-fixed")
             self.assertEqual(stored["sha256"], receipt.receipt_digest(stored["payload"]))
+            serialized = json.dumps(stored, sort_keys=True)
+            self.assertIn('"privacy_attestation"', serialized)
+            self.assertNotIn("RUMBO_PRIVACY_DENY_HASHES", serialized)
             self.assertFalse(ev.push_calls)

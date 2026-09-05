@@ -49,6 +49,7 @@ def evaluate(request: policy.MergeRequest, merge_policy: policy.MergePolicy, evi
     current_gate = "POLICY"
     target_sha: str | None = None
     live_id: str | None = None
+    write_completed = False
     try:
         policy.validate_request(request, merge_policy)
         policy.validate_execution_mode(mode, request.expected_base, merge_policy)
@@ -59,12 +60,17 @@ def evaluate(request: policy.MergeRequest, merge_policy: policy.MergePolicy, evi
             pr.get("state") == "OPEN"
             and pr.get("base") == request.expected_base
             and pr.get("head") == request.expected_head_sha
+            and bool(pr.get("head_branch"))
             and pr.get("repo") == request.repository
             and not pr.get("cross")
         )
         if not identity_ok:
             return _stop(gates, current_gate, {"reason": "PR identity drift"})
-        gates.append(GateResult(current_gate, True, {"head": request.expected_head_sha, "base": request.expected_base}))
+        gates.append(GateResult(current_gate, True, {
+            "head": request.expected_head_sha,
+            "head_branch": pr.get("head_branch"),
+            "base": request.expected_base,
+        }))
 
         current_gate = "REQUIRED_CHECKS"
         states = evidence.checks(request.expected_head_sha)
@@ -78,9 +84,16 @@ def evaluate(request: policy.MergeRequest, merge_policy: policy.MergePolicy, evi
         target_sha = evidence.target_sha(request.expected_base)
         if not evidence.is_ancestor(target_sha, request.expected_head_sha):
             return _stop(gates, current_gate, {"reason": "candidate is not descendant"}, target_sha=target_sha)
-        if not evidence.privacy_ok(request.expected_head_sha):
-            return _stop(gates, current_gate, {"reason": "privacy verification failed"}, target_sha=target_sha)
-        gates.append(GateResult(current_gate, True, {"target_sha": target_sha, "candidate": request.expected_head_sha}))
+        if not evidence.commit_metadata_ok(request.expected_head_sha):
+            return _stop(gates, current_gate, {"reason": "public commit metadata failed"}, target_sha=target_sha)
+        attestation = evidence.privacy_attestation(
+            request.pr_number, request.expected_head_sha, request.expected_base, pr.get("head_branch")
+        )
+        gates.append(GateResult(current_gate, True, {
+            "target_sha": target_sha,
+            "candidate": request.expected_head_sha,
+            "privacy_attestation": attestation,
+        }))
 
         current_gate = "PRODUCTION_NO_GO"
         vercel = evidence.vercel_state()
@@ -108,6 +121,8 @@ def evaluate(request: policy.MergeRequest, merge_policy: policy.MergePolicy, evi
             return MergeOutcome("DRY_RUN_PASS", None, tuple(gates), target_sha, live_id)
 
         evidence.fast_forward(request.expected_base, target_sha, request.expected_head_sha)
+        write_completed = True
+        current_gate = "POST_WRITE_VERIFY"
 
         post_target = evidence.target_sha(request.expected_base)
         if post_target != request.expected_head_sha:
@@ -116,8 +131,11 @@ def evaluate(request: policy.MergeRequest, merge_policy: policy.MergePolicy, evi
         post_checks = evidence.checks(request.expected_head_sha)
         if any(post_checks.get(name) != "SUCCESS" for name in required):
             return _post_fail(gates, {"reason": "required checks changed after write"}, target_sha=target_sha, live=live_id)
-        if not evidence.privacy_ok(request.expected_head_sha):
-            return _post_fail(gates, {"reason": "privacy verification failed after write"}, target_sha=target_sha, live=live_id)
+        if not evidence.commit_metadata_ok(request.expected_head_sha):
+            return _post_fail(gates, {"reason": "public commit metadata failed after write"}, target_sha=target_sha, live=live_id)
+        post_attestation = evidence.privacy_attestation(
+            request.pr_number, request.expected_head_sha, request.expected_base, pr.get("head_branch")
+        )
         if not evidence.ruleset_ok():
             return _post_fail(gates, {"reason": "ruleset drift after write"}, target_sha=target_sha, live=live_id)
         if not evidence.branch_protection_ok(request.expected_base, required):
@@ -134,16 +152,17 @@ def evaluate(request: policy.MergeRequest, merge_policy: policy.MergePolicy, evi
         if not post_prod_ok:
             return _post_fail(gates, {"reason": "Vercel drift after write"}, target_sha=target_sha, live=live_id)
 
-        gates.append(GateResult("POST_WRITE_VERIFY", True, {"target": post_target, "liveDeployment": live_id}))
+        gates.append(GateResult("POST_WRITE_VERIFY", True, {
+            "target": post_target,
+            "liveDeployment": live_id,
+            "privacy_attestation": post_attestation,
+        }))
         return MergeOutcome("MERGED_SAFE", None, tuple(gates), target_sha, live_id)
     except Exception as exc:
-        return _stop(
-            gates,
-            current_gate,
-            {"reason": "exception", "type": type(exc).__name__},
-            target_sha=target_sha,
-            live=live_id,
-        )
+        failure = {"reason": "exception", "type": type(exc).__name__}
+        if write_completed:
+            return _post_fail(gates, failure, target_sha=target_sha, live=live_id)
+        return _stop(gates, current_gate, failure, target_sha=target_sha, live=live_id)
 
 
 def _utc_now() -> str:
