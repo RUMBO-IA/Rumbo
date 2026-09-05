@@ -27,6 +27,7 @@ jobs:
         env:
           RUMBO_PRIVACY_DENY_HASHES: ${{ secrets.RUMBO_PRIVACY_DENY_HASHES }}
           RUMBO_PRIVACY_COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          RUMBO_PRIVACY_SCAN_ALL_REFS: '1'
         run: python scripts/verify_public_privacy.py
       - name: Test commercial coherence verifier
         run: python -m unittest scripts/test_verify_commercial_coherence.py
