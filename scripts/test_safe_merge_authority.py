@@ -100,10 +100,11 @@ def merge_request(head=HEAD, base="main", repository="RUMBO-IA/Rumbo"):
 
 class FakeEvidence:
     def __init__(self, *, head=HEAD, base="main", repo="RUMBO-IA/Rumbo", checks=None,
-                 privacy=True, ancestor=True, vercel=None, target_sequence=None, ruleset=True):
+                 privacy=True, ancestor=True, vercel=None, target_sequence=None, ruleset=True, branch_protection=True):
         self.head, self.base, self.repo = head, base, repo
         self.check_states = checks if checks is not None else {"privacy": "SUCCESS", "Vercel": "SUCCESS"}
         self.privacy, self.ancestor, self.ruleset = privacy, ancestor, ruleset
+        self.branch_protection = branch_protection
         self.vercel = vercel or {"autoAssignCustomDomains": False, "commandForIgnoringBuildStep": None,
                                  "productionBranch": "main", "liveDeployment": "dpl_live", "liveTarget": "production"}
         self.targets = list(target_sequence or [BASE, BASE, HEAD])
@@ -118,6 +119,7 @@ class FakeEvidence:
     def privacy_ok(self, _candidate): return self.privacy
     def vercel_state(self): return dict(self.vercel)
     def ruleset_ok(self): return self.ruleset
+    def branch_protection_ok(self, _target, _required): return self.branch_protection
     def fast_forward(self, target, expected_old, candidate):
         self.push_calls.append((target, expected_old, candidate))
         return evidence.CommandResult(("git", "push"), 0, "", "")
@@ -166,3 +168,34 @@ class AuthorityGateTests(unittest.TestCase):
         self.assertEqual(out.state, "DRY_RUN_PASS")
         self.assertIsNone(out.failed_gate)
         self.assertFalse(ev.push_calls)
+
+
+class FastForwardTests(unittest.TestCase):
+    def test_concurrent_tip_change_blocks_write(self):
+        target = "probe/safe-merge-test"
+        ev = FakeEvidence(base=target, target_sequence=[BASE, "3" * 40])
+        out = authority.evaluate(merge_request(base=target), policy.DEFAULT_POLICY, ev, mode="probe")
+        self.assertEqual(out.failed_gate, "FAST_FORWARD_ONLY")
+        self.assertFalse(ev.push_calls)
+
+    def test_probe_push_uses_exact_candidate_without_force(self):
+        target = "probe/safe-merge-test"
+        ev = FakeEvidence(base=target, target_sequence=[BASE, BASE, HEAD])
+        out = authority.evaluate(merge_request(base=target), policy.DEFAULT_POLICY, ev, mode="probe")
+        self.assertEqual(out.state, "MERGED_SAFE")
+        self.assertEqual(ev.push_calls, [(target, BASE, HEAD)])
+
+    def test_post_write_target_mismatch_never_rolls_back(self):
+        target = "probe/safe-merge-test"
+        ev = FakeEvidence(base=target, target_sequence=[BASE, BASE, "4" * 40])
+        out = authority.evaluate(merge_request(base=target), policy.DEFAULT_POLICY, ev, mode="probe")
+        self.assertEqual(out.state, "POST_WRITE_VERIFY_FAILED")
+        self.assertEqual(ev.push_calls, [(target, BASE, HEAD)])
+
+
+    def test_post_write_branch_protection_drift_fails_without_rollback(self):
+        target = "probe/safe-merge-test"
+        ev = FakeEvidence(base=target, target_sequence=[BASE, BASE, HEAD], branch_protection=False)
+        out = authority.evaluate(merge_request(base=target), policy.DEFAULT_POLICY, ev, mode="probe")
+        self.assertEqual(out.state, "POST_WRITE_VERIFY_FAILED")
+        self.assertEqual(ev.push_calls, [(target, BASE, HEAD)])

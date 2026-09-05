@@ -191,3 +191,34 @@ class RealEvidence:
             and not data.get("bypass_actors")
             and {"commit_author_email_pattern", "committer_email_pattern", "non_fast_forward"} <= rule_types
         )
+
+
+    def branch_protection_ok(self, target: str, required: tuple[str, ...]) -> bool:
+        if target not in self.policy.phase3_targets:
+            return True
+        owner, repo = self.policy.repository.split("/", 1)
+        data = self._json(("gh", "api", f"repos/{owner}/{repo}/branches/{target}/protection"))
+        status = data.get("required_status_checks") or {}
+        contexts = set(status.get("contexts") or [])
+        contexts.update(item.get("context") for item in status.get("checks") or [] if item.get("context"))
+        return (
+            set(required) <= contexts
+            and bool((data.get("enforce_admins") or {}).get("enabled"))
+            and bool((data.get("required_linear_history") or {}).get("enabled"))
+            and not bool((data.get("allow_force_pushes") or {}).get("enabled"))
+            and bool((data.get("required_conversation_resolution") or {}).get("enabled"))
+        )
+
+    def fast_forward(self, target: str, expected_old: str, candidate: str) -> CommandResult:
+        authorized = target in self.policy.phase3_targets or target.startswith(self.policy.probe_prefix)
+        if not authorized:
+            raise EvidenceError("target is outside safe-merge policy")
+        check_ref = self.runner.run(("git", "check-ref-format", f"refs/heads/{target}"))
+        if check_ref.returncode != 0:
+            raise EvidenceError("target is not a valid branch ref")
+        if self.target_sha(target) != expected_old:
+            raise EvidenceError("target changed at write boundary")
+        result = self.runner.run(("git", "push", "origin", f"{candidate}:refs/heads/{target}"))
+        if result.returncode != 0:
+            raise EvidenceError("fast-forward push failed")
+        return result

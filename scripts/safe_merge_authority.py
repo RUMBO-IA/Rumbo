@@ -25,6 +25,11 @@ def _stop(gates, gate: str, evidence: dict[str, Any], *, target_sha=None, live=N
     return MergeOutcome("SAFE_STOP", gate, tuple(gates), target_sha, live)
 
 
+def _post_fail(gates, evidence: dict[str, Any], *, target_sha=None, live=None) -> MergeOutcome:
+    gates.append(GateResult("POST_WRITE_VERIFY", False, evidence))
+    return MergeOutcome("POST_WRITE_VERIFY_FAILED", "POST_WRITE_VERIFY", tuple(gates), target_sha, live)
+
+
 def _required_checks(target: str, merge_policy: policy.MergePolicy) -> tuple[str, ...]:
     if target in merge_policy.required_checks:
         return merge_policy.required_checks[target]
@@ -95,13 +100,36 @@ def evaluate(request: policy.MergeRequest, merge_policy: policy.MergePolicy, evi
 
         if mode == "dry-run":
             return MergeOutcome("DRY_RUN_PASS", None, tuple(gates), target_sha, live_id)
-        return _stop(
-            gates,
-            current_gate,
-            {"reason": "write path not enabled yet"},
-            target_sha=target_sha,
-            live=live_id,
+
+        evidence.fast_forward(request.expected_base, target_sha, request.expected_head_sha)
+
+        post_target = evidence.target_sha(request.expected_base)
+        if post_target != request.expected_head_sha:
+            return _post_fail(gates, {"reason": "target SHA mismatch", "observed": post_target}, target_sha=target_sha, live=live_id)
+
+        post_checks = evidence.checks(request.expected_head_sha)
+        if any(post_checks.get(name) != "SUCCESS" for name in required):
+            return _post_fail(gates, {"reason": "required checks changed after write"}, target_sha=target_sha, live=live_id)
+        if not evidence.privacy_ok(request.expected_head_sha):
+            return _post_fail(gates, {"reason": "privacy verification failed after write"}, target_sha=target_sha, live=live_id)
+        if not evidence.ruleset_ok():
+            return _post_fail(gates, {"reason": "ruleset drift after write"}, target_sha=target_sha, live=live_id)
+        if not evidence.branch_protection_ok(request.expected_base, required):
+            return _post_fail(gates, {"reason": "branch protection drift after write"}, target_sha=target_sha, live=live_id)
+
+        post_vercel = evidence.vercel_state()
+        post_prod_ok = (
+            post_vercel.get("autoAssignCustomDomains") is False
+            and post_vercel.get("commandForIgnoringBuildStep") in (None, "")
+            and post_vercel.get("productionBranch") == "main"
+            and post_vercel.get("liveDeployment") == live_id
+            and post_vercel.get("liveTarget") == "production"
         )
+        if not post_prod_ok:
+            return _post_fail(gates, {"reason": "Vercel drift after write"}, target_sha=target_sha, live=live_id)
+
+        gates.append(GateResult("POST_WRITE_VERIFY", True, {"target": post_target, "liveDeployment": live_id}))
+        return MergeOutcome("MERGED_SAFE", None, tuple(gates), target_sha, live_id)
     except Exception as exc:
         return _stop(
             gates,
