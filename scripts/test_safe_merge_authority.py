@@ -8,6 +8,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import safe_merge_policy as policy
+import safe_merge_evidence as evidence
 import safe_merge_receipt as receipt
 
 
@@ -44,3 +45,45 @@ class ReceiptTests(unittest.TestCase):
             self.assertEqual(stored["payload"], payload)
             with self.assertRaises(FileExistsError):
                 receipt.write_receipt(Path(td), payload)
+
+
+class FakeRunner:
+    def __init__(self, responses):
+        self.responses = responses
+        self.calls = []
+
+    def run(self, args, **_kwargs):
+        args = tuple(args)
+        self.calls.append(args)
+        for prefix, result in self.responses.items():
+            if args[:len(prefix)] == prefix:
+                if isinstance(result, evidence.CommandResult):
+                    return result
+                return evidence.CommandResult(args, 0, result, "")
+        return evidence.CommandResult(args, 1, "", "unexpected command")
+
+
+class EvidenceTests(unittest.TestCase):
+    def test_pr_snapshot_normalizes_exact_fields(self):
+        payload = '{"number":40,"state":"OPEN","baseRefName":"main","headRefOid":"' + "a" * 40 + '","headRepository":{"nameWithOwner":"RUMBO-IA/Rumbo"},"isCrossRepository":false,"statusCheckRollup":[]}'
+        fake = FakeRunner({("gh", "pr", "view"): payload})
+        ev = evidence.RealEvidence(ROOT, fake, policy.DEFAULT_POLICY)
+        snapshot = ev.pr(40)
+        self.assertEqual(snapshot["base"], "main")
+        self.assertEqual(snapshot["repo"], "RUMBO-IA/Rumbo")
+        self.assertIn("--json", fake.calls[0])
+
+    def test_nonzero_command_fails_closed(self):
+        result = evidence.CommandResult(("gh",), 1, "", "boom")
+        with self.assertRaises(evidence.EvidenceError):
+            evidence.parse_json_result(result)
+
+    def test_vercel_state_normalizes_project_and_live_alias(self):
+        project = '{"autoAssignCustomDomains":false,"commandForIgnoringBuildStep":null,"link":{"productionBranch":"main"}}'
+        live = '{"id":"dpl_live","target":"production"}'
+        fake = FakeRunner({("vercel", "api"): project, ("vercel", "inspect"): live})
+        state = evidence.RealEvidence(ROOT, fake, policy.DEFAULT_POLICY).vercel_state()
+        self.assertEqual(state["liveDeployment"], "dpl_live")
+        self.assertFalse(state["autoAssignCustomDomains"])
+        self.assertIsNone(state["commandForIgnoringBuildStep"])
+        self.assertEqual(state["productionBranch"], "main")
