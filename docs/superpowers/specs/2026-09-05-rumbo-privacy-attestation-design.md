@@ -24,7 +24,8 @@ The attestation is valid only when all of these values match policy:
 - repository: `RUMBO-IA/Rumbo`;
 - workflow path: `.github/workflows/privacy-gate.yml`;
 - workflow ID: `347174988`;
-- event: `pull_request` for the requested PR;
+- accepted event: `pull_request` when the requested base is a Phase 3 target;
+- accepted event: `push` when the requested base starts with `probe/safe-merge-`;
 - head SHA: exactly the requested candidate SHA;
 - conclusion: `success`;
 - workflow file Git blob: `3ab38299fd55f9182e9e10834b04550cc832557a`;
@@ -47,9 +48,10 @@ No one proof substitutes for another.
 1. The authority reads PR identity and required checks for the expected head SHA.
 2. It fetches remote refs and validates ancestry plus public Git metadata locally.
 3. It reads the workflow file at the candidate SHA and verifies both pinned digests.
-4. It lists `pull_request` runs for the pinned workflow, filters to the exact candidate SHA and requested PR, selects the newest matching run by `run_attempt` and creation time, and requires that run to be completed with conclusion `success`.
-5. It records only non-secret evidence: workflow ID, run ID, event, conclusion, head SHA, PR number, workflow digests, and timestamps.
-6. Only then may evaluation continue to `PRODUCTION_NO_GO` and `FAST_FORWARD_ONLY`.
+4. It chooses the attestation event from policy: `pull_request` for Phase 3 targets and `push` for `probe/safe-merge-*` targets.
+5. For `pull_request`, it filters to the exact candidate SHA and requested PR. For `push`, it filters to the exact candidate SHA and expected probe branch. It selects the newest matching run by `run_attempt` and creation time and requires that run to be completed with conclusion `success`.
+6. It records only non-secret evidence: workflow ID, run ID, event, conclusion, head SHA, PR number, workflow digests, and timestamps.
+7. Only then may evaluation continue to `PRODUCTION_NO_GO` and `FAST_FORWARD_ONLY`.
 
 ## Fail-closed rules
 
@@ -60,7 +62,9 @@ Reject the attestation when any of these conditions occurs:
 - workflow ID or path differs from policy;
 - workflow content differs from either pinned digest;
 - run head SHA differs from the requested SHA;
-- run is not associated with the requested PR;
+- a `pull_request` run is not associated with the requested PR;
+- a `push` run does not target the expected probe branch;
+- event type does not match the base-branch policy;
 - GitHub evidence cannot be read or parsed;
 - local ancestry or metadata proof fails.
 
@@ -71,7 +75,7 @@ Reject the attestation when any of these conditions occurs:
 `safe_merge_evidence.py` gains read-only methods:
 
 - `workflow_blob(candidate_sha: str) -> dict` with path and both digests;
-- `privacy_attestation(pr_number: int, candidate_sha: str) -> dict` with normalized run evidence.
+- `privacy_attestation(pr_number: int, candidate_sha: str, target: str) -> dict` with normalized run evidence and policy-selected event.
 
 `safe_merge_authority.py` changes G3 so `privacy_ok()` no longer requires the deny-set on the host. Instead, G3 requires local metadata/ancestry plus `privacy_attestation()`.
 
@@ -98,7 +102,10 @@ Implementation follows red-green-refactor. Required tests cover:
 
 - exact successful run is accepted;
 - successful run for a different SHA is rejected;
-- successful run for another PR is rejected;
+- successful `pull_request` run for another PR is rejected;
+- successful `push` run for another branch is rejected;
+- `push` attestation is rejected for `main`;
+- `pull_request` attestation is rejected for probe targets;
 - failed, cancelled, pending, or missing run is rejected;
 - workflow ID/path mismatch is rejected;
 - Git blob mismatch is rejected;
