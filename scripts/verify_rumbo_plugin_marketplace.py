@@ -9,6 +9,7 @@ MARKETPLACE=json.loads((ROOT/".agents"/"plugins"/"marketplace.json").read_text(e
 assert MANIFEST["name"]=="rumbo-coding-agent-reliability"
 assert MANIFEST["version"]=="0.1.6"
 assert MANIFEST["skills"]=="./skills/"
+assert MANIFEST["repository"]=="https://github.com/RUMBO-IA/Rumbo"
 prompts=MANIFEST["interface"]["defaultPrompt"]
 assert 1<=len(prompts)<=3
 assert all(isinstance(p,str) and 1<=len(p)<=128 for p in prompts)

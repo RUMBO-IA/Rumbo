@@ -23,7 +23,7 @@ EMAIL_RE = re.compile(r"(?i)(?<![a-z0-9._%+-])[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{
 
 PUBLIC_PLUGIN_METADATA_HASHES = {
     Path(".agents/plugins/marketplace.json"): "5e02d4f3b7fb21b33c6834b40ec8cf5d1cc21c4857a3a86f4f82dc9f9a987ae3",
-    Path("plugins/rumbo-coding-agent-reliability/.codex-plugin/plugin.json"): "e9b6ba6c570a9e8f76faa846ff020a25c80b4febcd1e603eb264fef55eeaae68",
+    Path("plugins/rumbo-coding-agent-reliability/.codex-plugin/plugin.json"): "e73b34e53ff43f2892ba88490038efd3c18c6451c6e5955871266c3d8a17ab22",
 }
 
 
