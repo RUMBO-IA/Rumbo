@@ -70,7 +70,7 @@ Reject the attestation when any of these conditions occurs:
 
 ## Components and interfaces
 
-`safe_merge_policy.py` gains immutable attestation policy fields for workflow ID, path, Git blob, SHA-256, and accepted event.
+`safe_merge_policy.py` gains immutable attestation policy fields for workflow ID, path, Git blob, SHA-256, and target-to-event mapping.
 
 `safe_merge_evidence.py` gains read-only methods:
 
