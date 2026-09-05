@@ -40,7 +40,7 @@ DEFAULT_POLICY = MergePolicy(
     privacy_workflow_id=347174988,
     privacy_workflow_path=".github/workflows/privacy-gate.yml",
     privacy_workflow_blob="3ab38299fd55f9182e9e10834b04550cc832557a",
-    privacy_workflow_sha256="5dcc2a09e10173bb37de8d449b9105296eb8ec966c33946b9f0400b6e2f2ab99",
+    privacy_workflow_sha256="e7fd1d50d447ac9ffcc255766d14cab0f41979d9115607845745943bb8e0d96b",
 )
 
 

@@ -1,3 +1,5 @@
+import base64
+import hashlib
 import json
 import os
 import re
@@ -66,13 +68,14 @@ class RealEvidence:
         data = self._json((
             "gh", "pr", "view", str(number),
             "-R", self.policy.repository,
-            "--json", "number,state,baseRefName,headRefOid,headRepository,isCrossRepository,statusCheckRollup",
+            "--json", "number,state,baseRefName,headRefName,headRefOid,headRepository,isCrossRepository,statusCheckRollup",
         ))
         head_repo = data.get("headRepository") or {}
         return {
             "number": data.get("number"),
             "state": str(data.get("state", "")).upper(),
             "base": data.get("baseRefName"),
+            "head_branch": data.get("headRefName"),
             "head": data.get("headRefOid"),
             "repo": head_repo.get("nameWithOwner"),
             "cross": bool(data.get("isCrossRepository")),
@@ -165,6 +168,96 @@ class RealEvidence:
                 cleanup = self.runner.run(("git", "worktree", "remove", "--force", str(candidate_root)))
                 if cleanup.returncode != 0:
                     raise EvidenceError("candidate privacy worktree cleanup failed")
+
+    def commit_metadata_ok(self, candidate: str) -> bool:
+        return not verify_public_privacy.commit_metadata_violations(candidate, set())
+
+    def workflow_blob(self, candidate_sha: str) -> dict[str, Any]:
+        owner, repo = self.policy.repository.split("/", 1)
+        endpoint = f"repos/{owner}/{repo}/contents/{self.policy.privacy_workflow_path}?ref={candidate_sha}"
+        data = self._json(("gh", "api", endpoint))
+        git_blob = str(data.get("sha") or "")
+        if git_blob != self.policy.privacy_workflow_blob:
+            raise EvidenceError("privacy workflow Git blob does not match pinned policy")
+        if data.get("encoding") != "base64":
+            raise EvidenceError("privacy workflow content encoding is not base64")
+        encoded = "".join(str(data.get("content") or "").split())
+        try:
+            raw = base64.b64decode(encoded, validate=True)
+        except (ValueError, TypeError) as exc:
+            raise EvidenceError("privacy workflow content is invalid base64") from exc
+        digest = hashlib.sha256(raw).hexdigest()
+        if digest != self.policy.privacy_workflow_sha256:
+            raise EvidenceError("privacy workflow SHA-256 does not match pinned policy")
+        return {
+            "path": self.policy.privacy_workflow_path,
+            "git_blob": git_blob,
+            "sha256": digest,
+        }
+
+    @staticmethod
+    def _run_sort_key(run: dict[str, Any]) -> tuple[str, int, int]:
+        try:
+            attempt = int(run.get("run_attempt") or 0)
+        except (TypeError, ValueError):
+            attempt = 0
+        try:
+            run_id = int(run.get("id") or 0)
+        except (TypeError, ValueError):
+            run_id = 0
+        return (str(run.get("created_at") or ""), attempt, run_id)
+
+    def privacy_attestation(self, pr_number: int, candidate_sha: str, target: str, head_branch: str) -> dict[str, Any]:
+        workflow = self.workflow_blob(candidate_sha)
+        event = policy.attestation_event(target, self.policy)
+        owner, repo = self.policy.repository.split("/", 1)
+        endpoint = f"repos/{owner}/{repo}/actions/workflows/{self.policy.privacy_workflow_id}/runs"
+        data = self._json((
+            "gh", "api", "--method", "GET", endpoint,
+            "-f", f"head_sha={candidate_sha}",
+            "-f", f"event={event}",
+            "-f", "per_page=100",
+        ))
+        runs = data.get("workflow_runs")
+        if not isinstance(runs, list):
+            raise EvidenceError("privacy workflow runs response is malformed")
+        matches: list[dict[str, Any]] = []
+        for run in runs:
+            if not isinstance(run, dict):
+                continue
+            if run.get("workflow_id") != self.policy.privacy_workflow_id:
+                continue
+            if run.get("path") != self.policy.privacy_workflow_path:
+                continue
+            if run.get("event") != event or run.get("head_sha") != candidate_sha:
+                continue
+            if event == "pull_request":
+                pull_requests = run.get("pull_requests") or []
+                if not any(item.get("number") == pr_number for item in pull_requests if isinstance(item, dict)):
+                    continue
+            elif run.get("head_branch") != head_branch:
+                continue
+            matches.append(run)
+        if not matches:
+            raise EvidenceError("no exact privacy workflow attestation exists")
+        latest = max(matches, key=self._run_sort_key)
+        if latest.get("status") != "completed" or latest.get("conclusion") != "success":
+            raise EvidenceError("newest exact privacy workflow attestation is not successful")
+        return {
+            "workflow_id": self.policy.privacy_workflow_id,
+            "workflow_path": workflow["path"],
+            "workflow_git_blob": workflow["git_blob"],
+            "workflow_sha256": workflow["sha256"],
+            "run_id": latest.get("id"),
+            "run_attempt": latest.get("run_attempt"),
+            "created_at": latest.get("created_at"),
+            "event": event,
+            "status": latest.get("status"),
+            "conclusion": latest.get("conclusion"),
+            "head_sha": candidate_sha,
+            "head_branch": latest.get("head_branch"),
+            "pr_number": pr_number if event == "pull_request" else None,
+        }
 
     def vercel_state(self) -> dict[str, Any]:
         project = self._json((

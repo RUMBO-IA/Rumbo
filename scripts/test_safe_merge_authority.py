@@ -1,4 +1,7 @@
+import base64
+import hashlib
 import json
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -38,7 +41,7 @@ class PolicyTests(unittest.TestCase):
         self.assertEqual(policy.DEFAULT_POLICY.privacy_workflow_id, 347174988)
         self.assertEqual(policy.DEFAULT_POLICY.privacy_workflow_path, ".github/workflows/privacy-gate.yml")
         self.assertEqual(policy.DEFAULT_POLICY.privacy_workflow_blob, "3ab38299fd55f9182e9e10834b04550cc832557a")
-        self.assertEqual(policy.DEFAULT_POLICY.privacy_workflow_sha256, "5dcc2a09e10173bb37de8d449b9105296eb8ec966c33946b9f0400b6e2f2ab99")
+        self.assertEqual(policy.DEFAULT_POLICY.privacy_workflow_sha256, "e7fd1d50d447ac9ffcc255766d14cab0f41979d9115607845745943bb8e0d96b")
 
 
 class ReceiptTests(unittest.TestCase):
@@ -78,11 +81,12 @@ class FakeRunner:
 
 class EvidenceTests(unittest.TestCase):
     def test_pr_snapshot_normalizes_exact_fields(self):
-        payload = '{"number":40,"state":"OPEN","baseRefName":"main","headRefOid":"' + "a" * 40 + '","headRepository":{"nameWithOwner":"RUMBO-IA/Rumbo"},"isCrossRepository":false,"statusCheckRollup":[]}'
+        payload = '{"number":40,"state":"OPEN","baseRefName":"main","headRefName":"feature/head","headRefOid":"' + "a" * 40 + '","headRepository":{"nameWithOwner":"RUMBO-IA/Rumbo"},"isCrossRepository":false,"statusCheckRollup":[]}'
         fake = FakeRunner({("gh", "pr", "view"): payload})
         ev = evidence.RealEvidence(ROOT, fake, policy.DEFAULT_POLICY)
         snapshot = ev.pr(40)
         self.assertEqual(snapshot["base"], "main")
+        self.assertEqual(snapshot["head_branch"], "feature/head")
         self.assertEqual(snapshot["repo"], "RUMBO-IA/Rumbo")
         self.assertIn("--json", fake.calls[0])
 
@@ -100,6 +104,100 @@ class EvidenceTests(unittest.TestCase):
         self.assertFalse(state["autoAssignCustomDomains"])
         self.assertIsNone(state["commandForIgnoringBuildStep"])
         self.assertEqual(state["productionBranch"], "main")
+
+    def _workflow_payload(self, *, blob=None, content=None):
+        raw = content if content is not None else subprocess.check_output(["git", "show", f"HEAD:{policy.DEFAULT_POLICY.privacy_workflow_path}"], cwd=ROOT)
+        return json.dumps({
+            "sha": blob or policy.DEFAULT_POLICY.privacy_workflow_blob,
+            "encoding": "base64",
+            "content": base64.b64encode(raw).decode("ascii"),
+        })
+
+    def _run_payload(self, run):
+        return json.dumps({"workflow_runs": [run]})
+
+    def test_workflow_blob_accepts_both_pinned_digests(self):
+        fake = FakeRunner({("gh", "api", f"repos/RUMBO-IA/Rumbo/contents/{policy.DEFAULT_POLICY.privacy_workflow_path}?ref=" + "a" * 40): self._workflow_payload()})
+        observed = evidence.RealEvidence(ROOT, fake, policy.DEFAULT_POLICY).workflow_blob("a" * 40)
+        self.assertEqual(observed["git_blob"], policy.DEFAULT_POLICY.privacy_workflow_blob)
+        self.assertEqual(observed["sha256"], policy.DEFAULT_POLICY.privacy_workflow_sha256)
+
+    def test_workflow_blob_rejects_git_blob_mismatch(self):
+        fake = FakeRunner({("gh", "api", f"repos/RUMBO-IA/Rumbo/contents/{policy.DEFAULT_POLICY.privacy_workflow_path}?ref=" + "a" * 40): self._workflow_payload(blob="0" * 40)})
+        with self.assertRaises(evidence.EvidenceError):
+            evidence.RealEvidence(ROOT, fake, policy.DEFAULT_POLICY).workflow_blob("a" * 40)
+
+    def test_workflow_blob_rejects_sha256_mismatch(self):
+        fake = FakeRunner({("gh", "api", f"repos/RUMBO-IA/Rumbo/contents/{policy.DEFAULT_POLICY.privacy_workflow_path}?ref=" + "a" * 40): self._workflow_payload(content=b"changed")})
+        with self.assertRaises(evidence.EvidenceError):
+            evidence.RealEvidence(ROOT, fake, policy.DEFAULT_POLICY).workflow_blob("a" * 40)
+
+    def test_main_accepts_exact_successful_pull_request_attestation(self):
+        run = {"id": 123, "workflow_id": policy.DEFAULT_POLICY.privacy_workflow_id,
+               "path": policy.DEFAULT_POLICY.privacy_workflow_path, "event": "pull_request",
+               "status": "completed", "conclusion": "success", "head_sha": "a" * 40,
+               "head_branch": "feature/head", "run_attempt": 1, "created_at": "2026-09-05T05:00:00Z",
+               "pull_requests": [{"number": 40}]}
+        fake = FakeRunner({
+            ("gh", "api", f"repos/RUMBO-IA/Rumbo/contents/{policy.DEFAULT_POLICY.privacy_workflow_path}?ref=" + "a" * 40): self._workflow_payload(),
+            ("gh", "api", "--method", "GET"): self._run_payload(run),
+        })
+        att = evidence.RealEvidence(ROOT, fake, policy.DEFAULT_POLICY).privacy_attestation(40, "a" * 40, "main", "feature/head")
+        self.assertEqual((att["run_id"], att["event"], att["head_sha"]), (123, "pull_request", "a" * 40))
+
+    def test_main_rejects_pull_request_attestation_for_other_pr(self):
+        run = {"id": 123, "workflow_id": policy.DEFAULT_POLICY.privacy_workflow_id,
+               "path": policy.DEFAULT_POLICY.privacy_workflow_path, "event": "pull_request",
+               "status": "completed", "conclusion": "success", "head_sha": "a" * 40,
+               "head_branch": "feature/head", "run_attempt": 1, "created_at": "2026-09-05T05:00:00Z",
+               "pull_requests": [{"number": 41}]}
+        fake = FakeRunner({
+            ("gh", "api", f"repos/RUMBO-IA/Rumbo/contents/{policy.DEFAULT_POLICY.privacy_workflow_path}?ref=" + "a" * 40): self._workflow_payload(),
+            ("gh", "api", "--method", "GET"): self._run_payload(run),
+        })
+        with self.assertRaises(evidence.EvidenceError):
+            evidence.RealEvidence(ROOT, fake, policy.DEFAULT_POLICY).privacy_attestation(40, "a" * 40, "main", "feature/head")
+
+    def test_probe_accepts_exact_successful_push_attestation_from_pr_head(self):
+        run = {"id": 124, "workflow_id": policy.DEFAULT_POLICY.privacy_workflow_id,
+               "path": policy.DEFAULT_POLICY.privacy_workflow_path, "event": "push",
+               "status": "completed", "conclusion": "success", "head_sha": "a" * 40,
+               "head_branch": "probe/safe-merge-head-x", "run_attempt": 1, "created_at": "2026-09-05T05:00:00Z",
+               "pull_requests": []}
+        fake = FakeRunner({
+            ("gh", "api", f"repos/RUMBO-IA/Rumbo/contents/{policy.DEFAULT_POLICY.privacy_workflow_path}?ref=" + "a" * 40): self._workflow_payload(),
+            ("gh", "api", "--method", "GET"): self._run_payload(run),
+        })
+        att = evidence.RealEvidence(ROOT, fake, policy.DEFAULT_POLICY).privacy_attestation(40, "a" * 40, "probe/safe-merge-base-x", "probe/safe-merge-head-x")
+        self.assertEqual((att["run_id"], att["event"], att["head_branch"]), (124, "push", "probe/safe-merge-head-x"))
+
+    def test_probe_rejects_push_attestation_from_other_branch(self):
+        run = {"id": 124, "workflow_id": policy.DEFAULT_POLICY.privacy_workflow_id,
+               "path": policy.DEFAULT_POLICY.privacy_workflow_path, "event": "push",
+               "status": "completed", "conclusion": "success", "head_sha": "a" * 40,
+               "head_branch": "probe/safe-merge-other", "run_attempt": 1, "created_at": "2026-09-05T05:00:00Z",
+               "pull_requests": []}
+        fake = FakeRunner({
+            ("gh", "api", f"repos/RUMBO-IA/Rumbo/contents/{policy.DEFAULT_POLICY.privacy_workflow_path}?ref=" + "a" * 40): self._workflow_payload(),
+            ("gh", "api", "--method", "GET"): self._run_payload(run),
+        })
+        with self.assertRaises(evidence.EvidenceError):
+            evidence.RealEvidence(ROOT, fake, policy.DEFAULT_POLICY).privacy_attestation(40, "a" * 40, "probe/safe-merge-base-x", "probe/safe-merge-head-x")
+
+    def test_attestation_rejects_newest_matching_failed_run(self):
+        older = {"id": 1, "workflow_id": policy.DEFAULT_POLICY.privacy_workflow_id, "path": policy.DEFAULT_POLICY.privacy_workflow_path,
+                 "event": "pull_request", "status": "completed", "conclusion": "success", "head_sha": "a" * 40,
+                 "head_branch": "feature/head", "run_attempt": 1, "created_at": "2026-09-05T04:00:00Z", "pull_requests": [{"number": 40}]}
+        newer = dict(older, id=2, conclusion="failure", run_attempt=2, created_at="2026-09-05T05:00:00Z")
+        fake = FakeRunner({
+            ("gh", "api", f"repos/RUMBO-IA/Rumbo/contents/{policy.DEFAULT_POLICY.privacy_workflow_path}?ref=" + "a" * 40): self._workflow_payload(),
+            ("gh", "api", "--method", "GET"): json.dumps({"workflow_runs": [older, newer]}),
+        })
+        with self.assertRaises(evidence.EvidenceError):
+            evidence.RealEvidence(ROOT, fake, policy.DEFAULT_POLICY).privacy_attestation(40, "a" * 40, "main", "feature/head")
+
+    def test_commit_metadata_ok_does_not_require_local_deny_hashes(self):
+        self.assertTrue(evidence.RealEvidence(ROOT, FakeRunner({}), policy.DEFAULT_POLICY).commit_metadata_ok("HEAD"))
 
 
 BASE = "1" * 40

@@ -29,7 +29,7 @@ The attestation is valid only when all of these values match policy:
 - head SHA: exactly the requested candidate SHA;
 - conclusion: `success`;
 - workflow file Git blob: `3ab38299fd55f9182e9e10834b04550cc832557a`;
-- workflow file SHA-256: `5dcc2a09e10173bb37de8d449b9105296eb8ec966c33946b9f0400b6e2f2ab99`.
+- workflow file SHA-256: `e7fd1d50d447ac9ffcc255766d14cab0f41979d9115607845745943bb8e0d96b`.
 
 The two workflow digests pin the reviewed workflow content. A future workflow change requires a separate review and explicit policy update before its runs can authorize G3.
 
