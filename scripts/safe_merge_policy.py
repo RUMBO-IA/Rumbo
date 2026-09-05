@@ -19,6 +19,10 @@ class MergePolicy:
     vercel_project: str
     vercel_scope: str
     live_domain: str
+    privacy_workflow_id: int
+    privacy_workflow_path: str
+    privacy_workflow_blob: str
+    privacy_workflow_sha256: str
 
 
 class PolicyError(ValueError):
@@ -33,6 +37,10 @@ DEFAULT_POLICY = MergePolicy(
     vercel_project="rumbo-ia-publica",
     vercel_scope="agent-ai-ingenieria",
     live_domain="rumbo.verso.fans",
+    privacy_workflow_id=347174988,
+    privacy_workflow_path=".github/workflows/privacy-gate.yml",
+    privacy_workflow_blob="3ab38299fd55f9182e9e10834b04550cc832557a",
+    privacy_workflow_sha256="5dcc2a09e10173bb37de8d449b9105296eb8ec966c33946b9f0400b6e2f2ab99",
 )
 
 
@@ -57,3 +65,11 @@ def validate_execution_mode(mode: str, target: str, merge_policy: MergePolicy) -
     if mode == "dry-run" and (phase3 or probe):
         return
     raise PolicyError(f"mode {mode!r} is not authorized for target {target!r}")
+
+
+def attestation_event(target: str, merge_policy: MergePolicy) -> str:
+    if target in merge_policy.phase3_targets:
+        return "pull_request"
+    if target.startswith(merge_policy.probe_prefix):
+        return "push"
+    raise PolicyError("privacy attestation event is undefined for target")

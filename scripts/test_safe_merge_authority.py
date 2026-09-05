@@ -28,6 +28,18 @@ class PolicyTests(unittest.TestCase):
         with self.assertRaises(policy.PolicyError):
             policy.validate_execution_mode("probe", "probe/other", policy.DEFAULT_POLICY)
 
+    def test_main_uses_pull_request_attestation(self):
+        self.assertEqual(policy.attestation_event("main", policy.DEFAULT_POLICY), "pull_request")
+
+    def test_probe_uses_push_attestation(self):
+        self.assertEqual(policy.attestation_event("probe/safe-merge-case", policy.DEFAULT_POLICY), "push")
+
+    def test_privacy_workflow_identity_is_pinned(self):
+        self.assertEqual(policy.DEFAULT_POLICY.privacy_workflow_id, 347174988)
+        self.assertEqual(policy.DEFAULT_POLICY.privacy_workflow_path, ".github/workflows/privacy-gate.yml")
+        self.assertEqual(policy.DEFAULT_POLICY.privacy_workflow_blob, "3ab38299fd55f9182e9e10834b04550cc832557a")
+        self.assertEqual(policy.DEFAULT_POLICY.privacy_workflow_sha256, "5dcc2a09e10173bb37de8d449b9105296eb8ec966c33946b9f0400b6e2f2ab99")
+
 
 class ReceiptTests(unittest.TestCase):
     def test_digest_is_order_invariant(self):
