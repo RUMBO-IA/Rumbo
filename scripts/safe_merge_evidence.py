@@ -3,6 +3,7 @@ import hashlib
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -28,6 +29,16 @@ class EvidenceError(RuntimeError):
     pass
 
 
+def resolve_command(args, *, which=shutil.which) -> tuple[str, ...]:
+    logical = tuple(args)
+    if not logical:
+        return logical
+    resolved = which(logical[0])
+    if not resolved:
+        return logical
+    return (resolved, *logical[1:])
+
+
 def parse_json_result(result: CommandResult) -> Any:
     if result.returncode != 0:
         raise EvidenceError(f"command failed ({result.returncode}): {' '.join(result.args)}")
@@ -43,15 +54,17 @@ class SubprocessRunner:
         self.results: list[CommandResult] = []
 
     def run(self, args, *, env=None) -> CommandResult:
+        logical_args = tuple(args)
+        execution_args = resolve_command(logical_args)
         completed = subprocess.run(
-            list(args),
+            list(execution_args),
             cwd=self.root,
             env=env,
             text=True,
             capture_output=True,
             check=False,
         )
-        result = CommandResult(tuple(args), completed.returncode, completed.stdout, completed.stderr)
+        result = CommandResult(logical_args, completed.returncode, completed.stdout, completed.stderr)
         self.results.append(result)
         return result
 

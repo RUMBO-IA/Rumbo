@@ -95,6 +95,10 @@ class EvidenceTests(unittest.TestCase):
         with self.assertRaises(evidence.EvidenceError):
             evidence.parse_json_result(result)
 
+    def test_resolve_command_uses_platform_shim_without_changing_arguments(self):
+        resolved = evidence.resolve_command(("vercel", "inspect"), which=lambda _name: r"C:\npm\vercel.CMD")
+        self.assertEqual(resolved, (r"C:\npm\vercel.CMD", "inspect"))
+
     def test_vercel_state_normalizes_project_and_live_alias(self):
         project = '{"autoAssignCustomDomains":false,"commandForIgnoringBuildStep":null,"link":{"productionBranch":"main"}}'
         live = '{"id":"dpl_live","target":"production"}'
