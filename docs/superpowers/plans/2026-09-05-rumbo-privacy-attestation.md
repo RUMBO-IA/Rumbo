@@ -76,7 +76,7 @@ Commit: `feat(safe-merge): pin privacy attestation policy`
 - Extends: `pr(number)` normalized snapshot with `head_branch` from `headRefName`.
 - Produces: `workflow_blob(candidate_sha: str) -> dict[str, Any]` with `path`, `git_blob`, `sha256`.
 - Produces: `privacy_attestation(pr_number: int, candidate_sha: str, target: str, head_branch: str) -> dict[str, Any]` with normalized non-secret run evidence.
-- Produces: `commit_metadata_ok(candidate: str) -> bool`, independent of deny hashes.
+- Produces: `commit_metadata_ok(candidate: str) -> bool`, without local deny-hash input.
 
 - [ ] **Step 1: Write failing evidence tests**
 
