@@ -113,6 +113,15 @@ def approved_head_author_email(author_email: str, commit_ref: str, deny: set[str
     del commit_ref
     return author_email in APPROVED_AUTHOR_EMAILS and not is_denied(author_email, deny)
 
+
+def metadata_scan_refs() -> list[str]:
+    selected_ref = os.environ.get("RUMBO_PRIVACY_COMMIT_SHA", "HEAD")
+    refs = [selected_ref]
+    if os.environ.get("RUMBO_PRIVACY_SCAN_ALL_REFS") == "1" and selected_ref != "--all":
+        refs.append("--all")
+    return refs
+
+
 def commit_metadata_violations(commit_ref: str, deny: set[str]) -> list[str]:
     violations: list[str] = []
     commits = subprocess.check_output(
@@ -149,10 +158,10 @@ def main() -> int:
 
     violations: list[str] = []
 
-    # Every reachable commit is public history. Validate the full ancestry, not only HEAD,
-    # so a multi-commit push cannot hide private metadata behind a clean tip commit.
-    commit_ref = os.environ.get("RUMBO_PRIVACY_COMMIT_SHA", "HEAD")
-    violations.extend(commit_metadata_violations(commit_ref, deny))
+    # Every reachable commit is public history. On CI, scan the selected commit and
+    # every fetched public ref so a stale or side branch cannot retain private metadata.
+    for commit_ref in metadata_scan_refs():
+        violations.extend(commit_metadata_violations(commit_ref, deny))
     for path in tracked_files():
         text = text_of(path)
         if text is None:

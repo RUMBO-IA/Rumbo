@@ -80,6 +80,22 @@ class PrivacyGateRegressionTests(unittest.TestCase):
         marker = "linkedin.com" + "/in/example"
         self.assertTrue(gate.text_has_direct_person_profile(marker))
 
+    def test_metadata_scan_refs_include_selected_ref_and_all_public_refs(self):
+        env = {
+            "RUMBO_PRIVACY_COMMIT_SHA": "abc123",
+            "RUMBO_PRIVACY_SCAN_ALL_REFS": "1",
+        }
+        with mock.patch.dict(gate.os.environ, env, clear=True):
+            self.assertEqual(gate.metadata_scan_refs(), ["abc123", "--all"])
+
+    def test_metadata_scan_refs_default_to_selected_ref_only(self):
+        with mock.patch.dict(gate.os.environ, {"RUMBO_PRIVACY_COMMIT_SHA": "abc123"}, clear=True):
+            self.assertEqual(gate.metadata_scan_refs(), ["abc123"])
+
+    def test_ci_enables_repository_wide_metadata_scan(self):
+        workflow = (Path(__file__).resolve().parents[1] / ".github/workflows/privacy-gate.yml").read_text(encoding="utf-8")
+        self.assertIn("RUMBO_PRIVACY_SCAN_ALL_REFS", workflow)
+
     def test_public_founder_display_is_first_name_only(self):
         self.assertEqual(gate.PUBLIC_NAME, "Sebasti\u00e1n")
 
