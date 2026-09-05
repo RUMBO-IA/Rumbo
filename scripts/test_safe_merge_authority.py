@@ -30,7 +30,7 @@ class PolicyTests(unittest.TestCase):
 
 
 class ReceiptTests(unittest.TestCase):
-    def test_digest_is_order_independent(self):
+    def test_digest_is_order_invariant(self):
         self.assertEqual(
             receipt.receipt_digest({"b": 2, "a": 1}),
             receipt.receipt_digest({"a": 1, "b": 2}),

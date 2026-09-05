@@ -17,7 +17,7 @@ Given a PR number, expected head SHA, and target branch, the authority either:
 1. proves all gates and performs one fast-forward-only branch update to that exact SHA; or
 2. performs no write and emits a structured `SAFE_STOP` receipt explaining the failed gate.
 
-A successful run is complete only after independent post-write verification confirms the remote target SHA, required GitHub checks, privacy ancestry, Vercel production separation, and absence of metadata violations.
+A successful run is complete only after separate post-write verification confirms the remote target SHA, required GitHub checks, privacy ancestry, Vercel production separation, and absence of metadata violations.
 
 ## Non-goals
 
@@ -118,7 +118,7 @@ Implementation follows red-green-refactor. Required adversarial cases include:
 - Vercel production configuration drift;
 - attempted force/non-branch/tag action rejected by policy;
 - normal fast-forward success to an exact SHA;
-- successful write followed by independent receipt verification;
+- successful write followed by separate receipt verification;
 - simulated post-write verification failure without rollback.
 
 A real remote probe, if used, must target temporary non-production branches only and must leave zero probe refs afterward.
@@ -148,6 +148,6 @@ The design is satisfied only when fresh evidence proves all of the following:
 
 ## Operational rule after acceptance
 
-For this repository, PR integration is defined as promotion of a pre-existing audited commit, not creation of a merge artifact. The safe path is therefore exact-SHA fast-forward under server-side metadata and non-fast-forward rules, followed by independent verification and evidence receipt.
+For this repository, PR integration is defined as promotion of a pre-existing audited commit, not creation of a merge artifact. The safe path is therefore exact-SHA fast-forward under server-side metadata and non-fast-forward rules, followed by separate verification and evidence receipt.
 
 Any future request that requires history rewriting, generated merge commits, tag creation, ruleset bypass, or production deployment is outside this authority and must fail closed pending a separate explicit design and authorization.
