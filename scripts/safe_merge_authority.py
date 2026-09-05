@@ -1,7 +1,13 @@
-from dataclasses import dataclass
+import argparse
+import uuid
+from dataclasses import asdict, dataclass
+from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any
 
+import safe_merge_evidence as evidence_module
 import safe_merge_policy as policy
+import safe_merge_receipt as receipt_module
 
 
 @dataclass(frozen=True)
@@ -138,3 +144,73 @@ def evaluate(request: policy.MergeRequest, merge_policy: policy.MergePolicy, evi
             target_sha=target_sha,
             live=live_id,
         )
+
+
+def _utc_now() -> str:
+    return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+
+
+def execute_request(
+    request: policy.MergeRequest,
+    merge_policy: policy.MergePolicy,
+    evidence,
+    *,
+    mode: str,
+    receipt_dir: Path,
+    clock=_utc_now,
+    invocation_id: str | None = None,
+):
+    invocation = invocation_id or uuid.uuid4().hex
+    started_at = clock()
+    outcome = evaluate(request, merge_policy, evidence, mode=mode)
+    finished_at = clock()
+    command_log = getattr(evidence, "command_log", lambda: [])()
+    payload = {
+        "invocation_id": invocation,
+        "started_at": started_at,
+        "finished_at": finished_at,
+        "repository": request.repository,
+        "pr_number": request.pr_number,
+        "mode": mode,
+        "expected": {"head": request.expected_head_sha, "base": request.expected_base},
+        "observed": {"target_before": outcome.pre_write_target_sha, "live_deployment_before": outcome.live_deployment_before},
+        "gates": [asdict(gate) for gate in outcome.gates],
+        "commands": command_log,
+        "state": outcome.state,
+        "error_code": outcome.failed_gate,
+    }
+    path = receipt_module.write_receipt(Path(receipt_dir), payload)
+    return outcome, path
+
+
+def main(argv=None) -> int:
+    parser = argparse.ArgumentParser(description="RUMBO exact-SHA safe merge authority")
+    parser.add_argument("--pr", type=int, required=True)
+    parser.add_argument("--head", required=True)
+    parser.add_argument("--base", required=True)
+    parser.add_argument("--mode", choices=("dry-run", "probe", "main"), required=True)
+    parser.add_argument("--receipt-dir", type=Path, required=True)
+    args = parser.parse_args(argv)
+
+    request = policy.MergeRequest(
+        pr_number=args.pr,
+        expected_head_sha=args.head,
+        expected_base=args.base,
+        repository=policy.DEFAULT_POLICY.repository,
+    )
+    root = Path(__file__).resolve().parents[1]
+    real_evidence = evidence_module.RealEvidence(root, merge_policy=policy.DEFAULT_POLICY)
+    outcome, receipt_path = execute_request(
+        request,
+        policy.DEFAULT_POLICY,
+        real_evidence,
+        mode=args.mode,
+        receipt_dir=args.receipt_dir,
+    )
+    print(f"SAFE_MERGE_STATE={outcome.state}")
+    print(f"SAFE_MERGE_RECEIPT={receipt_path}")
+    return {"DRY_RUN_PASS": 0, "MERGED_SAFE": 0, "SAFE_STOP": 2, "POST_WRITE_VERIFY_FAILED": 3}.get(outcome.state, 4)
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

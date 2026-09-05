@@ -199,3 +199,28 @@ class FastForwardTests(unittest.TestCase):
         out = authority.evaluate(merge_request(base=target), policy.DEFAULT_POLICY, ev, mode="probe")
         self.assertEqual(out.state, "POST_WRITE_VERIFY_FAILED")
         self.assertEqual(ev.push_calls, [(target, BASE, HEAD)])
+
+
+class CliTests(unittest.TestCase):
+    def test_probe_mode_rejects_main(self):
+        with self.assertRaises(policy.PolicyError):
+            policy.validate_execution_mode("probe", "main", policy.DEFAULT_POLICY)
+
+    def test_execute_request_writes_digest_verified_receipt(self):
+        ev = FakeEvidence(target_sequence=[BASE, BASE])
+        with tempfile.TemporaryDirectory() as td:
+            out, path = authority.execute_request(
+                merge_request(),
+                policy.DEFAULT_POLICY,
+                ev,
+                mode="dry-run",
+                receipt_dir=Path(td),
+                clock=lambda: "2026-09-05T04:30:00Z",
+                invocation_id="inv-fixed",
+            )
+            stored = json.loads(path.read_text(encoding="utf-8"))
+            self.assertEqual(out.state, "DRY_RUN_PASS")
+            self.assertEqual(stored["payload"]["state"], "DRY_RUN_PASS")
+            self.assertEqual(stored["payload"]["invocation_id"], "inv-fixed")
+            self.assertEqual(stored["sha256"], receipt.receipt_digest(stored["payload"]))
+            self.assertFalse(ev.push_calls)

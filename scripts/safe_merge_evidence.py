@@ -38,6 +38,7 @@ def parse_json_result(result: CommandResult) -> Any:
 class SubprocessRunner:
     def __init__(self, root: Path):
         self.root = root
+        self.results: list[CommandResult] = []
 
     def run(self, args, *, env=None) -> CommandResult:
         completed = subprocess.run(
@@ -48,7 +49,9 @@ class SubprocessRunner:
             capture_output=True,
             check=False,
         )
-        return CommandResult(tuple(args), completed.returncode, completed.stdout, completed.stderr)
+        result = CommandResult(tuple(args), completed.returncode, completed.stdout, completed.stderr)
+        self.results.append(result)
+        return result
 
 
 class RealEvidence:
@@ -179,6 +182,18 @@ class RealEvidence:
             "liveDeployment": live.get("id"),
             "liveTarget": live.get("target"),
         }
+
+
+    def command_log(self) -> list[dict[str, Any]]:
+        results = getattr(self.runner, "results", [])
+        return [
+            {
+                "tool": item.args[0] if item.args else "",
+                "operation": item.args[1] if len(item.args) > 1 else "",
+                "returncode": item.returncode,
+            }
+            for item in results
+        ]
 
     def ruleset_ok(self) -> bool:
         owner, repo = self.policy.repository.split("/", 1)
