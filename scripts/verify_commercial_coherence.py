@@ -12,27 +12,20 @@ README = ROOT / "README.md"
 TYPEFORM = "https://form.typeform.com/to/Tu3D3tVo"
 TYPEFORM_PREFIX = "https://form.typeform.com/to/"
 TYPEFORM_URL = re.compile(r"https://form\.typeform\.com/to/[A-Za-z0-9]+")
-MONTHLY_PRICE = re.compile(
-    r"(?:USD|\$)\s*\d+(?:[.,]\d+)?\s*(?:/\s*(?:mes|month)|a\s+month|al\s+mes)\b",
-    re.I,
-)
+MONTHLY_PRICE = re.compile(r"(?:USD|\$)\s*\d+(?:[.,]\d+)?\s*(?:/\s*(?:mes|month|mo)|a\s+month|al\s+mes)\b", re.I)
+LEGACY_COMMERCIAL_MARKERS = ("RUMBO Capture", "RUMBO Recovery", "RUMBO Front Desk AI", "RUMBO Growth Engine", "Plan Growth completo")
+TOOL_COUNT = re.compile(r"\b(?:(?:more than|más de)\s+)?\d+\s+(?:tools|herramientas)\b", re.I)
+FAKE_FORM_SUCCESS = re.compile(r"\b(?:mensaje enviado|message sent)\b", re.I)
+GENERIC_SOCIAL_DESTINATION = re.compile(r'href=["\']https://www\.(?:linkedin|instagram)\.com/?["\']', re.I)
+TYPEFORM_ANCHOR = re.compile(r'<a\b[^>]*href=["\']' + re.escape(TYPEFORM) + r'["\'][^>]*>.*?</a>', re.I | re.S)
 
 README_INVARIANTS = (
-    "Revenue Recovery Sprint",
-    "14 calendar days",
-    "USD 149 one-time before kickoff",
-    TYPEFORM,
+    "Revenue Recovery Sprint", "14 calendar days", "USD 149 one-time before kickoff", TYPEFORM,
 )
 INDEX_INVARIANTS = (
-    "Revenue Recovery Sprint",
-    "14 días",
-    "USD 149",
-    "pago único",
-    "No garantiza ROI",
-    "Control humano para acciones sensibles",
-    "continuidad",
+    "Revenue Recovery Sprint", "14 días", "USD 149", "pago único",
+    "No garantiza ROI", "Control humano para acciones sensibles", "continuidad",
 )
-
 
 class AnchorParser(HTMLParser):
     def __init__(self) -> None:
@@ -55,21 +48,28 @@ def check(readme: str, html: str) -> list[str]:
     errors: list[str] = []
     plain_html = re.sub(r"<[^>]+>", " ", html)
     plain_html = re.sub(r"\s+", " ", plain_html)
-
     for value in README_INVARIANTS:
         if value not in readme:
             errors.append(f"README_MISSING:{value}")
-
     for value in INDEX_INVARIANTS:
         if value.casefold() not in html.casefold():
             errors.append(f"INDEX_MISSING:{value}")
-
     if MONTHLY_PRICE.search(plain_html):
         errors.append("MONTHLY_PRICE")
-
     if "@rumbo_ia" in html.casefold():
         errors.append("STALE_SOCIAL_HANDLE")
-
+    if any(marker.casefold() in html.casefold() for marker in LEGACY_COMMERCIAL_MARKERS):
+        errors.append("LEGACY_COMMERCIAL_CATALOG")
+    if TOOL_COUNT.search(plain_html):
+        errors.append("UNVERIFIED_TOOL_COUNT")
+    if FAKE_FORM_SUCCESS.search(plain_html):
+        errors.append("FAKE_FORM_SUCCESS")
+    if GENERIC_SOCIAL_DESTINATION.search(html):
+        errors.append("GENERIC_SOCIAL_DESTINATION")
+    for anchor in TYPEFORM_ANCHOR.findall(html):
+        if re.search(r"\b(?:whatsapp|email|correo)\b", anchor, re.I):
+            errors.append("MISLABELED_TYPEFORM_ROUTE")
+            break
     if "mailto:" in readme.casefold() or "mailto:" in html.casefold():
         errors.append("PUBLIC_MAILTO")
 
@@ -85,13 +85,11 @@ def check(readme: str, html: str) -> list[str]:
         errors.append("CONTACT_SECTION_MISSING")
     if "#contacto" not in parser.hrefs:
         errors.append("CONTACT_CTA_MISSING")
-
     typeform_links = [href for href in parser.hrefs if href.startswith(TYPEFORM_PREFIX)]
     if TYPEFORM not in typeform_links:
         errors.append("CANONICAL_TYPEFORM_ANCHOR_MISSING")
     if any(href != TYPEFORM for href in typeform_links):
         errors.append("NONCANONICAL_TYPEFORM_ANCHOR")
-
     return sorted(set(errors))
 
 
@@ -99,7 +97,6 @@ def main() -> int:
     if not README.is_file() or any(not path.is_file() for path in PUBLIC_HTML):
         print("COMMERCIAL_COHERENCE_FAIL: REQUIRED_PUBLIC_SURFACE_MISSING")
         return 1
-
     errors = check(
         README.read_text(encoding="utf-8"),
         "\n".join(path.read_text(encoding="utf-8") for path in PUBLIC_HTML),
@@ -109,7 +106,6 @@ def main() -> int:
         for error in errors:
             print(f"VIOLATION={error}")
         return 1
-
     print("COMMERCIAL_COHERENCE_PASS")
     return 0
 

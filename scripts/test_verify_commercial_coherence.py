@@ -57,5 +57,33 @@ class CommercialCoherenceTests(unittest.TestCase):
         self.assertIn("CONTACT_CTA_MISSING", errors)
 
 
+    def test_slash_mo_monthly_pricing_is_rejected(self):
+        self.assertIn("MONTHLY_PRICE", verifier.check(self.readme, self.html + "\nUSD 349/mo"))
+
+    def test_legacy_commercial_catalog_is_rejected(self):
+        for marker in ("RUMBO Capture", "RUMBO Recovery", "RUMBO Front Desk AI", "RUMBO Growth Engine", "Plan Growth completo"):
+            with self.subTest(marker=marker):
+                self.assertIn("LEGACY_COMMERCIAL_CATALOG", verifier.check(self.readme, self.html + "\n" + marker))
+
+    def test_unverified_tool_counts_are_rejected(self):
+        for wording in ("13 tools", "More than 14 tools", "14 herramientas", "Más de 14 herramientas"):
+            with self.subTest(wording=wording):
+                self.assertIn("UNVERIFIED_TOOL_COUNT", verifier.check(self.readme, self.html + "\n" + wording))
+
+    def test_fake_form_success_is_rejected(self):
+        for wording in ("Mensaje enviado", "Message sent"):
+            with self.subTest(wording=wording):
+                self.assertIn("FAKE_FORM_SUCCESS", verifier.check(self.readme, self.html + "\n" + wording))
+
+    def test_mislabeled_typeform_route_is_rejected(self):
+        sample = self.html + f'\n<a href="{verifier.TYPEFORM}" aria-label="WhatsApp directo">Email directo</a>'
+        self.assertIn("MISLABELED_TYPEFORM_ROUTE", verifier.check(self.readme, sample))
+
+    def test_generic_social_destinations_are_rejected(self):
+        for url in ("https://www.linkedin.com", "https://www.instagram.com"):
+            with self.subTest(url=url):
+                self.assertIn("GENERIC_SOCIAL_DESTINATION", verifier.check(self.readme, self.html + f'\n<a href="{url}">Social</a>'))
+
+
 if __name__ == "__main__":
     unittest.main()
