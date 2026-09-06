@@ -85,5 +85,31 @@ class CommercialCoherenceTests(unittest.TestCase):
                 self.assertIn("GENERIC_SOCIAL_DESTINATION", verifier.check(self.readme, self.html + f'\n<a href="{url}">Social</a>'))
 
 
+    def test_adjectival_tool_count_is_rejected(self):
+        errors = verifier.check(self.readme, self.html + "\nMore than 14 specialized tools")
+        self.assertIn("UNVERIFIED_TOOL_COUNT", errors)
+
+    def test_duplicate_footer_typeform_item_is_rejected(self):
+        item = '<li><a href="' + verifier.TYPEFORM + '">Assessment form</a></li>'
+        errors = verifier.check(self.readme, self.html + "\n<footer><ul>" + item + item + "</ul></footer>")
+        self.assertIn("DUPLICATE_FOOTER_LINK", errors)
+
+    def test_typeform_whatsapp_visual_marker_is_rejected(self):
+        sample = self.html + '\n<a href="' + verifier.TYPEFORM + '"><svg fill="#25D366"></svg><span>wa</span></a>'
+        self.assertIn("MISLABELED_TYPEFORM_ROUTE", verifier.check(self.readme, sample))
+
+    def test_spanish_static_price_label_is_localized(self):
+        self.assertIn('id="calc-plan-price">— USD 149 pago único</span>', self.landing_es)
+        self.assertNotIn('id="calc-plan-price">— USD 149 one-time</span>', self.landing_es)
+
+    def test_surface_invariants_do_not_leak_between_files(self):
+        surfaces = {
+            "root.html": (self.html, verifier.ES_SURFACE_INVARIANTS),
+            "en.html": (self.landing_en.replace("Revenue Recovery Sprint", "BROKEN"), verifier.EN_SURFACE_INVARIANTS),
+        }
+        errors = verifier.check_surfaces(self.readme, surfaces)
+        self.assertTrue(any(e.startswith("en.html:INDEX_MISSING:") for e in errors))
+
+
 if __name__ == "__main__":
     unittest.main()
