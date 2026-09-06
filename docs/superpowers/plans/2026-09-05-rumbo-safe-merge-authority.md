@@ -378,3 +378,13 @@ Commit only source/tests/docs, never receipts containing environment-specific ru
 ## Completion gate
 
 Do not promote the implementation into `main` merely because tests pass. Completion means the implementation branch has green tests, a successful temporary exact-SHA probe, zero residual probe refs, unchanged live production deployment, and an audit report. A separate explicit integration decision can then use the new authority itself after its acceptance evidence is reviewed.
+
+### Task 8: Production-trigger guard hardening — 2026-09-06
+
+- [x] Reproduce the gap with fresh Vercel project evidence showing `productionBranch=main` and Git-provider deployment creation enabled while the live deployment remains unchanged.
+- [x] Add RED tests for project-state normalization and pre-write blocking on `main`.
+- [x] Preserve probe behavior when the target is not the production branch.
+- [x] Add a separate RED test for post-write reactivation of Git-provider deployment creation.
+- [x] Require exact `"disabled"` state for Phase 3 targets both before and after write.
+- [ ] Run a real `main` dry-run against current Vercel state and require `SAFE_STOP` at `PRODUCTION_NO_GO` while automatic deployment creation remains enabled.
+- [ ] Record the new fail-closed receipt and leave `origin/main` unchanged unless a separate Vercel deployment-policy decision is explicitly authorized.

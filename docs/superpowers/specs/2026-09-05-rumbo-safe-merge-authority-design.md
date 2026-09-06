@@ -151,3 +151,15 @@ The design is satisfied only when fresh evidence proves all of the following:
 For this repository, PR integration is defined as promotion of a pre-existing audited commit, not creation of a merge artifact. The safe path is therefore exact-SHA fast-forward under server-side metadata and non-fast-forward rules, followed by separate verification and evidence receipt.
 
 Any future request that requires history rewriting, generated merge commits, tag creation, ruleset bypass, or production deployment is outside this authority and must fail closed pending a separate explicit design and authorization.
+
+## Production-trigger hardening — 2026-09-06
+
+A Phase 3 target that is also Vercel's production branch must not be written while Git-provider deployment creation is enabled.
+
+For `main`, `PRODUCTION_NO_GO` therefore requires all prior Vercel invariants plus `gitProviderOptions.createDeployments == "disabled"`. A probe target may still run with Git-provider deployments enabled because the probe ref is not the configured production branch.
+
+The same condition is re-read after a successful branch write. If Git-provider deployment creation becomes enabled between the pre-write and post-write checks, the result is `POST_WRITE_VERIFY_FAILED`; the authority does not rewrite history or attempt rollback.
+
+This closes an asynchronous TOCTOU gap: an immediate live-alias read can remain unchanged even though a push to the production branch has already queued a new deployment.
+
+The authority never changes Vercel project configuration itself. If the required suppression state is absent, it fails closed. Any operation that changes Vercel deployment policy remains a separate external control decision.

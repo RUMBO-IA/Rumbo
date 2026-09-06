@@ -285,6 +285,7 @@ class RealEvidence:
             "autoAssignCustomDomains": project.get("autoAssignCustomDomains"),
             "commandForIgnoringBuildStep": project.get("commandForIgnoringBuildStep"),
             "productionBranch": (project.get("link") or {}).get("productionBranch"),
+            "gitDeployments": (project.get("gitProviderOptions") or {}).get("createDeployments"),
             "liveDeployment": live.get("id"),
             "liveTarget": live.get("target"),
         }

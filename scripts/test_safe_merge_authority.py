@@ -100,7 +100,7 @@ class EvidenceTests(unittest.TestCase):
         self.assertEqual(resolved, (r"C:\npm\vercel.CMD", "inspect"))
 
     def test_vercel_state_normalizes_project_and_live_alias(self):
-        project = '{"autoAssignCustomDomains":false,"commandForIgnoringBuildStep":null,"link":{"productionBranch":"main"}}'
+        project = '{"autoAssignCustomDomains":false,"commandForIgnoringBuildStep":null,"gitProviderOptions":{"createDeployments":"disabled"},"link":{"productionBranch":"main"}}'
         live = '{"id":"dpl_live","target":"production"}'
         fake = FakeRunner({("vercel", "api"): project, ("vercel", "inspect"): live})
         state = evidence.RealEvidence(ROOT, fake, policy.DEFAULT_POLICY).vercel_state()
@@ -108,6 +108,7 @@ class EvidenceTests(unittest.TestCase):
         self.assertFalse(state["autoAssignCustomDomains"])
         self.assertIsNone(state["commandForIgnoringBuildStep"])
         self.assertEqual(state["productionBranch"], "main")
+        self.assertEqual(state["gitDeployments"], "disabled")
 
     def _workflow_payload(self, *, blob=None, content=None):
         raw = content if content is not None else subprocess.check_output(["git", "show", f"HEAD:{policy.DEFAULT_POLICY.privacy_workflow_path}"], cwd=ROOT)
@@ -224,7 +225,8 @@ class FakeEvidence:
         self.attestation_calls = 0
         self.branch_protection = branch_protection
         self.vercel = vercel or {"autoAssignCustomDomains": False, "commandForIgnoringBuildStep": None,
-                                 "productionBranch": "main", "liveDeployment": "dpl_live", "liveTarget": "production"}
+                                 "productionBranch": "main", "gitDeployments": "disabled",
+                                 "liveDeployment": "dpl_live", "liveTarget": "production"}
         self.targets = list(target_sequence or [BASE, BASE, HEAD])
         self.push_calls = []
 
@@ -278,6 +280,35 @@ class AuthorityGateTests(unittest.TestCase):
     def test_non_descendant_stops_at_g3(self):
         out = authority.evaluate(merge_request(), policy.DEFAULT_POLICY, FakeEvidence(ancestor=False))
         self.assertEqual(out.failed_gate, "PRIVACY_ANCESTRY")
+    def test_main_blocks_when_vercel_git_deployments_are_enabled(self):
+        risky = {
+            "autoAssignCustomDomains": False,
+            "commandForIgnoringBuildStep": None,
+            "productionBranch": "main",
+            "gitDeployments": "enabled",
+            "liveDeployment": "dpl_live",
+            "liveTarget": "production",
+        }
+        ev = FakeEvidence(vercel=risky)
+        out = authority.evaluate(merge_request(), policy.DEFAULT_POLICY, ev)
+        self.assertEqual((out.state, out.failed_gate), ("SAFE_STOP", "PRODUCTION_NO_GO"))
+        self.assertFalse(ev.push_calls)
+
+    def test_probe_allows_vercel_git_deployments_when_main_is_unchanged(self):
+        target = "probe/safe-merge-production-guard"
+        preview_safe = {
+            "autoAssignCustomDomains": False,
+            "commandForIgnoringBuildStep": None,
+            "productionBranch": "main",
+            "gitDeployments": "enabled",
+            "liveDeployment": "dpl_live",
+            "liveTarget": "production",
+        }
+        ev = FakeEvidence(base=target, vercel=preview_safe, target_sequence=[BASE, BASE])
+        out = authority.evaluate(merge_request(base=target), policy.DEFAULT_POLICY, ev, mode="dry-run")
+        self.assertEqual(out.state, "DRY_RUN_PASS")
+        self.assertFalse(ev.push_calls)
+
     def test_vercel_drift_stops_at_g4(self):
         bad = {
             "autoAssignCustomDomains": True,
@@ -321,6 +352,23 @@ class FastForwardTests(unittest.TestCase):
         self.assertEqual(out.state, "MERGED_SAFE")
         self.assertEqual(ev.push_calls, [(target, BASE, HEAD)])
         self.assertEqual((ev.metadata_calls, ev.attestation_calls), (2, 2))
+
+    def test_main_post_write_blocks_if_vercel_git_deployments_reactivate(self):
+        safe = {
+            "autoAssignCustomDomains": False,
+            "commandForIgnoringBuildStep": None,
+            "productionBranch": "main",
+            "gitDeployments": "disabled",
+            "liveDeployment": "dpl_live",
+            "liveTarget": "production",
+        }
+        risky = dict(safe, gitDeployments="enabled")
+        states = [safe, risky]
+        ev = FakeEvidence(target_sequence=[BASE, BASE, HEAD])
+        ev.vercel_state = lambda: dict(states.pop(0) if len(states) > 1 else states[0])
+        out = authority.evaluate(merge_request(), policy.DEFAULT_POLICY, ev, mode="main")
+        self.assertEqual((out.state, out.failed_gate), ("POST_WRITE_VERIFY_FAILED", "POST_WRITE_VERIFY"))
+        self.assertEqual(ev.push_calls, [("main", BASE, HEAD)])
 
     def test_post_write_target_mismatch_never_rolls_back(self):
         target = "probe/safe-merge-test"

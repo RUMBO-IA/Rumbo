@@ -102,12 +102,16 @@ def evaluate(request: policy.MergeRequest, merge_policy: policy.MergePolicy, evi
             vercel.get("autoAssignCustomDomains") is False
             and vercel.get("commandForIgnoringBuildStep") in (None, "")
             and vercel.get("productionBranch") == "main"
+            and (
+                request.expected_base not in merge_policy.phase3_targets
+                or vercel.get("gitDeployments") == "disabled"
+            )
             and bool(live_id)
             and vercel.get("liveTarget") == "production"
         )
         if not production_ok:
             return _stop(gates, current_gate, {"reason": "Vercel production safety drift"}, target_sha=target_sha, live=live_id)
-        gates.append(GateResult(current_gate, True, {"liveDeployment": live_id}))
+        gates.append(GateResult(current_gate, True, {"liveDeployment": live_id, "gitDeployments": vercel.get("gitDeployments")}))
 
         current_gate = "FAST_FORWARD_ONLY"
         if not evidence.ruleset_ok():
@@ -146,6 +150,10 @@ def evaluate(request: policy.MergeRequest, merge_policy: policy.MergePolicy, evi
             post_vercel.get("autoAssignCustomDomains") is False
             and post_vercel.get("commandForIgnoringBuildStep") in (None, "")
             and post_vercel.get("productionBranch") == "main"
+            and (
+                request.expected_base not in merge_policy.phase3_targets
+                or post_vercel.get("gitDeployments") == "disabled"
+            )
             and post_vercel.get("liveDeployment") == live_id
             and post_vercel.get("liveTarget") == "production"
         )
