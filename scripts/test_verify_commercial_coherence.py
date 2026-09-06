@@ -111,5 +111,11 @@ class CommercialCoherenceTests(unittest.TestCase):
         self.assertTrue(any(e.startswith("en.html:INDEX_MISSING:") for e in errors))
 
 
+    def test_invariant_matching_uses_rendered_text(self):
+        marked = self.html.replace("Revenue Recovery Sprint", "Revenue <strong>Recovery</strong> Sprint")
+        errors = verifier.check(self.readme, marked, ("Revenue Recovery Sprint",))
+        self.assertNotIn("INDEX_MISSING:Revenue Recovery Sprint", errors)
+
+
 if __name__ == "__main__":
     unittest.main()

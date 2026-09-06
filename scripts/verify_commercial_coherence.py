@@ -56,7 +56,7 @@ def check(readme: str, html: str, invariants=INDEX_INVARIANTS) -> list[str]:
         if value not in readme:
             errors.append(f"README_MISSING:{value}")
     for value in invariants:
-        if value.casefold() not in html.casefold():
+        if value.casefold() not in plain_html.casefold():
             errors.append(f"INDEX_MISSING:{value}")
     if MONTHLY_PRICE.search(plain_html):
         errors.append("MONTHLY_PRICE")
