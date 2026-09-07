@@ -148,7 +148,7 @@ Resolve PR #48 head SHA with `gh pr view`; require `privacy=SUCCESS` and `Vercel
 
 - [x] **Step 2: Execute real dry-run**
 
-Run: `python scripts/safe_merge_authority.py --pr 41 --head <exact-head> --base main --mode dry-run --receipt-dir <temp-receipts>`.
+Run: `python scripts/safe_merge_authority.py --pr 48 --head <exact-head> --base main --mode dry-run --receipt-dir <temp-receipts>`.
 Expected: `SAFE_MERGE_STATE=DRY_RUN_PASS`, exit 0, zero `git push` commands.
 
 - [x] **Step 3: Validate receipt and invariants**
@@ -199,11 +199,11 @@ Confirm branch metadata ruleset remains active, tag creation restriction remains
 
 - [x] **Step 4: Completion gate**
 
-Invoke `superpowers:verification-before-completion`, record fresh evidence, then invoke `superpowers:finishing-a-development-branch`. Do not integrate PR #48 into `main` without a separate explicit integration decision.
+Invoke `superpowers:verification-before-completion`, record fresh evidence, then invoke `superpowers:finishing-a-development-branch`. PR #48 was subsequently integrated by exact-SHA fast-forward; this historical task constraint is now satisfied and retained only as execution history.
 
 ## Final execution reconciliation — 2026-09-07
 
-- Implementation was integrated into `main` by exact-SHA fast-forward; final `main` and `origin/main` are `35af1ddc7a000069f686574f750f16bec2926dc4`.
+- Implementation was integrated into `main` by exact-SHA fast-forward; implementation baseline before documentation-only reconciliation was `35af1ddc7a000069f686574f750f16bec2926dc4`; current `main` and `origin/main` are `107b4f04d1aaf4f6506fddadc9cac1483d83980d`.
 - PR #48 supplied the production-trigger and post-write attestation hardening; its merge commit SHA equals the audited head SHA.
 - Real Phase B dry-run completed as `DRY_RUN_PASS` with receipt `9e3339ed149fc5d3f6969a7a80cf913d168e5d93d6906331d94e77de10fdea2f`.
 - Real Phase C probe completed as `MERGED_SAFE` with receipt `b6256ae1beaf0e48881f8864dc9d9f01ac2cfe61299164ffe1e8cbcd35fc541a`; all temporary probe refs were removed.
