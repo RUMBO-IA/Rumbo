@@ -36,6 +36,9 @@ def resolve_command(args, *, which=shutil.which) -> tuple[str, ...]:
     resolved = which(logical[0])
     if not resolved:
         return logical
+    if Path(resolved).suffix.lower() in {".cmd", ".bat"}:
+        command_shell = which("cmd.exe") or "cmd.exe"
+        return (command_shell, "/d", "/s", "/c", resolved, *logical[1:])
     return (resolved, *logical[1:])
 
 
@@ -63,6 +66,7 @@ class SubprocessRunner:
             text=True,
             capture_output=True,
             check=False,
+            timeout=30,
         )
         result = CommandResult(logical_args, completed.returncode, completed.stdout, completed.stderr)
         self.results.append(result)
@@ -329,8 +333,8 @@ class RealEvidence:
             "--scope", self.policy.vercel_scope, "--raw",
         ))
         live = self._json((
-            "vercel", "inspect", self.policy.live_domain,
-            "--scope", self.policy.vercel_scope, "--json",
+            "vercel", "api", f"/v13/deployments/{self.policy.live_domain}",
+            "--scope", self.policy.vercel_scope, "--raw",
         ))
         return {
             "autoAssignCustomDomains": project.get("autoAssignCustomDomains"),

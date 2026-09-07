@@ -5,6 +5,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest import mock
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -95,14 +96,25 @@ class EvidenceTests(unittest.TestCase):
         with self.assertRaises(evidence.EvidenceError):
             evidence.parse_json_result(result)
 
-    def test_resolve_command_uses_platform_shim_without_changing_arguments(self):
-        resolved = evidence.resolve_command(("vercel", "inspect"), which=lambda _name: r"C:\npm\vercel.CMD")
-        self.assertEqual(resolved, (r"C:\npm\vercel.CMD", "inspect"))
+    def test_resolve_command_wraps_windows_cmd_shim(self):
+        def fake_which(name):
+            return {"vercel": r"C:\npm\vercel.CMD", "cmd.exe": r"C:\Windows\System32\cmd.exe"}.get(name)
+        resolved = evidence.resolve_command(("vercel", "api", "/v9/projects/x"), which=fake_which)
+        self.assertEqual(resolved, (r"C:\Windows\System32\cmd.exe", "/d", "/s", "/c", r"C:\npm\vercel.CMD", "api", "/v9/projects/x"))
 
-    def test_vercel_state_normalizes_project_and_live_alias(self):
+    def test_subprocess_runner_sets_timeout(self):
+        with mock.patch.object(evidence.subprocess, "run") as run:
+            run.return_value = subprocess.CompletedProcess(["git"], 0, "", "")
+            evidence.SubprocessRunner(ROOT).run(("git", "status"))
+        self.assertIn("timeout", run.call_args.kwargs)
+
+    def test_vercel_state_uses_rest_api_for_live_domain(self):
         project = '{"autoAssignCustomDomains":false,"commandForIgnoringBuildStep":null,"gitProviderOptions":{"createDeployments":"disabled"},"link":{"productionBranch":"main"}}'
         live = '{"id":"dpl_live","target":"production"}'
-        fake = FakeRunner({("vercel", "api"): project, ("vercel", "inspect"): live})
+        fake = FakeRunner({
+            ("vercel", "api", f"/v9/projects/{policy.DEFAULT_POLICY.vercel_project}"): project,
+            ("vercel", "api", f"/v13/deployments/{policy.DEFAULT_POLICY.live_domain}"): live,
+        })
         state = evidence.RealEvidence(ROOT, fake, policy.DEFAULT_POLICY).vercel_state()
         self.assertEqual(state["liveDeployment"], "dpl_live")
         self.assertFalse(state["autoAssignCustomDomains"])
