@@ -142,7 +142,8 @@ def evaluate(request: policy.MergeRequest, merge_policy: policy.MergePolicy, evi
             return _post_fail(gates, {"reason": "target SHA mismatch", "observed": post_target}, target_sha=target_sha, live=live_id)
 
         post_checks = evidence.checks(request.expected_head_sha)
-        if any(post_checks.get(name) != "SUCCESS" for name in required):
+        generic_post_checks = tuple(name for name in required if name != 'privacy')
+        if any(post_checks.get(name) != 'SUCCESS' for name in generic_post_checks):
             return _post_fail(gates, {"reason": "required checks changed after write"}, target_sha=target_sha, live=live_id)
         if not evidence.commit_metadata_ok(request.expected_head_sha):
             return _post_fail(gates, {"reason": "public commit metadata failed after write"}, target_sha=target_sha, live=live_id)

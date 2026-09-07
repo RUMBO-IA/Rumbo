@@ -423,6 +423,23 @@ class FastForwardTests(unittest.TestCase):
         self.assertEqual(ev.post_attestation_calls, 1)
         self.assertEqual(ev.push_calls, [("main", BASE, HEAD)])
 
+    def test_main_post_write_accepts_transient_push_privacy_pending_when_exact_attestation_stays_successful(self):
+        class PushPrivacyPending(FakeEvidence):
+            def __init__(self, **kwargs):
+                super().__init__(**kwargs)
+                self.check_calls = 0
+
+            def checks(self, _sha):
+                self.check_calls += 1
+                if self.check_calls == 1:
+                    return {"privacy": "SUCCESS", "Vercel": "SUCCESS"}
+                return {"privacy": "PENDING", "Vercel": "SUCCESS"}
+
+        ev = PushPrivacyPending(target_sequence=[BASE, BASE, HEAD])
+        out = authority.evaluate(merge_request(), policy.DEFAULT_POLICY, ev, mode="main")
+        self.assertEqual(out.state, "MERGED_SAFE")
+        self.assertEqual(ev.post_attestation_calls, 1)
+        self.assertEqual(ev.push_calls, [("main", BASE, HEAD)])
     def test_main_post_write_blocks_if_vercel_git_deployments_reactivate(self):
         safe = {
             "autoAssignCustomDomains": False,
