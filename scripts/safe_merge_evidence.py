@@ -73,7 +73,7 @@ class SubprocessRunner:
                 stdout=stdout_file,
                 stderr=stderr_file,
                 check=False,
-                timeout=30,
+                timeout=60,
             )
             stdout_file.seek(0)
             stderr_file.seek(0)
