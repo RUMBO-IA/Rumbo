@@ -26,6 +26,19 @@ class SourceBindingTests(unittest.TestCase):
 
 
 class CandidateInventoryTests(unittest.TestCase):
+    def test_candidate_digest_helper_exists_for_canonical_git_identity(self):
+        from scripts import verify_agent_reliability_publication as verifier
+        self.assertTrue(hasattr(verifier, 'candidate_skill_digest'))
+
+    def test_candidate_digest_uses_head_git_blob_not_worktree_bytes(self):
+        from scripts import verify_agent_reliability_publication as verifier
+        receipt = json.loads((PUB / "source-receipt.json").read_text(encoding="utf-8"))
+        expected = receipt["skill_sha256"]["canonical-state-recovery"]
+        self.assertEqual(
+            verifier.candidate_skill_digest("canonical-state-recovery"),
+            expected,
+        )
+
     def test_candidate_is_exact_skills_only_inventory(self):
         plugin = PUB / "plugin"
         skills = {p.parent.name for p in (plugin / "skills").glob("*/SKILL.md")}
@@ -37,11 +50,10 @@ class CandidateInventoryTests(unittest.TestCase):
         self.assertFalse(any(p.name in forbidden for p in plugin.rglob("*")))
 
     def test_candidate_skill_bytes_match_bound_source(self):
-        import hashlib
+        from scripts import verify_agent_reliability_publication as verifier
         receipt = json.loads((PUB / "source-receipt.json").read_text(encoding="utf-8"))
         for skill, expected in receipt["skill_sha256"].items():
-            data = (PUB / "plugin" / "skills" / skill / "SKILL.md").read_bytes()
-            self.assertEqual(hashlib.sha256(data).hexdigest(), expected)
+            self.assertEqual(verifier.candidate_skill_digest(skill), expected)
 
     def test_manifest_uses_public_identity_and_live_root_policies(self):
         manifest = json.loads((PUB / "plugin" / ".codex-plugin" / "plugin.json").read_text(encoding="utf-8"))

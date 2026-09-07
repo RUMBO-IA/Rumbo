@@ -23,6 +23,11 @@ def git_bytes(path: str) -> bytes:
 def sha256(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
+def candidate_skill_digest(skill: str) -> str:
+    path = f"openai-publication/agent-reliability/plugin/skills/{skill}/SKILL.md"
+    data = subprocess.check_output(["git", "show", f"HEAD:{path}"], cwd=ROOT)
+    return sha256(data)
+
 
 def build_source_receipt() -> dict:
     tree = subprocess.check_output(["git", "rev-parse", f"{SOURCE_COMMIT}:{PLUGIN}"], cwd=ROOT, text=True).strip()
