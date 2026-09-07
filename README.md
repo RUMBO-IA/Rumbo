@@ -15,7 +15,12 @@ The public repository keeps consequential behavior behind explicit verification 
 - CI checks public privacy invariants, commercial-offer coherence, and security-header configuration;
 - repository security and reporting rules are documented in [`SECURITY.md`](SECURITY.md).
 
-The latest published `main` baseline passed the public privacy gate before this documentation update.
+## Release posture
+
+This repository distinguishes the Git `main` state from production traffic. Current `main` is `76fe0bec7fcbb7a363026ef695e3fceebddff5dd`. The production domain `rumbo.verso.fans` is intentionally serving the audited application commit `35af1ddc7a000069f686574f750f16bec2926dc4` through Vercel deployment `dpl_6NvixhNBiCbUUmSjnPJWC5MjB9ni`.
+
+Changes to `main` do not automatically promote production: Git deployments for `main` are disabled, and production promotion is explicit and subject to the Safe Merge Authority gates.
+
 
 ## Current status
 
