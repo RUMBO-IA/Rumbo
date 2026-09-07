@@ -17,7 +17,7 @@ The public repository keeps consequential behavior behind explicit verification 
 
 ## Release posture
 
-This repository distinguishes the Git `main` state from production traffic. Current `main` is `76fe0bec7fcbb7a363026ef695e3fceebddff5dd`. The production domain `rumbo.verso.fans` is intentionally serving the audited application commit `35af1ddc7a000069f686574f750f16bec2926dc4` through Vercel deployment `dpl_6NvixhNBiCbUUmSjnPJWC5MjB9ni`.
+This repository distinguishes the Git `main` state from production traffic. The authoritative code state is the `main` branch ref itself; this README deliberately does not pin a `main` SHA because the commit containing that value would make it stale. The production domain `rumbo.verso.fans` is intentionally serving the audited application commit `35af1ddc7a000069f686574f750f16bec2926dc4` through Vercel deployment `dpl_6NvixhNBiCbUUmSjnPJWC5MjB9ni`.
 
 Changes to `main` do not automatically promote production: Git deployments for `main` are disabled, and production promotion is explicit and subject to the Safe Merge Authority gates.
 
