@@ -50,3 +50,24 @@ class CandidateInventoryTests(unittest.TestCase):
         self.assertEqual(manifest["interface"]["displayName"], "RUMBO Agent Reliability")
         self.assertEqual(manifest["interface"]["privacyPolicyURL"], "https://rumbo.verso.fans/openai-privacy")
         self.assertEqual(manifest["interface"]["termsOfServiceURL"], "https://rumbo.verso.fans/openai-terms")
+
+
+class ReviewerPacketTests(unittest.TestCase):
+    def test_listing_has_required_reviewer_fields(self):
+        listing = json.loads((PUB / "submission" / "listing.json").read_text(encoding="utf-8"))
+        self.assertEqual(listing["display_name"], "RUMBO Agent Reliability")
+        self.assertGreaterEqual(len(listing["starter_prompts"]), 3)
+        self.assertEqual(listing["availability"]["state"], "UNSET_FAIL_CLOSED")
+        self.assertEqual(listing["publisher_urls"]["privacy"], "https://rumbo.verso.fans/openai-privacy")
+        self.assertEqual(listing["publisher_urls"]["terms"], "https://rumbo.verso.fans/openai-terms")
+        self.assertEqual(listing["publisher_urls"]["support"], "https://rumbo.verso.fans/openai-support")
+
+    def test_reviewer_cases_meet_minimums_and_are_bounded(self):
+        packet = json.loads((PUB / "submission" / "reviewer-cases.json").read_text(encoding="utf-8"))
+        positive = [c for c in packet["cases"] if c["class"] == "positive"]
+        negative = [c for c in packet["cases"] if c["class"] == "negative"]
+        self.assertGreaterEqual(len(positive), 5)
+        self.assertGreaterEqual(len(negative), 3)
+        for case in packet["cases"]:
+            self.assertIn(case["expected_skill"], SKILLS | {"NONE"})
+            self.assertTrue(case["expected_behavior"])

@@ -1,0 +1,23 @@
+{
+  "schema": "rumbo.openai-agent-reliability-listing/v1",
+  "display_name": "RUMBO Agent Reliability",
+  "package_slug": "rumbo-coding-agent-reliability",
+  "category": "Developer Tools",
+  "short_description": "Evidence-first workflows for reliable agent state, execution verification, and final-state audit.",
+  "long_description": "RUMBO Agent Reliability helps recover canonical workflow state, reconcile conflicting evidence, keep execution within authority, verify observed effects, and audit final state before accepting completion claims.",
+  "publisher_urls": {
+    "website": "https://rumbo.verso.fans/",
+    "support": "https://rumbo.verso.fans/openai-support",
+    "privacy": "https://rumbo.verso.fans/openai-privacy",
+    "terms": "https://rumbo.verso.fans/openai-terms"
+  },
+  "starter_prompts": [
+    "Recover the canonical state of this workflow before continuing.",
+    "Reconcile these conflicting execution receipts and tell me what is actually proven.",
+    "Audit this agent run and separate intended actions from verified effects."
+  ],
+  "availability": {
+    "state": "UNSET_FAIL_CLOSED",
+    "countries": []
+  }
+}
