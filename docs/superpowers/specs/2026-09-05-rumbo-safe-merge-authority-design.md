@@ -163,3 +163,12 @@ The same condition is re-read after a successful branch write. If Git-provider d
 This closes an asynchronous TOCTOU gap: an immediate live-alias read can remain unchanged even though a push to the production branch has already queued a new deployment.
 
 The authority never changes Vercel project configuration itself. If the required suppression state is absent, it fails closed. Any operation that changes Vercel deployment policy remains a separate external control decision.
+## Production trigger and post-write attestation amendment — 2026-09-07
+
+Observed production behavior proved that the Vercel project field `gitProviderOptions.createDeployments=disabled` is not sufficient by itself to prevent an asynchronous deployment after a Git ref update.
+
+For every Phase 3 target, the candidate commit must therefore contain `vercel.json` with `git.deploymentEnabled` explicitly denying that target. The project-level field remains a second control, not the primary proof. Missing, malformed, permissive, or ambiguous repository configuration is `SAFE_STOP` before the branch write.
+
+The repository keeps `main=false` and a disposable `probe/vercel-git-block-* = false` rule so the no-deployment behavior can be tested without touching `main`.
+
+Post-write privacy verification must not require GitHub Actions `pull_requests[]` to remain populated. GitHub can clear that association after an exact-SHA fast-forward marks the PR merged. The pre-write attestation remains strict and PR-bound; post-write verification re-fetches the exact pre-write `run_id` and requires unchanged workflow identity, event, head SHA, head branch, attempt, creation time, completed status, and successful conclusion.

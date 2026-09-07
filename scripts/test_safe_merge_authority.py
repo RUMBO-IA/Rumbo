@@ -163,6 +163,48 @@ class EvidenceTests(unittest.TestCase):
         with self.assertRaises(evidence.EvidenceError):
             evidence.RealEvidence(ROOT, fake, policy.DEFAULT_POLICY).privacy_attestation(40, "a" * 40, "main", "feature/head")
 
+    def test_post_write_attestation_accepts_exact_run_after_pr_binding_disappears(self):
+        run = {"id": 123, "workflow_id": policy.DEFAULT_POLICY.privacy_workflow_id,
+               "path": policy.DEFAULT_POLICY.privacy_workflow_path, "event": "pull_request",
+               "status": "completed", "conclusion": "success", "head_sha": "a" * 40,
+               "head_branch": "feature/head", "run_attempt": 1, "created_at": "2026-09-05T05:00:00Z",
+               "pull_requests": []}
+        fake = FakeRunner({
+            ("gh", "api", f"repos/RUMBO-IA/Rumbo/contents/{policy.DEFAULT_POLICY.privacy_workflow_path}?ref=" + "a" * 40): self._workflow_payload(),
+            ("gh", "api", "repos/RUMBO-IA/Rumbo/actions/runs/123"): json.dumps(run),
+        })
+        previous = {"run_id": 123, "run_attempt": 1, "created_at": "2026-09-05T05:00:00Z", "pr_number": 40}
+        att = evidence.RealEvidence(ROOT, fake, policy.DEFAULT_POLICY).privacy_attestation_by_run(
+            previous, "a" * 40, "main", "feature/head"
+        )
+        self.assertEqual((att["run_id"], att["head_sha"], att["pr_number"]), (123, "a" * 40, 40))
+
+    def test_post_write_attestation_rejects_exact_run_if_conclusion_changes(self):
+        run = {"id": 123, "workflow_id": policy.DEFAULT_POLICY.privacy_workflow_id,
+               "path": policy.DEFAULT_POLICY.privacy_workflow_path, "event": "pull_request",
+               "status": "completed", "conclusion": "failure", "head_sha": "a" * 40,
+               "head_branch": "feature/head", "run_attempt": 1, "created_at": "2026-09-05T05:00:00Z",
+               "pull_requests": []}
+        fake = FakeRunner({
+            ("gh", "api", f"repos/RUMBO-IA/Rumbo/contents/{policy.DEFAULT_POLICY.privacy_workflow_path}?ref=" + "a" * 40): self._workflow_payload(),
+            ("gh", "api", "repos/RUMBO-IA/Rumbo/actions/runs/123"): json.dumps(run),
+        })
+        previous = {"run_id": 123, "run_attempt": 1, "created_at": "2026-09-05T05:00:00Z", "pr_number": 40}
+        with self.assertRaises(evidence.EvidenceError):
+            evidence.RealEvidence(ROOT, fake, policy.DEFAULT_POLICY).privacy_attestation_by_run(
+                previous, "a" * 40, "main", "feature/head"
+            )
+
+    def test_candidate_vercel_config_blocks_main_git_deployment(self):
+        payload = '{"git":{"deploymentEnabled":{"main":false,"probe/vercel-git-block-*":false}}}'
+        fake = FakeRunner({("git", "show"): payload})
+        ev = evidence.RealEvidence(ROOT, fake, policy.DEFAULT_POLICY)
+        self.assertTrue(ev.vercel_git_deployments_blocked("a" * 40, "main"))
+
+    def test_repository_vercel_config_blocks_main_git_deployment(self):
+        data = json.loads((ROOT / "vercel.json").read_text(encoding="utf-8"))
+        self.assertIs(data["git"]["deploymentEnabled"]["main"], False)
+
     def test_probe_accepts_exact_successful_push_attestation_from_pr_head(self):
         run = {"id": 124, "workflow_id": policy.DEFAULT_POLICY.privacy_workflow_id,
                "path": policy.DEFAULT_POLICY.privacy_workflow_path, "event": "push",
@@ -215,14 +257,17 @@ def merge_request(head=HEAD, base="main", repository="RUMBO-IA/Rumbo"):
 
 class FakeEvidence:
     def __init__(self, *, head=HEAD, base="main", repo="RUMBO-IA/Rumbo", head_branch="feature/head", checks=None,
-                 metadata=True, attestation_sequence=None, ancestor=True, vercel=None, target_sequence=None,
-                 ruleset=True, branch_protection=True):
+                 metadata=True, attestation_sequence=None, post_attestation_sequence=None, ancestor=True, vercel=None, target_sequence=None,
+                 ruleset=True, branch_protection=True, repo_deployment_blocked=True):
         self.head, self.base, self.repo, self.head_branch = head, base, repo, head_branch
         self.check_states = checks if checks is not None else {"privacy": "SUCCESS", "Vercel": "SUCCESS"}
         self.metadata, self.ancestor, self.ruleset = metadata, ancestor, ruleset
         self.attestations = list(attestation_sequence or [True, True])
+        self.post_attestations = list(post_attestation_sequence or [True])
         self.metadata_calls = 0
         self.attestation_calls = 0
+        self.post_attestation_calls = 0
+        self.repo_deployment_blocked = repo_deployment_blocked
         self.branch_protection = branch_protection
         self.vercel = vercel or {"autoAssignCustomDomains": False, "commandForIgnoringBuildStep": None,
                                  "productionBranch": "main", "gitDeployments": "disabled",
@@ -248,6 +293,13 @@ class FakeEvidence:
         return {"workflow_id": policy.DEFAULT_POLICY.privacy_workflow_id, "run_id": 123,
                 "event": policy.attestation_event(target, policy.DEFAULT_POLICY), "head_sha": candidate,
                 "head_branch": head_branch, "pr_number": pr_number if target == "main" else None}
+    def privacy_attestation_by_run(self, previous, candidate, target, head_branch):
+        self.post_attestation_calls += 1
+        current = self.post_attestations.pop(0) if len(self.post_attestations) > 1 else self.post_attestations[0]
+        if not current:
+            raise evidence.EvidenceError("post-write attestation unavailable")
+        return dict(previous, head_sha=candidate, head_branch=head_branch)
+    def vercel_git_deployments_blocked(self, _candidate, _target): return self.repo_deployment_blocked
     def vercel_state(self): return dict(self.vercel)
     def ruleset_ok(self): return self.ruleset
     def branch_protection_ok(self, _target, _required): return self.branch_protection
@@ -290,6 +342,12 @@ class AuthorityGateTests(unittest.TestCase):
             "liveTarget": "production",
         }
         ev = FakeEvidence(vercel=risky)
+        out = authority.evaluate(merge_request(), policy.DEFAULT_POLICY, ev)
+        self.assertEqual((out.state, out.failed_gate), ("SAFE_STOP", "PRODUCTION_NO_GO"))
+        self.assertFalse(ev.push_calls)
+
+    def test_main_blocks_when_candidate_vercel_config_does_not_block_main(self):
+        ev = FakeEvidence(repo_deployment_blocked=False)
         out = authority.evaluate(merge_request(), policy.DEFAULT_POLICY, ev)
         self.assertEqual((out.state, out.failed_gate), ("SAFE_STOP", "PRODUCTION_NO_GO"))
         self.assertFalse(ev.push_calls)
@@ -351,7 +409,19 @@ class FastForwardTests(unittest.TestCase):
         out = authority.evaluate(merge_request(base=target), policy.DEFAULT_POLICY, ev, mode="probe")
         self.assertEqual(out.state, "MERGED_SAFE")
         self.assertEqual(ev.push_calls, [(target, BASE, HEAD)])
-        self.assertEqual((ev.metadata_calls, ev.attestation_calls), (2, 2))
+        self.assertEqual((ev.metadata_calls, ev.attestation_calls, ev.post_attestation_calls), (2, 1, 1))
+
+    def test_post_write_uses_exact_prewrite_run_when_pr_binding_disappears(self):
+        class PrBindingDisappears(FakeEvidence):
+            def privacy_attestation(self, pr_number, candidate, target, head_branch):
+                if self.attestation_calls:
+                    raise evidence.EvidenceError("PR binding disappeared")
+                return super().privacy_attestation(pr_number, candidate, target, head_branch)
+        ev = PrBindingDisappears(target_sequence=[BASE, BASE, HEAD])
+        out = authority.evaluate(merge_request(), policy.DEFAULT_POLICY, ev, mode="main")
+        self.assertEqual(out.state, "MERGED_SAFE")
+        self.assertEqual(ev.post_attestation_calls, 1)
+        self.assertEqual(ev.push_calls, [("main", BASE, HEAD)])
 
     def test_main_post_write_blocks_if_vercel_git_deployments_reactivate(self):
         safe = {
@@ -380,7 +450,7 @@ class FastForwardTests(unittest.TestCase):
 
     def test_post_write_attestation_error_is_post_write_failure(self):
         target = "probe/safe-merge-test"
-        ev = FakeEvidence(base=target, target_sequence=[BASE, BASE, HEAD], attestation_sequence=[True, False])
+        ev = FakeEvidence(base=target, target_sequence=[BASE, BASE, HEAD], post_attestation_sequence=[False])
         out = authority.evaluate(merge_request(base=target), policy.DEFAULT_POLICY, ev, mode="probe")
         self.assertEqual((out.state, out.failed_gate), ("POST_WRITE_VERIFY_FAILED", "POST_WRITE_VERIFY"))
         self.assertEqual(ev.push_calls, [(target, BASE, HEAD)])

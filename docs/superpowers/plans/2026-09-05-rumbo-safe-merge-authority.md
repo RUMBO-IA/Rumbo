@@ -388,3 +388,13 @@ Do not promote the implementation into `main` merely because tests pass. Complet
 - [x] Require exact `"disabled"` state for Phase 3 targets both before and after write.
 - [ ] Run a real `main` dry-run against current Vercel state and require `SAFE_STOP` at `PRODUCTION_NO_GO` while automatic deployment creation remains enabled.
 - [ ] Record the new fail-closed receipt and leave `origin/main` unchanged unless a separate Vercel deployment-policy decision is explicitly authorized.
+## Follow-up hardening — production trigger + merged-PR attestation
+
+- [x] Reproduce project-level Vercel trigger control as insufficient: an asynchronous `target=production` deployment was created after `main` advanced.
+- [x] Add RED→GREEN coverage requiring candidate `vercel.json` to deny Git deployment for `main`.
+- [x] Keep `gitProviderOptions.createDeployments=disabled` as a second control, not the sole gate.
+- [x] Add RED→GREEN coverage for GitHub clearing workflow-run `pull_requests[]` after exact-SHA integration.
+- [x] Revalidate post-write privacy by exact pre-write `run_id` and immutable run bindings instead of re-reading the mutable PR association.
+- [ ] Push the hardening branch and require exact-head privacy/Vercel/analysis checks.
+- [ ] Push a disposable `probe/vercel-git-block-*` ref and prove no new Vercel deployment is created for that ref; then delete it.
+- [ ] Run real dry-run and exact-SHA `main` integration from a fresh PR; wait beyond the previous asynchronous window and prove no new production deployment appears.

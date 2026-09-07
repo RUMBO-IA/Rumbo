@@ -272,6 +272,57 @@ class RealEvidence:
             "pr_number": pr_number if event == "pull_request" else None,
         }
 
+    def privacy_attestation_by_run(self, previous: dict[str, Any], candidate_sha: str, target: str, head_branch: str) -> dict[str, Any]:
+        workflow = self.workflow_blob(candidate_sha)
+        event = policy.attestation_event(target, self.policy)
+        run_id = previous.get("run_id")
+        if not isinstance(run_id, int) or run_id <= 0:
+            raise EvidenceError("pre-write privacy attestation run id is invalid")
+        owner, repo = self.policy.repository.split("/", 1)
+        run = self._json(("gh", "api", f"repos/{owner}/{repo}/actions/runs/{run_id}"))
+        if run.get("id") != run_id:
+            raise EvidenceError("privacy attestation run id changed")
+        if run.get("workflow_id") != self.policy.privacy_workflow_id or run.get("path") != self.policy.privacy_workflow_path:
+            raise EvidenceError("privacy attestation workflow identity changed")
+        if run.get("event") != event or run.get("head_sha") != candidate_sha or run.get("head_branch") != head_branch:
+            raise EvidenceError("privacy attestation commit binding changed")
+        if run.get("status") != "completed" or run.get("conclusion") != "success":
+            raise EvidenceError("privacy attestation is no longer successful")
+        if previous.get("run_attempt") is not None and run.get("run_attempt") != previous.get("run_attempt"):
+            raise EvidenceError("privacy attestation attempt changed")
+        if previous.get("created_at") and run.get("created_at") != previous.get("created_at"):
+            raise EvidenceError("privacy attestation creation time changed")
+        return {
+            "workflow_id": self.policy.privacy_workflow_id,
+            "workflow_path": workflow["path"],
+            "workflow_git_blob": workflow["git_blob"],
+            "workflow_sha256": workflow["sha256"],
+            "run_id": run_id,
+            "run_attempt": run.get("run_attempt"),
+            "created_at": run.get("created_at"),
+            "event": event,
+            "status": run.get("status"),
+            "conclusion": run.get("conclusion"),
+            "head_sha": candidate_sha,
+            "head_branch": run.get("head_branch"),
+            "pr_number": previous.get("pr_number"),
+        }
+
+    def vercel_git_deployments_blocked(self, candidate_sha: str, target: str) -> bool:
+        result = self._run_ok(("git", "show", f"{candidate_sha}:vercel.json"))
+        try:
+            data = json.loads(result.stdout)
+        except json.JSONDecodeError as exc:
+            raise EvidenceError("candidate vercel.json is invalid JSON") from exc
+        deployment_enabled = (data.get("git") or {}).get("deploymentEnabled")
+        if deployment_enabled is False:
+            return True
+        if not isinstance(deployment_enabled, dict):
+            return False
+        if deployment_enabled.get(target) is not False:
+            return False
+        return all(value is False for value in deployment_enabled.values())
+
     def vercel_state(self) -> dict[str, Any]:
         project = self._json((
             "vercel", "api", f"/v9/projects/{self.policy.vercel_project}",

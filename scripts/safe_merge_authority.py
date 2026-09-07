@@ -98,6 +98,10 @@ def evaluate(request: policy.MergeRequest, merge_policy: policy.MergePolicy, evi
         current_gate = "PRODUCTION_NO_GO"
         vercel = evidence.vercel_state()
         live_id = vercel.get("liveDeployment")
+        candidate_git_blocked = (
+            request.expected_base not in merge_policy.phase3_targets
+            or evidence.vercel_git_deployments_blocked(request.expected_head_sha, request.expected_base)
+        )
         production_ok = (
             vercel.get("autoAssignCustomDomains") is False
             and vercel.get("commandForIgnoringBuildStep") in (None, "")
@@ -106,12 +110,17 @@ def evaluate(request: policy.MergeRequest, merge_policy: policy.MergePolicy, evi
                 request.expected_base not in merge_policy.phase3_targets
                 or vercel.get("gitDeployments") == "disabled"
             )
+            and candidate_git_blocked
             and bool(live_id)
             and vercel.get("liveTarget") == "production"
         )
         if not production_ok:
             return _stop(gates, current_gate, {"reason": "Vercel production safety drift"}, target_sha=target_sha, live=live_id)
-        gates.append(GateResult(current_gate, True, {"liveDeployment": live_id, "gitDeployments": vercel.get("gitDeployments")}))
+        gates.append(GateResult(current_gate, True, {
+            "liveDeployment": live_id,
+            "gitDeployments": vercel.get("gitDeployments"),
+            "candidateGitDeploymentsBlocked": candidate_git_blocked,
+        }))
 
         current_gate = "FAST_FORWARD_ONLY"
         if not evidence.ruleset_ok():
@@ -137,8 +146,8 @@ def evaluate(request: policy.MergeRequest, merge_policy: policy.MergePolicy, evi
             return _post_fail(gates, {"reason": "required checks changed after write"}, target_sha=target_sha, live=live_id)
         if not evidence.commit_metadata_ok(request.expected_head_sha):
             return _post_fail(gates, {"reason": "public commit metadata failed after write"}, target_sha=target_sha, live=live_id)
-        post_attestation = evidence.privacy_attestation(
-            request.pr_number, request.expected_head_sha, request.expected_base, pr.get("head_branch")
+        post_attestation = evidence.privacy_attestation_by_run(
+            attestation, request.expected_head_sha, request.expected_base, pr.get("head_branch")
         )
         if not evidence.ruleset_ok():
             return _post_fail(gates, {"reason": "ruleset drift after write"}, target_sha=target_sha, live=live_id)
