@@ -1,0 +1,32 @@
+{
+  "schema": "rumbo.openai-agent-reliability-publication-readiness/v1",
+  "observed_at_art": "2026-09-07T13:32:00-03:00",
+  "candidate": "RUMBO Agent Reliability",
+  "package_slug": "rumbo-coding-agent-reliability",
+  "source_commit": "3a7bff2a139cb6840ab6e23a2c19e315000e8b13",
+  "local_package": "PASS",
+  "skills": "5/5 SOURCE_BYTE_IDENTICAL",
+  "public_url_http": {
+    "https://rumbo.verso.fans/": 200,
+    "https://rumbo.verso.fans/openai-support": 200,
+    "https://rumbo.verso.fans/openai-privacy": 200,
+    "https://rumbo.verso.fans/openai-terms": 200
+  },
+  "account_observation": {
+    "user_scoped_plugin_installed_enabled": true,
+    "plugin_id": "plugin_asdk_app_6a9b9c5f7a708191a145dddc5734dff2",
+    "public_directory_presence": "NOT_PROVEN",
+    "permissions_probe": "CONTRADICTORY_NOT_USED_AS_AUTHORITY"
+  },
+  "account_gates": {
+    "apps_management_write": "UNVERIFIED",
+    "developer_identity_verified": "UNVERIFIED",
+    "same_publishing_organization": "UNVERIFIED"
+  },
+  "external_effects": {
+    "portal_draft_write": false,
+    "submitted_for_review": false,
+    "published": false
+  },
+  "state": "SUBMISSION_PACKET_READY_ACCOUNT_GATES_OPEN"
+}

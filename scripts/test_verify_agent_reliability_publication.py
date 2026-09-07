@@ -71,3 +71,16 @@ class ReviewerPacketTests(unittest.TestCase):
         for case in packet["cases"]:
             self.assertIn(case["expected_skill"], SKILLS | {"NONE"})
             self.assertTrue(case["expected_behavior"])
+
+
+class FinalReadinessTests(unittest.TestCase):
+    def test_final_receipt_is_fail_closed_on_external_gates(self):
+        final = json.loads((PUB / "FINAL_READINESS.json").read_text(encoding="utf-8"))
+        self.assertEqual(final["local_package"], "PASS")
+        self.assertEqual(set(final["public_url_http"].values()), {200})
+        self.assertTrue(final["account_observation"]["user_scoped_plugin_installed_enabled"])
+        self.assertEqual(final["account_gates"]["apps_management_write"], "UNVERIFIED")
+        self.assertEqual(final["account_gates"]["developer_identity_verified"], "UNVERIFIED")
+        self.assertFalse(final["external_effects"]["submitted_for_review"])
+        self.assertFalse(final["external_effects"]["published"])
+        self.assertEqual(final["state"], "SUBMISSION_PACKET_READY_ACCOUNT_GATES_OPEN")
