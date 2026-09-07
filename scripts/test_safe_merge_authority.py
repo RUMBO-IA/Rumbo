@@ -412,6 +412,12 @@ class AuthorityGateTests(unittest.TestCase):
         self.assertEqual(out.failed_gate, "FAST_FORWARD_ONLY")
         self.assertFalse(ev.push_calls)
 
+    def test_prewrite_branch_protection_drift_stops_at_g5_without_write(self):
+        ev = FakeEvidence(target_sequence=[BASE, BASE], branch_protection=False)
+        out = authority.evaluate(merge_request(), policy.DEFAULT_POLICY, ev, mode="main")
+        self.assertEqual((out.state, out.failed_gate), ("SAFE_STOP", "FAST_FORWARD_ONLY"))
+        self.assertFalse(ev.push_calls)
+
     def test_clean_dry_run_passes_without_write(self):
         ev = FakeEvidence(target_sequence=[BASE, BASE])
         out = authority.evaluate(merge_request(), policy.DEFAULT_POLICY, ev)

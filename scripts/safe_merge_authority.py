@@ -125,6 +125,11 @@ def evaluate(request: policy.MergeRequest, merge_policy: policy.MergePolicy, evi
         current_gate = "FAST_FORWARD_ONLY"
         if not evidence.ruleset_ok():
             return _stop(gates, current_gate, {"reason": "branch ruleset drift"}, target_sha=target_sha, live=live_id)
+        if (
+            request.expected_base in merge_policy.phase3_targets
+            and not evidence.branch_protection_ok(request.expected_base, required)
+        ):
+            return _stop(gates, current_gate, {"reason": "branch protection drift"}, target_sha=target_sha, live=live_id)
         fresh_target = evidence.target_sha(request.expected_base)
         if fresh_target != target_sha:
             return _stop(gates, current_gate, {"reason": "target changed before write", "fresh_target": fresh_target}, target_sha=target_sha, live=live_id)
