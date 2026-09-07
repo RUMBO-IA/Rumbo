@@ -1,0 +1,21 @@
+{
+  "schema": "rumbo.openai-agent-reliability-source/v1",
+  "source_repository": "https://github.com/fscfede-beep/Rumbo",
+  "source_commit": "3a7bff2a139cb6840ab6e23a2c19e315000e8b13",
+  "tree_sha": "bdb15b47bf350c52b5712b4e2b3e86970a78a138",
+  "manifest_sha256": "3aecd7c41470b842f00e16d524a680ea9dbc7dfede2c4492198d7f83b375e828",
+  "skills": [
+    "canonical-state-recovery",
+    "deep-research-reconcile",
+    "goal-loop-controller",
+    "execute-verify-close",
+    "audit-final-state"
+  ],
+  "skill_sha256": {
+    "canonical-state-recovery": "9e3fa969b9d2720efc62c195eba39ac1d51a8761835a0925deeef5f2c69f0ff5",
+    "deep-research-reconcile": "dcca8a06d1374e32d44427b5e0a69751d72a592407074f7669ad815db3de6fe1",
+    "goal-loop-controller": "851938c8ab99b316ec5384be44065951f1a56a5f052d568caf330c092d366ad9",
+    "execute-verify-close": "411d14ed47a36807e77bcce2dd6e667fc361ec25dcc195559a89399e70e91fab",
+    "audit-final-state": "2d8f6960123e5888a361d9e60621586e71b7bf2b7dddb6e501b2fa24b4b17a04"
+  }
+}
