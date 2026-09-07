@@ -43,7 +43,7 @@ Pilot intake: https://form.typeform.com/to/Tu3D3tVo
 
 Sebastián
 
-Founder · AI Systems & Agent Reliability Engineer
+Founder · Product & AI Systems Operator
 
 ## Contact
 
