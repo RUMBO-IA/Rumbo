@@ -23,3 +23,30 @@ class SourceBindingTests(unittest.TestCase):
         self.assertEqual(set(receipt["skill_sha256"]), SKILLS)
         for digest in receipt["skill_sha256"].values():
             self.assertRegex(digest, r"^[0-9a-f]{64}$")
+
+
+class CandidateInventoryTests(unittest.TestCase):
+    def test_candidate_is_exact_skills_only_inventory(self):
+        plugin = PUB / "plugin"
+        skills = {p.parent.name for p in (plugin / "skills").glob("*/SKILL.md")}
+        self.assertEqual(skills, SKILLS)
+        self.assertTrue((plugin / ".codex-plugin" / "plugin.json").is_file())
+        self.assertTrue((plugin / "assets" / "icon.svg").is_file())
+        self.assertTrue((plugin / "assets" / "logo.svg").is_file())
+        forbidden = {".app.json", ".mcp.json", "hooks.json"}
+        self.assertFalse(any(p.name in forbidden for p in plugin.rglob("*")))
+
+    def test_candidate_skill_bytes_match_bound_source(self):
+        import hashlib
+        receipt = json.loads((PUB / "source-receipt.json").read_text(encoding="utf-8"))
+        for skill, expected in receipt["skill_sha256"].items():
+            data = (PUB / "plugin" / "skills" / skill / "SKILL.md").read_bytes()
+            self.assertEqual(hashlib.sha256(data).hexdigest(), expected)
+
+    def test_manifest_uses_public_identity_and_live_root_policies(self):
+        manifest = json.loads((PUB / "plugin" / ".codex-plugin" / "plugin.json").read_text(encoding="utf-8"))
+        self.assertEqual(manifest["repository"], "https://github.com/RUMBO-IA/Rumbo")
+        self.assertNotIn("email", manifest["author"])
+        self.assertEqual(manifest["interface"]["displayName"], "RUMBO Agent Reliability")
+        self.assertEqual(manifest["interface"]["privacyPolicyURL"], "https://rumbo.verso.fans/openai-privacy")
+        self.assertEqual(manifest["interface"]["termsOfServiceURL"], "https://rumbo.verso.fans/openai-terms")
