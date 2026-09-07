@@ -138,6 +138,18 @@ class EvidenceTests(unittest.TestCase):
         self.assertEqual(state["productionBranch"], "main")
         self.assertEqual(state["gitDeployments"], "disabled")
 
+    def test_fast_forward_push_uses_exact_expected_old_lease(self):
+        fake = FakeRunner({
+            ("git", "check-ref-format"): "",
+            ("git", "fetch"): "",
+            ("git", "rev-parse"): BASE,
+            ("git", "push"): "",
+        })
+        ev = evidence.RealEvidence(ROOT, fake, policy.DEFAULT_POLICY)
+        ev.fast_forward("main", BASE, HEAD)
+        push = next(call for call in fake.calls if call[:2] == ("git", "push"))
+        self.assertIn(f"--force-with-lease=refs/heads/main:{BASE}", push)
+
     def _workflow_payload(self, *, blob=None, content=None):
         raw = content if content is not None else subprocess.check_output(["git", "show", f"HEAD:{policy.DEFAULT_POLICY.privacy_workflow_path}"], cwd=ROOT)
         return json.dumps({

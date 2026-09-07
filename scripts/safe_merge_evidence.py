@@ -406,7 +406,10 @@ class RealEvidence:
             raise EvidenceError("target is not a valid branch ref")
         if self.target_sha(target) != expected_old:
             raise EvidenceError("target changed at write boundary")
-        result = self.runner.run(("git", "push", "origin", f"{candidate}:refs/heads/{target}"))
+        result = self.runner.run((
+            "git", "push", f"--force-with-lease=refs/heads/{target}:{expected_old}",
+            "origin", f"{candidate}:refs/heads/{target}",
+        ))
         if result.returncode != 0:
             raise EvidenceError("fast-forward push failed")
         return result
