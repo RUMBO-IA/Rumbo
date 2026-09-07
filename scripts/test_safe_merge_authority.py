@@ -108,6 +108,22 @@ class EvidenceTests(unittest.TestCase):
             evidence.SubprocessRunner(ROOT).run(("git", "status"))
         self.assertIn("timeout", run.call_args.kwargs)
 
+    def test_subprocess_runner_uses_file_handles_not_pipes(self):
+        with mock.patch.object(evidence.subprocess, "run") as run:
+            run.return_value = subprocess.CompletedProcess(["git"], 0)
+            evidence.SubprocessRunner(ROOT).run(("git", "status"))
+        self.assertNotIn("capture_output", run.call_args.kwargs)
+        self.assertIsNotNone(run.call_args.kwargs.get("stdout"))
+        self.assertIsNotNone(run.call_args.kwargs.get("stderr"))
+
+    def test_subprocess_runner_forces_noninteractive_ci_environment(self):
+        with mock.patch.object(evidence.subprocess, "run") as run:
+            run.return_value = subprocess.CompletedProcess(["git"], 0)
+            evidence.SubprocessRunner(ROOT).run(("git", "status"), env={"CUSTOM": "1"})
+        self.assertIs(run.call_args.kwargs.get("stdin"), subprocess.DEVNULL)
+        self.assertEqual(run.call_args.kwargs["env"]["CI"], "1")
+        self.assertEqual(run.call_args.kwargs["env"]["CUSTOM"], "1")
+
     def test_vercel_state_uses_rest_api_for_live_domain(self):
         project = '{"autoAssignCustomDomains":false,"commandForIgnoringBuildStep":null,"gitProviderOptions":{"createDeployments":"disabled"},"link":{"productionBranch":"main"}}'
         live = '{"id":"dpl_live","target":"production"}'

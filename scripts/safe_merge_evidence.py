@@ -59,16 +59,27 @@ class SubprocessRunner:
     def run(self, args, *, env=None) -> CommandResult:
         logical_args = tuple(args)
         execution_args = resolve_command(logical_args)
-        completed = subprocess.run(
-            list(execution_args),
-            cwd=self.root,
-            env=env,
-            text=True,
-            capture_output=True,
-            check=False,
-            timeout=30,
-        )
-        result = CommandResult(logical_args, completed.returncode, completed.stdout, completed.stderr)
+        effective_env = os.environ.copy()
+        if env:
+            effective_env.update(env)
+        effective_env["CI"] = "1"
+        with tempfile.TemporaryFile(mode="w+", encoding="utf-8") as stdout_file, tempfile.TemporaryFile(mode="w+", encoding="utf-8") as stderr_file:
+            completed = subprocess.run(
+                list(execution_args),
+                cwd=self.root,
+                env=effective_env,
+                stdin=subprocess.DEVNULL,
+                text=True,
+                stdout=stdout_file,
+                stderr=stderr_file,
+                check=False,
+                timeout=30,
+            )
+            stdout_file.seek(0)
+            stderr_file.seek(0)
+            stdout = stdout_file.read()
+            stderr = stderr_file.read()
+        result = CommandResult(logical_args, completed.returncode, stdout, stderr)
         self.results.append(result)
         return result
 
