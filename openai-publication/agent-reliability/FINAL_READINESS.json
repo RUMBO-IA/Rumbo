@@ -20,7 +20,7 @@
   },
   "account_gates": {
     "apps_management_write": "UNVERIFIED",
-    "developer_identity_verified": "UNVERIFIED",
+    "publisher_identity_verified": "UNVERIFIED",
     "same_publishing_organization": "UNVERIFIED"
   },
   "external_effects": {

@@ -71,8 +71,8 @@ OpenAI Platform account state is a separate authority layer from package readine
 Before creating or editing the public submission draft, implementation must verify in the publishing organization:
 
 1. the submitter has `Apps Management = Write` or organization-owner-equivalent authority;
-2. the selected Developer Identity is verified;
-3. the verified identity matches the listing's developer name, website, support contact, privacy policy, and terms;
+2. the selected publisher identity is verified;
+3. the verified publisher identity matches the listing name, website, support contact, privacy policy, and terms;
 4. the plugin submission is being created in the same organization/project context expected by the verified identity.
 
 Failure of any account gate blocks portal mutation but does not invalidate the package.
@@ -119,7 +119,7 @@ This design is implemented when one exact RUMBO Agent Reliability skills-only pa
 
 This design was reconciled on 2026-09-07 against the current OpenAI plugin documentation:
 
-- `https://developers.openai.com/plugins/deploy/submission` — skills-only submissions, Apps Management write access, verified Developer Identity, listing materials, starter prompts, 5 positive + 3 negative tests, availability, review, publication, and directory readback.
+- Official OpenAI plugin submission documentation — skills-only submissions, app-management write access, verified publisher identity, listing materials, starter prompts, 5 positive + 3 negative tests, availability, review, publication, and directory readback.
 - `https://developers.openai.com/plugins/build/plugins` — required `.codex-plugin/plugin.json`, skills directory layout, stable plugin naming, and published manifest metadata.
 
 If these documented requirements materially change before implementation reaches portal entry, the implementation plan must re-reconcile the changed requirement and update this design only if the architecture or authority boundary changes.

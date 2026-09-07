@@ -18,7 +18,7 @@
 - No `.app.json`, `.mcp.json`, MCP server, hooks, hidden network dependency, billing, write action, or auth flow.
 - No portal submission, approval, publication, or directory-presence claim from local verification.
 - Public publisher URLs must return HTTP 200 immediately before portal entry.
-- Portal mutation requires verified Developer Identity and Apps Management write authority.
+- Portal mutation requires verified publisher identity and authorized app-management write access.
 
 ---### Task 1: Bind the Proven 0.1.6 Source
 
@@ -82,7 +82,7 @@
 - [ ] **Step 3: Implement final verifier** to hash the candidate, run all local checks, and consume explicit account/public-URL observations without fabricating them.
 - [ ] **Step 4: Run** `python -m unittest scripts.test_verify_agent_reliability_publication -v`, repository privacy tests, `git diff --check`, and the publication verifier; require all PASS.
 - [ ] **Step 5: Re-read website/support/privacy/terms over HTTPS** and record exact status/readback evidence.
-- [ ] **Step 6: Query available OpenAI account/plugin surfaces** for current installed/public state and permission evidence; unresolved Apps Management/Developer Identity remains `OPEN`, not guessed.
+- [ ] **Step 6: Query available OpenAI account/plugin surfaces** for current installed/public state and permission evidence; unresolved publisher identity or app-management authority remains `OPEN`, not guessed.
 - [ ] **Step 7: Commit** `test(openai): close agent reliability publication readiness`.
 
 ### Task 5: Integration Gate

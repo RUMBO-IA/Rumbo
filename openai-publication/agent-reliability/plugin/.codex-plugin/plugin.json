@@ -22,7 +22,7 @@
     "shortDescription": "Evidence-first coding-agent reliability workflows",
     "longDescription": "Recover authoritative state, reconcile conflicting evidence, control agent loops, verify real effects, and audit final state before accepting coding-agent work.",
     "developerName": "RUMBO IA",
-    "category": "Developer Tools",
+    "category": "Productivity",
     "capabilities": [
       "Read"
     ],

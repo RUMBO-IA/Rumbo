@@ -80,7 +80,7 @@ class FinalReadinessTests(unittest.TestCase):
         self.assertEqual(set(final["public_url_http"].values()), {200})
         self.assertTrue(final["account_observation"]["user_scoped_plugin_installed_enabled"])
         self.assertEqual(final["account_gates"]["apps_management_write"], "UNVERIFIED")
-        self.assertEqual(final["account_gates"]["developer_identity_verified"], "UNVERIFIED")
+        self.assertEqual(final["account_gates"]["publisher_identity_verified"], "UNVERIFIED")
         self.assertFalse(final["external_effects"]["submitted_for_review"])
         self.assertFalse(final["external_effects"]["published"])
         self.assertEqual(final["state"], "SUBMISSION_PACKET_READY_ACCOUNT_GATES_OPEN")

@@ -2,7 +2,7 @@
   "schema": "rumbo.openai-agent-reliability-listing/v1",
   "display_name": "RUMBO Agent Reliability",
   "package_slug": "rumbo-coding-agent-reliability",
-  "category": "Developer Tools",
+  "category": "Productivity",
   "short_description": "Evidence-first workflows for reliable agent state, execution verification, and final-state audit.",
   "long_description": "RUMBO Agent Reliability helps recover canonical workflow state, reconcile conflicting evidence, keep execution within authority, verify observed effects, and audit final state before accepting completion claims.",
   "publisher_urls": {
