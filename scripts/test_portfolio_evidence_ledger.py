@@ -32,7 +32,7 @@ def record(**overrides):
 
 
 class PortfolioEvidenceLedgerTests(unittest.TestCase):
-    def test_digest_is_independent_of_mapping_order(self):
+    def test_digest_stable(self):
         first = record()
         second = dict(reversed(list(first.items())))
         self.assertEqual(ledger.record_digest(first), ledger.record_digest(second))
