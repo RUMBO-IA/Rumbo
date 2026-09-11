@@ -36,14 +36,26 @@ PRODUCTION_LOCK = {
     "invariant": "MAIN_ADVANCE != PRODUCTION_AUTHORITY",
 }
 
+DISTRIBUTION_LOCK = {
+    "schema_version": 1, "registry_issue": "RUMBO-IA/Rumbo#72", "observed_at": "2026-09-11",
+    "overall_status": "PARTIAL_PASS", "required_channels": ["website","youtube","x","linkedin"],
+    "channels": {
+        "website": {"binding":"PASS","profile_alignment":"PASS","readback":"PASS"},
+        "youtube": {"binding":"PASS","profile_alignment":"PASS","readback":"PASS"},
+        "x": {"binding":"PASS","profile_alignment":"UNRESOLVED_CONFLICT","readback":"PASS"},
+        "linkedin": {"binding":"PASS","profile_alignment":"COMPANY_SURFACE_ABSENT","readback":"API_LIMITED"}},
+    "optional_channels": {"metricool": {"binding":"CONNECTED_NO_NETWORKS","profile_alignment":"N/A","readback":"PASS"}},
+    "invariant": "DISTRIBUTION_PASS_REQUIRES_ALL_REQUIRED_CHANNELS_PASS"}
 
-def make_surface(root: pathlib.Path, index: str = BASE_INDEX, readme: str = BASE_README, registry=REGISTRY, production_lock=PRODUCTION_LOCK) -> None:
+
+def make_surface(root: pathlib.Path, index: str = BASE_INDEX, readme: str = BASE_README, registry=REGISTRY, production_lock=PRODUCTION_LOCK, distribution_lock=DISTRIBUTION_LOCK) -> None:
     (root / "index.html").write_text(index, encoding="utf-8")
     (root / "README.md").write_text(readme, encoding="utf-8")
     d = root / "docs" / "brand"
     d.mkdir(parents=True)
     (d / "identity_registry_v1.json").write_text(json.dumps(registry), encoding="utf-8")
     (d / "production_lock_v1.json").write_text(json.dumps(production_lock), encoding="utf-8")
+    (d / "distribution_lock_v1.json").write_text(json.dumps(distribution_lock), encoding="utf-8")
     landing = root / "apps" / "landing-publica"
     landing.mkdir(parents=True)
     for name in ("index.html", "index-es.html", "index-en-openai.html"):
@@ -183,6 +195,27 @@ class BrandContractTests(unittest.TestCase):
             readme = BASE_README.replace(PRODUCTION_LOCK["deployment_id"], "dpl_UNAUTHORIZED123")
             make_surface(root, readme=readme)
             self.assertTrue(any("deployment_id" in e and "authorized lock" in e for e in brand.verify(root)))
+
+
+    def test_missing_distribution_lock_fails_closed(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = pathlib.Path(td); make_surface(root)
+            (root / "docs/brand/distribution_lock_v1.json").unlink()
+            self.assertTrue(any("distribution lock invalid" in e for e in brand.verify(root)))
+
+    def test_distribution_pass_rejects_incomplete_required_channel(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = pathlib.Path(td); bad = json.loads(json.dumps(DISTRIBUTION_LOCK)); bad["overall_status"] = "PASS"
+            make_surface(root, distribution_lock=bad)
+            self.assertTrue(any("distribution PASS forbidden" in e for e in brand.verify(root)))
+
+    def test_distribution_pass_accepts_all_required_channels_complete(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = pathlib.Path(td); good = json.loads(json.dumps(DISTRIBUTION_LOCK)); good["overall_status"] = "PASS"
+            for name in good["required_channels"]:
+                good["channels"][name] = {"binding":"PASS","profile_alignment":"PASS","readback":"PASS"}
+            make_surface(root, distribution_lock=good)
+            self.assertEqual([], brand.verify(root))
 
     def test_required_palette_contains_primary_and_status_colors(self):
         for color in ("#ff7a45", "#63ddb0", "#7aa7ff", "#ff7b88"):

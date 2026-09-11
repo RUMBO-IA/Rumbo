@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "registry_issue": "RUMBO-IA/Rumbo#72",
+  "observed_at": "2026-09-11",
+  "overall_status": "PARTIAL_PASS",
+  "required_channels": ["website", "youtube", "x", "linkedin"],
+  "channels": {
+    "website": {"binding": "PASS", "profile_alignment": "PASS", "readback": "PASS"},
+    "youtube": {"binding": "PASS", "profile_alignment": "PASS", "readback": "PASS"},
+    "x": {"binding": "PASS", "profile_alignment": "UNRESOLVED_CONFLICT", "readback": "PASS"},
+    "linkedin": {"binding": "PASS", "profile_alignment": "COMPANY_SURFACE_ABSENT", "readback": "API_LIMITED"}
+  },
+  "optional_channels": {
+    "metricool": {"binding": "CONNECTED_NO_NETWORKS", "profile_alignment": "N/A", "readback": "PASS"}
+  },
+  "invariant": "DISTRIBUTION_PASS_REQUIRES_ALL_REQUIRED_CHANNELS_PASS"
+}

@@ -8,6 +8,7 @@ import sys
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 REGISTRY_PATH = pathlib.Path("docs/brand/identity_registry_v1.json")
 PRODUCTION_LOCK_PATH = pathlib.Path("docs/brand/production_lock_v1.json")
+DISTRIBUTION_LOCK_PATH = pathlib.Path("docs/brand/distribution_lock_v1.json")
 PRIMARY = pathlib.Path("index.html")
 README = pathlib.Path("README.md")
 SECONDARY_REQUIRED = (
@@ -99,6 +100,32 @@ def load_production_lock(root: pathlib.Path = ROOT) -> dict:
     return data
 
 
+def load_distribution_lock(root: pathlib.Path = ROOT) -> dict:
+    path = root / DISTRIBUTION_LOCK_PATH
+    if not path.is_file():
+        raise ValueError(f"missing distribution lock: {DISTRIBUTION_LOCK_PATH}")
+    data = json.loads(path.read_text(encoding="utf-8-sig"))
+    if data.get("schema_version") != 1 or data.get("registry_issue") != "RUMBO-IA/Rumbo#72":
+        raise ValueError("distribution lock must bind schema v1 and canonical registry")
+    required = data.get("required_channels")
+    channels = data.get("channels")
+    if not isinstance(required, list) or not required or not isinstance(channels, dict):
+        raise ValueError("distribution lock required_channels/channels invalid")
+    if any(name not in channels for name in required):
+        raise ValueError("distribution lock missing required channel")
+    status = data.get("overall_status")
+    if status not in {"PARTIAL_PASS", "PASS"}:
+        raise ValueError("distribution lock overall_status invalid")
+    if status == "PASS":
+        for name in required:
+            state = channels[name]
+            if any(state.get(field) != "PASS" for field in ("binding", "profile_alignment", "readback")):
+                raise ValueError(f"distribution PASS forbidden while required channel incomplete: {name}")
+    if data.get("invariant") != "DISTRIBUTION_PASS_REQUIRES_ALL_REQUIRED_CHANNELS_PASS":
+        raise ValueError("distribution lock invariant invalid")
+    return data
+
+
 def admit_identity(name: str, role: str, root: pathlib.Path = ROOT) -> tuple[str, str]:
     try:
         data = load_registry(root)
@@ -173,6 +200,10 @@ def verify(root: pathlib.Path = ROOT) -> list[str]:
         production_lock = load_production_lock(root)
     except (OSError, ValueError, json.JSONDecodeError) as exc:
         return [f"production authority lock invalid: {exc}"]
+    try:
+        load_distribution_lock(root)
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        return [f"distribution lock invalid: {exc}"]
 
     required = [PRIMARY, README, *SECONDARY_REQUIRED, SECONDARY_README]
     texts = {rel: _read_required(root, rel, errors) for rel in required}
