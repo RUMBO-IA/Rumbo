@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+<title id="title">RUMBO</title>
+<rect width="64" height="64" rx="16" fill="#090A0C"/>
+<path d="M18 49V15h17c8 0 13 5 13 12s-5 12-13 12H18m15 0 15 10" fill="none" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M39 20l9 7-9 7" fill="none" stroke="#5B7CFF" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
