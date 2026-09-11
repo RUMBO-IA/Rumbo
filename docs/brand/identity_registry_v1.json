@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "roles": [
+    "PARENT_BRAND",
+    "PUBLIC_EXPRESSION",
+    "PRODUCT",
+    "OFFER",
+    "PROFILE",
+    "TECH_NAMESPACE",
+    "SHORT_FORM"
+  ],
+  "identities": {
+    "RUMBO": ["PARENT_BRAND", "SHORT_FORM"],
+    "RUMBO IA": ["PUBLIC_EXPRESSION"],
+    "RUMBO-IA": ["TECH_NAMESPACE"],
+    "RUMBO Agent Reliability": ["PRODUCT"],
+    "RUMBO Guardian": ["PRODUCT"],
+    "Revenue Recovery Sprint": ["OFFER"]
+  },
+  "non_canonical": ["Avanza"],
+  "invariants": [
+    "KNOWN_NAME != ALLOWED_ROLE",
+    "UNKNOWN_NAME != NEW_BRAND_AUTHORITY",
+    "NON_CANONICAL_NAME = SAFE_STOP"
+  ]
+}
