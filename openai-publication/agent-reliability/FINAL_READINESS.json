@@ -8,9 +8,9 @@
   "skills": "5/5 SOURCE_BYTE_IDENTICAL",
   "public_url_http": {
     "https://rumbo.verso.fans/": 200,
-    "https://rumbo.verso.fans/openai-support": 200,
     "https://rumbo.verso.fans/openai-privacy": 200,
-    "https://rumbo.verso.fans/openai-terms": 200
+    "https://rumbo.verso.fans/openai-terms": 200,
+    "https://rumbo-openai-support.val.run/": 200
   },
   "account_observation": {
     "user_scoped_plugin_installed_enabled": true,
@@ -28,5 +28,11 @@
     "submitted_for_review": false,
     "published": false
   },
-  "state": "SUBMISSION_PACKET_READY_ACCOUNT_GATES_OPEN"
+  "state": "SUBMISSION_PACKET_READY_ACCOUNT_GATES_OPEN",
+  "publisher_support_semantic": {
+    "state": "PASS",
+    "url": "https://rumbo-openai-support.val.run/",
+    "verification": "REMOTE_HTTP_200_AND_REQUIRED_MARKERS",
+    "observed_at_art": "2026-09-11T01:38:00-03:00"
+  }
 }
