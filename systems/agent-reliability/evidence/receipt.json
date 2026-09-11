@@ -1,0 +1,27 @@
+{
+  "schema": "rumbo.evidence.receipt.v1",
+  "artifact": "rumbo-agent-reliability",
+  "version": "1.0.0",
+  "scope": "deterministic-local-demo",
+  "tests": {
+    "passed": 7,
+    "total": 7
+  },
+  "result": "PASS",
+  "production_proven": false,
+  "external_reproduction": false,
+  "artifact_sha256": "02dc357b7e45532345644a55c947e701863fa7a9f75ca448e507b504a77da2ee",
+  "observed_at": "2026-09-11T03:13:52Z",
+  "environment": {
+    "python": "Python 3.13.5",
+    "pytest": "pytest 9.0.2"
+  },
+  "secret_scan": "PASS",
+  "clean_cache_policy": "pycache/pytest-cache excluded and absent at hash time",
+  "limitations": [
+    "No distributed-scale validation",
+    "No production claim",
+    "No arbitrary-adversary security claim",
+    "No independent external reproduction"
+  ]
+}

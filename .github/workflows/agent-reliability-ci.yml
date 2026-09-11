@@ -1,0 +1,46 @@
+name: RUMBO Agent Reliability CI
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'systems/agent-reliability/**'
+      - '.github/workflows/agent-reliability-ci.yml'
+  push:
+    paths:
+      - 'systems/agent-reliability/**'
+      - '.github/workflows/agent-reliability-ci.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  reliability:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: '3.13'
+      - name: Install deterministic test dependency
+        run: python -m pip install --disable-pip-version-check pytest==9.0.2
+      - name: Run seven reliability invariants
+        env:
+          PYTHONPATH: systems/agent-reliability/src
+        run: python -m pytest -q systems/agent-reliability/tests
+      - name: Enforce claim boundary
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          receipt = json.loads(Path('systems/agent-reliability/evidence/receipt.json').read_text())
+          assert receipt['result'] == 'PASS'
+          assert receipt['tests'] == {'passed': 7, 'total': 7}
+          assert receipt['production_proven'] is False
+          assert receipt['external_reproduction'] is False
+          print('claim-boundary: PASS')
+          PY
