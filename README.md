@@ -1,49 +1,27 @@
-# RUMBO
+# RUMBO IA
 
 [![Public privacy gate](https://github.com/RUMBO-IA/Rumbo/actions/workflows/privacy-gate.yml/badge.svg?branch=main)](https://github.com/RUMBO-IA/Rumbo/actions/workflows/privacy-gate.yml)
 
-**Verified Agent Systems**
+Human-controlled AI CRM and automation for small businesses in Latin America.
 
-**Intelligence into Action.**
+RUMBO IA helps small businesses organize customer conversations, leads, follow-ups, approved business knowledge and commercial workflows while keeping humans in control of sensitive decisions.
 
-RUMBO builds reliable AI systems that move from intent to controlled, verifiable execution.
+## Brand governance
 
-We focus on the infrastructure around intelligent agents: bounded authority, controlled execution, readback, evidence, verification and recovery.
-
-`INTENT → AUTHORITY → PREFLIGHT → EXECUTION → READBACK → EVIDENCE → VERIFICATION`
-
-## What we build
-
-- **Agents** — systems designed to perform useful work across tools and environments.
-- **Reliability** — control planes, gates, recovery mechanisms and operational safeguards.
-- **Evidence** — receipts, attestations and verification systems that distinguish claims from demonstrated outcomes.
-- **Applied systems** — human-controlled CRM and automation workflows for small businesses in Latin America.
+RUMBO brand identity, naming roles, claim classes and publication guardrails are governed by [`docs/brand/BRAND_SYSTEM_V1.md`](docs/brand/BRAND_SYSTEM_V1.md) and the machine-readable [`docs/brand/identity_registry_v1.json`](docs/brand/identity_registry_v1.json). Generated or publishable identity names must pass the fail-closed brand admission contract; unknown or explicitly non-canonical names are not implicitly authorized.
 
 ## Engineering controls
 
 The public repository keeps consequential behavior behind explicit verification boundaries:
 
 - sensitive business actions remain human-supervised;
-- the public privacy gate runs on branch pushes and pull requests targeting `main`;
-- CI checks public privacy invariants, commercial-offer coherence, and security-header configuration;
+- the public privacy gate runs on branch pushes and on pull requests targeting `main`;
+- CI checks public privacy invariants, commercial-offer coherence, security-header configuration, and the RUMBO brand contract on governed brand/public surfaces;
 - repository security and reporting rules are documented in [`SECURITY.md`](SECURITY.md).
-
-## Public systems
-
-### RUMBO Agent Reliability
-
-A deterministic reference implementation for separating capability, authority, execution and verified outcome in agent workflows.
-
-- [Implementation, tests and evidence](systems/agent-reliability/)
-- Seven explicit reliability scenarios
-- Local result: `7/7 PASS`
-- Production reliability: **not claimed**
 
 ## Release posture
 
-This repository distinguishes the mutable Git `main` branch from production traffic. GitHub is the source of truth for the current branch head.
-
-The production domain `rumbo.verso.fans` is intentionally serving the audited application commit `35af1ddc7a000069f686574f750f16bec2926dc4` through Vercel deployment `dpl_6NvixhNBiCbUUmSjnPJWC5MjB9ni`.
+This repository distinguishes the mutable Git `main` branch from production traffic. The current `main` head is intentionally not hardcoded here; GitHub is the source of truth for the branch head. The production domain `rumbo.verso.fans` is intentionally serving the audited application commit `dfa2ed451d8edbbdcd955ef438a04671126d81f1` through Vercel deployment `dpl_FgcSweUirN8ZBv1iQKTJ4Xjjnnht`.
 
 Changes to `main` do not automatically promote production: Git deployments for `main` are disabled, and production promotion is explicit and subject to the Safe Merge Authority gates.
 
@@ -51,7 +29,7 @@ Changes to `main` do not automatically promote production: Git deployments for `
 
 The core product is built and controlled commercial pilots are being prepared.
 
-RUMBO is bootstrapped, founder-operated in Argentina and currently pre-revenue.
+RUMBO IA is bootstrapped, founder-operated in Argentina and currently pre-revenue.
 
 ## Public links
 
@@ -73,7 +51,3 @@ Founder · Product & AI Systems Operator
 ## Contact
 
 sebastian@rumbo.verso.fans
-
----
-
-**RUMBO** · Verified Agent Systems · *Intelligence into Action.*
