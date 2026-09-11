@@ -37,6 +37,10 @@ PYTHONPATH=systems/agent-reliability/src python -m pytest -q systems/agent-relia
 
 The local receipt is in [`evidence/receipt.json`](evidence/receipt.json). It explicitly records `production_proven=false` and `external_reproduction=false` for the original local artifact.
 
+## Community test request
+
+Want to reproduce the seven invariants or try to break one? See [issue #87](https://github.com/RUMBO-IA/Rumbo/issues/87). A useful report includes the exact commit SHA, OS, Python version, command, result, and a minimal counterexample if an invariant fails.
+
 ## Limitations
 
 See [`docs/limitations.md`](docs/limitations.md). Claims are intentionally narrower than the implementation ambitions.
