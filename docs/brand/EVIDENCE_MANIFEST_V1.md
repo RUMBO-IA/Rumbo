@@ -1,5 +1,7 @@
 # RUMBO Brand Evidence Manifest V1
 
+> **Historical manifest.** Current operational evidence is reconciled in `EVIDENCE_MANIFEST_V30.md`. This V1 file preserves pre-landing evidence and MUST NOT be interpreted as current production or distribution state.
+
 Status: CANDIDATE / NOT YET BRANCH-REFERENCED
 
 ## Base authority
