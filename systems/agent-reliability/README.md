@@ -10,7 +10,7 @@ It tests seven behaviors: missing authority, successful verified execution, fals
 
 ## Scope
 
-Status: `LOCAL_PROVEN` based on the recorded local run. GitHub CI, when successful, is an additional external execution-environment reproduction; it is **not** independent human validation.
+Status: `LOCAL_PROVEN` based on the recorded local run. GitHub CI, when successful, adds a second execution-environment check; it is **not** validation performed by another person.
 
 This system does **not** establish production reliability, distributed correctness, enterprise readiness, or security against arbitrary adversaries.
 
