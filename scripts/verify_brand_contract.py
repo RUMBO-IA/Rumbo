@@ -7,6 +7,7 @@ import sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 REGISTRY_PATH = pathlib.Path("docs/brand/identity_registry_v1.json")
+PRODUCTION_LOCK_PATH = pathlib.Path("docs/brand/production_lock_v1.json")
 PRIMARY = pathlib.Path("index.html")
 README = pathlib.Path("README.md")
 SECONDARY_REQUIRED = (
@@ -67,6 +68,34 @@ def load_registry(root: pathlib.Path = ROOT) -> dict:
     overlap = {name.casefold() for name in identities} & {name.casefold() for name in non_canonical}
     if overlap:
         raise ValueError(f"canonical/non-canonical overlap: {sorted(overlap)}")
+    return data
+
+
+def load_production_lock(root: pathlib.Path = ROOT) -> dict:
+    path = root / PRODUCTION_LOCK_PATH
+    if not path.is_file():
+        raise ValueError(f"missing production authority lock: {PRODUCTION_LOCK_PATH}")
+    data = json.loads(path.read_text(encoding="utf-8-sig"))
+    if data.get("schema_version") != 1:
+        raise ValueError("unsupported production lock schema_version")
+    if data.get("registry_issue") != "RUMBO-IA/Rumbo#72":
+        raise ValueError("production lock must bind canonical registry RUMBO-IA/Rumbo#72")
+    comment_id = data.get("owner_authorization_comment_id")
+    if not isinstance(comment_id, int) or comment_id <= 0:
+        raise ValueError("production lock owner authorization comment id invalid")
+    app_sha = data.get("application_sha")
+    if not isinstance(app_sha, str) or re.fullmatch(r"[0-9a-f]{40}", app_sha) is None:
+        raise ValueError("production lock application_sha must be lowercase 40-hex")
+    deployment_id = data.get("deployment_id")
+    if not isinstance(deployment_id, str) or re.fullmatch(r"dpl_[A-Za-z0-9]+", deployment_id) is None:
+        raise ValueError("production lock deployment_id invalid")
+    domain = data.get("domain")
+    if not isinstance(domain, str) or re.fullmatch(r"[A-Za-z0-9.-]+\.[A-Za-z]{2,}", domain) is None:
+        raise ValueError("production lock domain invalid")
+    if data.get("status") != "AUTHORIZED":
+        raise ValueError("production lock status must be AUTHORIZED")
+    if data.get("invariant") != "MAIN_ADVANCE != PRODUCTION_AUTHORITY":
+        raise ValueError("production lock invariant invalid")
     return data
 
 
@@ -140,6 +169,10 @@ def verify(root: pathlib.Path = ROOT) -> list[str]:
         registry = load_registry(root)
     except (OSError, ValueError, json.JSONDecodeError) as exc:
         return [f"brand identity registry invalid: {exc}"]
+    try:
+        production_lock = load_production_lock(root)
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        return [f"production authority lock invalid: {exc}"]
 
     required = [PRIMARY, README, *SECONDARY_REQUIRED, SECONDARY_README]
     texts = {rel: _read_required(root, rel, errors) for rel in required}
@@ -167,6 +200,10 @@ def verify(root: pathlib.Path = ROOT) -> list[str]:
     readme = texts[README].casefold()
     if "main" not in readme or "production" not in readme:
         errors.append("README must preserve main-vs-production release posture")
+    for field in ("domain", "application_sha", "deployment_id"):
+        value = str(production_lock[field]).casefold()
+        if value not in readme:
+            errors.append(f"README production release posture does not match authorized lock: {field}")
 
     secondary_readme = texts[SECONDARY_README].casefold()
     if "producción" not in secondary_readme and "production" not in secondary_readme:
