@@ -19,7 +19,6 @@ Landing protocol:
 7. Run/inspect privacy, commercial coherence, security-header and brand gates required by repository governance.
 8. Open or update the Brand PR only after the referenced candidate exists.
 9. Resolve review threads and required reviews/statuses.
-10. Keep publication and production as independent gates.
 
 Fail closed on parent drift, identity mismatch, tree mismatch, CI ambiguity, unresolved review gates, or missing publication/production authority.
 
