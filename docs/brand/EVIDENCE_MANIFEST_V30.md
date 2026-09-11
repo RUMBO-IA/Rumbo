@@ -39,7 +39,7 @@ Status: CURRENT_RECONCILED_EVIDENCE
 
 ## Social authority
 
-- X: `@RumboAGI`; binding/publish authority PASS; fresh connector metadata reports display name `RUMBO AGI`, conflicting with the V24 public-UI receipt `RUMBO IA`; current profile alignment is NOT_PROVEN pending readback.
+- X: `@RumboAGI`; binding/publish authority PASS; public display name `RUMBO IA` confirmed by authorized browser readback in #72 V31. Upload-Post still reports stale display-name metadata `RUMBO AGI`, which is non-authoritative for public profile identity.
 - YouTube: `RUMBO IA / @RumboAGI`; binding/publish authority PASS; canonical description PASS.
 - LinkedIn: personal profile binding PASS; no administered RUMBO IA company page is proven.
 - full cross-channel profile alignment: NOT_PROVEN.
@@ -55,8 +55,8 @@ No production alias change, social test post, credential extraction, rule weaken
 `BRAND_CONTROL_PLANE=PASS`
 `AUTHORIZED_PRODUCTION_CURRENT=PASS`
 `PRODUCTION_SURFACE_WATCH=PASS`
-`SOCIAL_AUTHORITY=PARTIAL_PROFILE_ALIGNMENT_WITH_X_METADATA_CONFLICT`
+`SOCIAL_AUTHORITY=PARTIAL_PROFILE_ALIGNMENT_LINKEDIN_COMPANY_ABSENT`
 `FULL_DISTRIBUTION_PASS=NO`
 `SPEND_USD=0`
 
-Next transition: resolve the X display-name conflict through an authorized public/profile readback or profile-edit surface. LinkedIn company-page absence remains a separate gate. Do not manufacture a new version solely to restate unchanged state.
+Next transition: create and verify the RUMBO IA LinkedIn company surface through an authorized LinkedIn session. X and YouTube are aligned. Do not manufacture a new version solely to restate unchanged state.
