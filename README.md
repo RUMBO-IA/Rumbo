@@ -21,7 +21,7 @@ The public repository keeps consequential behavior behind explicit verification 
 
 ## Release posture
 
-This repository distinguishes the mutable Git `main` branch from production traffic. The current `main` head is intentionally not hardcoded here; GitHub is the source of truth for the branch head. The production domain `rumbo.verso.fans` is intentionally serving the audited application commit `34c625c65e047fdec06a5bef7064d2de6bed48ba` through Vercel deployment `dpl_8KbqvsKuua22xK4EQYZmtF3KXmNK`.
+This repository distinguishes the mutable Git `main` branch from production traffic. The current `main` head is intentionally not hardcoded here; GitHub is the source of truth for the branch head. The production domain `rumbo.verso.fans` is intentionally serving the audited application commit `9401e9a1f5cf393e9db5013c48b203d316c9c291` through Vercel deployment `dpl_DNWTpqjEt2erpToH934v92Dq5p2B`.
 
 Changes to `main` do not automatically promote production: Git deployments for `main` are disabled, and production promotion is explicit and subject to the Safe Merge Authority gates.
 
