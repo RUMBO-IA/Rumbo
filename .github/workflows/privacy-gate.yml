@@ -21,6 +21,10 @@ jobs:
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
           python-version: '3.12'
+      - name: Run brand contract regression tests
+        run: python -m unittest scripts.test_verify_brand_contract
+      - name: Verify brand contract
+        run: python scripts/verify_brand_contract.py
       - name: Run privacy gate regression tests
         run: python scripts/test_verify_public_privacy.py
       - name: Verify public privacy invariants
