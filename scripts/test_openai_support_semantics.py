@@ -17,5 +17,22 @@ class PublisherSupportPageTests(unittest.TestCase):
         self.assertIn("do not send passwords", html)
         self.assertNotIn("turn customer conversations into", html)
 
+    def test_publisher_surfaces_follow_canonical_brand_hierarchy(self):
+        surfaces = {
+            "support": (ROOT / "openai-support.html").read_text(encoding="utf-8-sig").lower(),
+            "privacy": (ROOT / "openai-privacy.html").read_text(encoding="utf-8-sig").lower(),
+            "terms": (ROOT / "openai-terms.html").read_text(encoding="utf-8-sig").lower(),
+        }
+        for name, html in surfaces.items():
+            with self.subTest(surface=name):
+                self.assertNotIn("rumbo ia crm", html)
+                self.assertNotIn("rumbo avanza", html)
+                self.assertNotIn("avanza", html)
+        self.assertIn("rumbo crm", surfaces["support"])
+        self.assertIn("rumbo crm", surfaces["privacy"])
+        self.assertIn("rumbo crm", surfaces["terms"])
+        self.assertIn("rumbo ia", surfaces["privacy"])
+        self.assertIn("rumbo ia", surfaces["terms"])
+
 if __name__ == "__main__":
     unittest.main()
