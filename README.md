@@ -19,6 +19,17 @@ The public repository keeps consequential behavior behind explicit verification 
 - CI checks public privacy invariants, commercial-offer coherence, security-header configuration, and the RUMBO brand contract on governed brand/public surfaces;
 - repository security and reporting rules are documented in [`SECURITY.md`](SECURITY.md).
 
+## Public systems
+
+### RUMBO Agent Reliability
+
+A deterministic reference implementation for separating capability, authority, execution and verified outcome in agent workflows.
+
+- [Implementation, tests and evidence](systems/agent-reliability/)
+- Seven explicit reliability scenarios
+- Local result: `7/7 PASS`
+- Production reliability: **not claimed**
+
 ## Release posture
 
 This repository distinguishes the mutable Git `main` branch from production traffic. The current `main` head is intentionally not hardcoded here; GitHub is the source of truth for the branch head. The production domain `rumbo.verso.fans` is intentionally serving the audited application commit `35af1ddc7a000069f686574f750f16bec2926dc4` through Vercel deployment `dpl_6NvixhNBiCbUUmSjnPJWC5MjB9ni`.
