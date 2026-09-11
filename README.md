@@ -28,6 +28,17 @@ The public repository keeps consequential behavior behind explicit verification 
 - CI checks public privacy invariants, commercial-offer coherence, and security-header configuration;
 - repository security and reporting rules are documented in [`SECURITY.md`](SECURITY.md).
 
+## Public systems
+
+### RUMBO Agent Reliability
+
+A deterministic reference implementation for separating capability, authority, execution and verified outcome in agent workflows.
+
+- [Implementation, tests and evidence](systems/agent-reliability/)
+- Seven explicit reliability scenarios
+- Local result: `7/7 PASS`
+- Production reliability: **not claimed**
+
 ## Release posture
 
 This repository distinguishes the mutable Git `main` branch from production traffic. GitHub is the source of truth for the current branch head.
