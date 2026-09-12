@@ -1,6 +1,6 @@
 {
   "schema": "rumbo.openai-agent-reliability-publication-readiness/v1",
-  "observed_at_art": "2026-09-12T16:40:21-03:00",
+  "observed_at_art": "2026-09-12T16:49:27-03:00",
   "candidate": "RUMBO Agent Reliability",
   "package_slug": "rumbo-coding-agent-reliability",
   "source_commit": "3a7bff2a139cb6840ab6e23a2c19e315000e8b13",
@@ -56,5 +56,15 @@
     "relationship": "RELATED_DISTINCT_PUBLIC_PROJECTION",
     "cross_package_byte_identity": "NOT_CLAIMED",
     "supersession_required_before_replacing_public_skill_bytes": true
+  },
+  "reviewer_packet_revalidation": {
+    "schema": "rumbo.openai-agent-reliability-reviewer-cases/v2",
+    "positive_cases": 5,
+    "negative_cases": 3,
+    "positive_expected_result_shape": "5/5 PRESENT",
+    "positive_fixture_data": "5/5 PRESENT",
+    "negative_why_not_complete": "3/3 PRESENT",
+    "external_test_account_required": false,
+    "state": "PASS"
   }
 }

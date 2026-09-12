@@ -83,6 +83,12 @@ class ReviewerPacketTests(unittest.TestCase):
         for case in packet["cases"]:
             self.assertIn(case["expected_skill"], SKILLS | {"NONE"})
             self.assertTrue(case["expected_behavior"])
+            self.assertEqual(case["test_account"], "NONE")
+            self.assertTrue(case["fixture_data"])
+        for case in positive:
+            self.assertTrue(case["expected_result_shape"])
+        for case in negative:
+            self.assertTrue(case["why_not_complete"])
 
 
 class FinalReadinessTests(unittest.TestCase):
