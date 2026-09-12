@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import pathlib
 import shutil
@@ -15,7 +16,7 @@ def make_root(tmp: str) -> pathlib.Path:
     root = pathlib.Path(tmp)
     brand = root / "docs" / "brand"
     brand.mkdir(parents=True)
-    for name in ("content_registry_v2.json", "identity_registry_v1.json", "distribution_lock_v1.json", "CONTENT_CANON_V2.md", "CHANNEL_MATRIX_V1.md", "CONTENT_REVIEW_PACKET_V1.md"):
+    for name in ("content_registry_v2.json", "identity_registry_v1.json", "distribution_lock_v1.json", "CONTENT_CANON_V2.md", "CHANNEL_MATRIX_V1.md", "CONTENT_REVIEW_PACKET_V1.md", "CONTENT_APPROVAL_RECEIPT_SCHEMA_V1.json"):
         shutil.copy2(ROOT / "docs" / "brand" / name, brand / name)
     return root
 
@@ -28,6 +29,25 @@ def load_registry(root: pathlib.Path) -> dict:
 def save_registry(root: pathlib.Path, data: dict) -> None:
     path = root / "docs" / "brand" / "content_registry_v2.json"
     path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
+def attach_valid_approval_receipt(root: pathlib.Path, item: dict, *, content_sha256: str | None = None) -> None:
+    rel = pathlib.Path("docs/brand/content_approval_receipts") / f"{item['id']}.json"
+    path = root / rel
+    path.parent.mkdir(parents=True, exist_ok=True)
+    receipt = {
+        "schema_version": 1,
+        "item_id": item["id"],
+        "decision": "APPROVED",
+        "content_sha256": content_sha256 or hashlib.sha256(item["copy"].encode("utf-8")).hexdigest(),
+        "review_packet_ref": item["review_packet_ref"],
+        "target_channels": item["target_channels"],
+        "reviewer": "human-reviewer",
+        "reviewed_at": "2026-09-12T19:40:00Z",
+        "source": "explicit_human_approval",
+    }
+    path.write_text(json.dumps(receipt, indent=2), encoding="utf-8")
+    item["approval_receipt_ref"] = rel.as_posix()
 
 
 class ContentContractTests(unittest.TestCase):
@@ -140,6 +160,69 @@ class ContentContractTests(unittest.TestCase):
             item["target_channels"] = ["UnknownChannel"]
             save_registry(root, data)
             self.assertTrue(any("target channel" in e for e in content.verify(root)))
+
+    def test_approved_requires_approval_receipt(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = make_root(td)
+            data = load_registry(root)
+            item = data["items"][0]
+            item["publication_state"] = "APPROVED"
+            item.pop("approval_receipt_ref", None)
+            save_registry(root, data)
+            self.assertTrue(any("approval_receipt_ref" in e for e in content.verify(root)))
+
+    def test_approved_rejects_copy_hash_mismatch(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = make_root(td)
+            data = load_registry(root)
+            item = data["items"][0]
+            item["publication_state"] = "APPROVED"
+            attach_valid_approval_receipt(root, item, content_sha256="0" * 64)
+            save_registry(root, data)
+            self.assertTrue(any("content_sha256 mismatch" in e for e in content.verify(root)))
+
+    def test_valid_approved_receipt_passes(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = make_root(td)
+            data = load_registry(root)
+            item = data["items"][0]
+            item["publication_state"] = "APPROVED"
+            attach_valid_approval_receipt(root, item)
+            save_registry(root, data)
+            self.assertEqual(content.verify(root), [])
+
+    def test_published_cannot_skip_approval_receipt(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = make_root(td)
+            data = load_registry(root)
+            item = data["items"][0]
+            item["publication_state"] = "PUBLISHED"
+            item["publication_receipt"] = "authenticated-publication-receipt"
+            item.pop("approval_receipt_ref", None)
+            save_registry(root, data)
+            self.assertTrue(any("approval_receipt_ref" in e for e in content.verify(root)))
+
+    def test_approval_policy_forbids_agent_issuance(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = make_root(td)
+            data = load_registry(root)
+            data["approval_policy"]["agent_may_issue_receipts"] = True
+            save_registry(root, data)
+            self.assertTrue(any("approval_policy" in e for e in content.verify(root)))
+
+    def test_approved_rejects_nonhuman_source(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = make_root(td)
+            data = load_registry(root)
+            item = data["items"][0]
+            item["publication_state"] = "APPROVED"
+            attach_valid_approval_receipt(root, item)
+            receipt_path = root / item["approval_receipt_ref"]
+            receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+            receipt["source"] = "agent_generated"
+            receipt_path.write_text(json.dumps(receipt, indent=2), encoding="utf-8")
+            save_registry(root, data)
+            self.assertTrue(any("source must be explicit_human_approval" in e for e in content.verify(root)))
 
     def test_personal_lane_cannot_inherit_rumbo_identity(self):
         with tempfile.TemporaryDirectory() as td:

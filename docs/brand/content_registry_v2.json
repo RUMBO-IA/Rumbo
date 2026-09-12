@@ -11,6 +11,7 @@
     "QUARANTINED",
     "CANDIDATE_SAFE",
     "READY_FOR_HUMAN_REVIEW",
+    "APPROVED",
     "PUBLISHED"
   ],
   "claim_classes": [
@@ -162,5 +163,11 @@
       "title": "Construí un sistema para que ChatGPT y Codex no pierdan el contexto"
     }
   ],
-  "distribution_authority_ref": "docs/brand/distribution_lock_v1.json"
+  "distribution_authority_ref": "docs/brand/distribution_lock_v1.json",
+  "approval_policy": {
+    "receipt_schema_ref": "docs/brand/CONTENT_APPROVAL_RECEIPT_SCHEMA_V1.json",
+    "receipt_directory": "docs/brand/content_approval_receipts",
+    "required_source": "explicit_human_approval",
+    "agent_may_issue_receipts": false
+  }
 }
