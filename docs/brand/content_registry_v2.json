@@ -27,7 +27,7 @@
       "lane": "RUMBO_BRAND",
       "identity": "RUMBO IA",
       "claim_class": "BUILT",
-      "publication_state": "READY_FOR_HUMAN_REVIEW",
+      "publication_state": "APPROVED",
       "evidence_refs": [
         "README.md",
         "docs/brand/MESSAGING_V1.md"
@@ -38,14 +38,15 @@
       "target_channels": [
         "LinkedIn",
         "X"
-      ]
+      ],
+      "approval_receipt_ref": "docs/brand/content_approval_receipts/W1-01.json"
     },
     {
       "id": "W1-02",
       "lane": "RUMBO_BRAND",
       "identity": "RUMBO IA",
       "claim_class": "BUILT",
-      "publication_state": "READY_FOR_HUMAN_REVIEW",
+      "publication_state": "APPROVED",
       "evidence_refs": [
         "docs/brand/MESSAGING_V1.md"
       ],
@@ -55,14 +56,15 @@
       "target_channels": [
         "LinkedIn",
         "X"
-      ]
+      ],
+      "approval_receipt_ref": "docs/brand/content_approval_receipts/W1-02.json"
     },
     {
       "id": "W1-03",
       "lane": "RUMBO_BRAND",
       "identity": "RUMBO IA",
       "claim_class": "BUILT",
-      "publication_state": "READY_FOR_HUMAN_REVIEW",
+      "publication_state": "APPROVED",
       "evidence_refs": [
         "README.md",
         "docs/brand/MESSAGING_V1.md"
@@ -73,14 +75,15 @@
       "target_channels": [
         "LinkedIn",
         "X"
-      ]
+      ],
+      "approval_receipt_ref": "docs/brand/content_approval_receipts/W1-03.json"
     },
     {
       "id": "W2-01",
       "lane": "RUMBO_BRAND",
       "identity": "RUMBO IA",
       "claim_class": "BUILT",
-      "publication_state": "READY_FOR_HUMAN_REVIEW",
+      "publication_state": "APPROVED",
       "evidence_refs": [
         "docs/brand/MESSAGING_V1.md"
       ],
@@ -90,14 +93,15 @@
       "target_channels": [
         "LinkedIn",
         "X"
-      ]
+      ],
+      "approval_receipt_ref": "docs/brand/content_approval_receipts/W2-01.json"
     },
     {
       "id": "W2-02",
       "lane": "RUMBO_BRAND",
       "identity": "RUMBO IA",
       "claim_class": "DEMO",
-      "publication_state": "READY_FOR_HUMAN_REVIEW",
+      "publication_state": "APPROVED",
       "evidence_refs": [
         "docs/brand/CLAIMS_POLICY_V1.md"
       ],
@@ -107,7 +111,8 @@
       "target_channels": [
         "LinkedIn",
         "X"
-      ]
+      ],
+      "approval_receipt_ref": "docs/brand/content_approval_receipts/W2-02.json"
     },
     {
       "id": "W2-03",

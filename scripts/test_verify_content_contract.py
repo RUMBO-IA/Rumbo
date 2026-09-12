@@ -18,6 +18,7 @@ def make_root(tmp: str) -> pathlib.Path:
     brand.mkdir(parents=True)
     for name in ("content_registry_v2.json", "identity_registry_v1.json", "distribution_lock_v1.json", "CONTENT_CANON_V2.md", "CHANNEL_MATRIX_V1.md", "CONTENT_REVIEW_PACKET_V1.md", "CONTENT_APPROVAL_RECEIPT_SCHEMA_V1.json", "CONTENT_PUBLICATION_RECEIPT_SCHEMA_V1.json", "CONTENT_PUBLICATION_AUTHORIZATION_RECEIPT_SCHEMA_V1.json"):
         shutil.copy2(ROOT / "docs" / "brand" / name, brand / name)
+    shutil.copytree(ROOT / "docs" / "brand" / "content_approval_receipts", brand / "content_approval_receipts", dirs_exist_ok=True)
     return root
 
 
