@@ -9,6 +9,8 @@ Primary public expression: RUMBO IA.
 
 Technical namespace: RUMBO-IA. It is not a consumer-facing replacement brand.
 
+Content / research imprint: RUMBO Labs. It is a subordinate technical-content imprint of RUMBO IA; it is not a parent brand, public-expression replacement, product, offer, or technical namespace.
+
 Short form: RUMBO after context is established.
 
 Product family convention: RUMBO <Capability>. Offers, products, profiles and technical namespaces must not be promoted to parent-brand status without an explicit canon change.
@@ -25,7 +27,7 @@ Documentation and registry must change together in one reviewed change. Registry
 
 Unknown generated names are deny-by-default. Absence from the canon is not authority to invent a new brand.
 
-Every identity token used in generated or publishable material must be classified as one of: PARENT_BRAND, PUBLIC_EXPRESSION, PRODUCT, OFFER, PROFILE, TECH_NAMESPACE, SHORT_FORM.
+Every identity token used in generated or publishable material must be classified as one of: PARENT_BRAND, PUBLIC_EXPRESSION, PRODUCT, OFFER, PROFILE, CONTENT_IMPRINT, TECH_NAMESPACE, SHORT_FORM.
 
 Admission is fail-closed:
 - recognized token in its allowed role/context -> PASS;
@@ -84,6 +86,7 @@ Visible keyboard focus; meaningful text labels in addition to color; sufficient 
 ## Governance
 BRAND_SPEC_PASS != PUBLICATION_AUTHORITY != PRODUCTION_DEPLOYMENT.
 KNOWN_NAME != ALLOWED_ROLE.
+CONTENT_IMPRINT != PUBLIC_EXPRESSION.
 UNKNOWN_NAME != NEW_BRAND_AUTHORITY.
 NON_CANONICAL_NAME = SAFE_STOP.
 SECONDARY_DEPLOYABLE_SURFACE != PRODUCTION_SURFACE.

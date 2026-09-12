@@ -6,6 +6,7 @@
     "PRODUCT",
     "OFFER",
     "PROFILE",
+    "CONTENT_IMPRINT",
     "TECH_NAMESPACE",
     "SHORT_FORM"
   ],
@@ -13,6 +14,7 @@
     "RUMBO": ["PARENT_BRAND", "SHORT_FORM"],
     "RUMBO IA": ["PUBLIC_EXPRESSION"],
     "RUMBO-IA": ["TECH_NAMESPACE"],
+    "RUMBO Labs": ["CONTENT_IMPRINT"],
     "RUMBO Agent Reliability": ["PRODUCT"],
     "RUMBO Guardian": ["PRODUCT"],
     "Revenue Recovery Sprint": ["OFFER"]
