@@ -7,7 +7,7 @@
   "long_description": "RUMBO Agent Reliability helps recover canonical workflow state, reconcile conflicting evidence, keep execution within authority, verify observed effects, and audit final state before accepting completion claims.",
   "publisher_urls": {
     "website": "https://rumbo.verso.fans/",
-    "support": "https://rumbo.verso.fans/openai-support",
+    "support": "https://rumbo-openai-support.val.run/",
     "privacy": "https://rumbo.verso.fans/openai-privacy",
     "terms": "https://rumbo.verso.fans/openai-terms"
   },

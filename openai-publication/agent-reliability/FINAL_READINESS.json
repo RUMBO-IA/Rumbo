@@ -1,6 +1,6 @@
 {
   "schema": "rumbo.openai-agent-reliability-publication-readiness/v1",
-  "observed_at_art": "2026-09-07T13:32:00-03:00",
+  "observed_at_art": "2026-09-12T16:49:27-03:00",
   "candidate": "RUMBO Agent Reliability",
   "package_slug": "rumbo-coding-agent-reliability",
   "source_commit": "3a7bff2a139cb6840ab6e23a2c19e315000e8b13",
@@ -8,9 +8,9 @@
   "skills": "5/5 SOURCE_BYTE_IDENTICAL",
   "public_url_http": {
     "https://rumbo.verso.fans/": 200,
-    "https://rumbo.verso.fans/openai-support": 200,
     "https://rumbo.verso.fans/openai-privacy": 200,
-    "https://rumbo.verso.fans/openai-terms": 200
+    "https://rumbo.verso.fans/openai-terms": 200,
+    "https://rumbo-openai-support.val.run/": 200
   },
   "account_observation": {
     "user_scoped_plugin_installed_enabled": true,
@@ -28,5 +28,43 @@
     "submitted_for_review": false,
     "published": false
   },
-  "state": "SUBMISSION_PACKET_READY_ACCOUNT_GATES_OPEN"
+  "state": "SUBMISSION_PACKET_READY_ACCOUNT_GATES_OPEN",
+  "publisher_support_semantic": {
+    "state": "PASS",
+    "url": "https://rumbo-openai-support.val.run/",
+    "verification": "REMOTE_HTTP_200_AND_REQUIRED_MARKERS",
+    "observed_at_art": "2026-09-12T16:40:21-03:00"
+  },
+  "runtime_revalidation": {
+    "codex_cli": "0.153.4",
+    "isolated_local_marketplace_install": "PASS",
+    "installed_plugin_version": "0.1.6",
+    "native_skills_resolved": "5/5",
+    "model_response_required": false
+  },
+  "test_revalidation": {
+    "publication_and_support": "10/10 PASS",
+    "brand_contract": "26/26 PASS",
+    "combined": "36/36 PASS",
+    "git_diff_check": "PASS"
+  },
+  "lineage_reconciliation": {
+    "public_source_commit": "3a7bff2a139cb6840ab6e23a2c19e315000e8b13",
+    "public_distribution_skills": 5,
+    "internal_operating_reference": "RUMBO-IA/rumbo-control-queue@ed0a39a0cacaa72946ed2e6a2e7af68456e3d372",
+    "internal_operating_skills": 7,
+    "relationship": "RELATED_DISTINCT_PUBLIC_PROJECTION",
+    "cross_package_byte_identity": "NOT_CLAIMED",
+    "supersession_required_before_replacing_public_skill_bytes": true
+  },
+  "reviewer_packet_revalidation": {
+    "schema": "rumbo.openai-agent-reliability-reviewer-cases/v2",
+    "positive_cases": 5,
+    "negative_cases": 3,
+    "positive_expected_result_shape": "5/5 PRESENT",
+    "positive_fixture_data": "5/5 PRESENT",
+    "negative_why_not_complete": "3/3 PRESENT",
+    "external_test_account_required": false,
+    "state": "PASS"
+  }
 }
