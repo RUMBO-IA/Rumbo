@@ -1,0 +1,166 @@
+{
+  "schema_version": 2,
+  "canonical_public_domain": "https://rumbo.verso.fans",
+  "auto_publish": "NO_GO",
+  "lanes": [
+    "RUMBO_BRAND",
+    "PERSONAL_BRAND"
+  ],
+  "publication_states": [
+    "SOURCE_MATERIAL",
+    "QUARANTINED",
+    "CANDIDATE_SAFE",
+    "READY_FOR_HUMAN_REVIEW",
+    "PUBLISHED"
+  ],
+  "claim_classes": [
+    "BUILT",
+    "DEMO",
+    "PILOT",
+    "PRODUCTION",
+    "MEASURED"
+  ],
+  "items": [
+    {
+      "id": "W1-01",
+      "lane": "RUMBO_BRAND",
+      "identity": "RUMBO IA",
+      "claim_class": "BUILT",
+      "publication_state": "READY_FOR_HUMAN_REVIEW",
+      "evidence_refs": [
+        "README.md",
+        "docs/brand/MESSAGING_V1.md"
+      ],
+      "publication_receipt": null,
+      "copy": "La IA no debería quitarte el control de tu negocio. RUMBO IA construye sistemas de CRM y automatización con IA para pequeñas empresas. El producto está construido y los pilotos controlados están en preparación. Construimos. Probamos. Auditamos.",
+      "review_packet_ref": "docs/brand/CONTENT_REVIEW_PACKET_V1.md",
+      "target_channels": [
+        "LinkedIn",
+        "X"
+      ]
+    },
+    {
+      "id": "W1-02",
+      "lane": "RUMBO_BRAND",
+      "identity": "RUMBO IA",
+      "claim_class": "BUILT",
+      "publication_state": "READY_FOR_HUMAN_REVIEW",
+      "evidence_refs": [
+        "docs/brand/MESSAGING_V1.md"
+      ],
+      "publication_receipt": null,
+      "copy": "Cinco procesos para revisar antes de sumar más trabajo manual: preguntas repetitivas, registro de consultas, seguimientos pendientes, clasificación inicial de oportunidades y consulta de información interna aprobada. Primero entender el proceso, después automatizarlo y recién entonces medir si mejoró.",
+      "review_packet_ref": "docs/brand/CONTENT_REVIEW_PACKET_V1.md",
+      "target_channels": [
+        "LinkedIn",
+        "X"
+      ]
+    },
+    {
+      "id": "W1-03",
+      "lane": "RUMBO_BRAND",
+      "identity": "RUMBO IA",
+      "claim_class": "BUILT",
+      "publication_state": "READY_FOR_HUMAN_REVIEW",
+      "evidence_refs": [
+        "README.md",
+        "docs/brand/MESSAGING_V1.md"
+      ],
+      "publication_receipt": null,
+      "copy": "El Revenue Recovery Sprint toma un único flujo comercial durante 14 días. Se define alcance y línea base, se automatiza solo el circuito acordado, se mantiene supervisión humana y se mide antes de afirmar resultados. Precio actual: USD 149, pago único antes del inicio. No se garantiza ROI.",
+      "review_packet_ref": "docs/brand/CONTENT_REVIEW_PACKET_V1.md",
+      "target_channels": [
+        "LinkedIn",
+        "X"
+      ]
+    },
+    {
+      "id": "W2-01",
+      "lane": "RUMBO_BRAND",
+      "identity": "RUMBO IA",
+      "claim_class": "BUILT",
+      "publication_state": "READY_FOR_HUMAN_REVIEW",
+      "evidence_refs": [
+        "docs/brand/MESSAGING_V1.md"
+      ],
+      "publication_receipt": null,
+      "copy": "Automatizar empieza por mapear un proceso concreto: entrada, decisión, acción, excepción y revisión humana. La herramienta viene después.",
+      "review_packet_ref": "docs/brand/CONTENT_REVIEW_PACKET_V1.md",
+      "target_channels": [
+        "LinkedIn",
+        "X"
+      ]
+    },
+    {
+      "id": "W2-02",
+      "lane": "RUMBO_BRAND",
+      "identity": "RUMBO IA",
+      "claim_class": "DEMO",
+      "publication_state": "READY_FOR_HUMAN_REVIEW",
+      "evidence_refs": [
+        "docs/brand/CLAIMS_POLICY_V1.md"
+      ],
+      "publication_receipt": null,
+      "copy": "DEMO: una IA puede proponer un rango de precio usando supuestos explícitos. La decisión final requiere criterio humano, costos reales y contexto comercial.",
+      "review_packet_ref": "docs/brand/CONTENT_REVIEW_PACKET_V1.md",
+      "target_channels": [
+        "LinkedIn",
+        "X"
+      ]
+    },
+    {
+      "id": "W2-03",
+      "lane": "RUMBO_BRAND",
+      "identity": "RUMBO IA",
+      "claim_class": "MEASURED",
+      "publication_state": "QUARANTINED",
+      "evidence_refs": [],
+      "publication_receipt": null,
+      "reason": "Historical customer-count claim lacks an evidence receipt."
+    },
+    {
+      "id": "W2-04",
+      "lane": "RUMBO_BRAND",
+      "identity": "RUMBO IA",
+      "claim_class": "MEASURED",
+      "publication_state": "QUARANTINED",
+      "evidence_refs": [],
+      "publication_receipt": null,
+      "reason": "Historical restaurant outcome lacks customer permission and measured evidence."
+    },
+    {
+      "id": "W2-05",
+      "lane": "PERSONAL_BRAND",
+      "identity": null,
+      "claim_class": "BUILT",
+      "publication_state": "QUARANTINED",
+      "evidence_refs": [],
+      "publication_receipt": null,
+      "reason": "Historical 2025 personal-brand post is stale and belongs outside RUMBO_BRAND."
+    },
+    {
+      "id": "W2-06",
+      "lane": "RUMBO_BRAND",
+      "identity": "RUMBO IA",
+      "claim_class": "MEASURED",
+      "publication_state": "QUARANTINED",
+      "evidence_refs": [],
+      "publication_receipt": null,
+      "reason": "Historical newsletter benchmark lacks source, population and observation window."
+    },
+    {
+      "id": "EP001",
+      "lane": "RUMBO_BRAND",
+      "identity": "RUMBO IA",
+      "claim_class": "BUILT",
+      "publication_state": "SOURCE_MATERIAL",
+      "production_state": "SPECIFIED_NOT_RENDERED",
+      "evidence_refs": [
+        "docs/brand/CLAIMS_POLICY_V1.md"
+      ],
+      "publication_receipt": null,
+      "title": "Construí un sistema para que ChatGPT y Codex no pierdan el contexto"
+    }
+  ],
+  "distribution_authority_ref": "docs/brand/distribution_lock_v1.json"
+}
