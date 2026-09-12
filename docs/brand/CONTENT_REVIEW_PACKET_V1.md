@@ -7,6 +7,7 @@ Status: REVIEW_PACKET ? non-authoritative aid for human review; it does not gran
 - `READY_FOR_HUMAN_REVIEW != APPROVED != PUBLISHED`.
 - `DISTRIBUTION=PASS != CONTENT_PUBLISHED`.
 - `AUTO_PUBLISH=NO_GO`.
+- Automated/agent lanes do not issue approval receipts; approval requires explicit human input.
 
 ## Scope
 The following five items satisfied the current machine gates for evidence, identity, copy presence, claim discipline and distribution readiness. Target review channels are LinkedIn and X only.
@@ -67,4 +68,4 @@ The following five items satisfied the current machine gates for evidence, ident
 - [ ] Privacy-sensitive information is absent.
 - [ ] Reviewer explicitly approves or rejects each item.
 
-A checked review packet is still not a publication receipt. Publication requires a separate authenticated action and readback.
+A checked review packet is still not an approval receipt or publication receipt. `APPROVED` requires an item-specific receipt that binds the exact copy SHA-256 and target channels. Publication requires a separate authenticated action and readback.

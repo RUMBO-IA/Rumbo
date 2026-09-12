@@ -31,9 +31,10 @@ Founder identity and RUMBO IA remain separate public surfaces unless a reviewed 
 - `QUARANTINED`: unsupported, stale, identity-invalid or privacy-sensitive material.
 - `CANDIDATE_SAFE`: reconciled to current policy but not publication-approved.
 - `READY_FOR_HUMAN_REVIEW`: evidence and channel requirements are satisfied; human review still required.
-- `PUBLISHED`: requires a publication receipt and authenticated readback.
+- `APPROVED`: explicit human approval receipt binds the exact copy SHA-256, review packet and target channels; publication has not occurred.
+- `PUBLISHED`: requires a valid approval receipt plus a publication receipt and authenticated readback.
 
-`CANDIDATE_SAFE != READY_FOR_HUMAN_REVIEW != PUBLISHED`.
+`CANDIDATE_SAFE != READY_FOR_HUMAN_REVIEW != APPROVED != PUBLISHED`.
 
 ## Historical kits
 Recovered Week 1 and Week 2 HTML kits are source material only.
@@ -100,6 +101,9 @@ A publish-capable connection is not profile-edit authority; a draft is not publi
 ## Invariants
 - `TECHNICAL_PASS != CONTENT_PUBLICATION_AUTHORITY`.
 - `CONTENT_COMPLETE != PUBLISHED`.
+- `APPROVED_REQUIRES_HASH_BOUND_HUMAN_RECEIPT`.
+- `AGENT_MAY_ISSUE_APPROVAL_RECEIPT = FALSE`.
+- `APPROVED != PUBLISHED`.
 - `PUBLISHED_ONCE != AUTO_PUBLISH_AUTHORITY`.
 - `MEASURED_CLAIM_REQUIRES_EVIDENCE_RECEIPT`.
 - `PERSONAL_BRAND != RUMBO_BRAND`.
