@@ -26,62 +26,87 @@
       "lane": "RUMBO_BRAND",
       "identity": "RUMBO IA",
       "claim_class": "BUILT",
-      "publication_state": "CANDIDATE_SAFE",
+      "publication_state": "READY_FOR_HUMAN_REVIEW",
       "evidence_refs": [
         "README.md",
         "docs/brand/MESSAGING_V1.md"
       ],
       "publication_receipt": null,
-      "copy": "La IA no debería quitarte el control de tu negocio. RUMBO IA construye sistemas de CRM y automatización con IA para pequeñas empresas. El producto está construido y los pilotos controlados están en preparación. Construimos. Probamos. Auditamos."
+      "copy": "La IA no debería quitarte el control de tu negocio. RUMBO IA construye sistemas de CRM y automatización con IA para pequeñas empresas. El producto está construido y los pilotos controlados están en preparación. Construimos. Probamos. Auditamos.",
+      "review_packet_ref": "docs/brand/CONTENT_REVIEW_PACKET_V1.md",
+      "target_channels": [
+        "LinkedIn",
+        "X"
+      ]
     },
     {
       "id": "W1-02",
       "lane": "RUMBO_BRAND",
       "identity": "RUMBO IA",
       "claim_class": "BUILT",
-      "publication_state": "CANDIDATE_SAFE",
+      "publication_state": "READY_FOR_HUMAN_REVIEW",
       "evidence_refs": [
         "docs/brand/MESSAGING_V1.md"
       ],
       "publication_receipt": null,
-      "copy": "Cinco procesos para revisar antes de sumar más trabajo manual: preguntas repetitivas, registro de consultas, seguimientos pendientes, clasificación inicial de oportunidades y consulta de información interna aprobada. Primero entender el proceso, después automatizarlo y recién entonces medir si mejoró."
+      "copy": "Cinco procesos para revisar antes de sumar más trabajo manual: preguntas repetitivas, registro de consultas, seguimientos pendientes, clasificación inicial de oportunidades y consulta de información interna aprobada. Primero entender el proceso, después automatizarlo y recién entonces medir si mejoró.",
+      "review_packet_ref": "docs/brand/CONTENT_REVIEW_PACKET_V1.md",
+      "target_channels": [
+        "LinkedIn",
+        "X"
+      ]
     },
     {
       "id": "W1-03",
       "lane": "RUMBO_BRAND",
       "identity": "RUMBO IA",
       "claim_class": "BUILT",
-      "publication_state": "CANDIDATE_SAFE",
+      "publication_state": "READY_FOR_HUMAN_REVIEW",
       "evidence_refs": [
         "README.md",
         "docs/brand/MESSAGING_V1.md"
       ],
       "publication_receipt": null,
-      "copy": "El Revenue Recovery Sprint toma un único flujo comercial durante 14 días. Se define alcance y línea base, se automatiza solo el circuito acordado, se mantiene supervisión humana y se mide antes de afirmar resultados. Precio actual: USD 149, pago único antes del inicio. No se garantiza ROI."
+      "copy": "El Revenue Recovery Sprint toma un único flujo comercial durante 14 días. Se define alcance y línea base, se automatiza solo el circuito acordado, se mantiene supervisión humana y se mide antes de afirmar resultados. Precio actual: USD 149, pago único antes del inicio. No se garantiza ROI.",
+      "review_packet_ref": "docs/brand/CONTENT_REVIEW_PACKET_V1.md",
+      "target_channels": [
+        "LinkedIn",
+        "X"
+      ]
     },
     {
       "id": "W2-01",
       "lane": "RUMBO_BRAND",
       "identity": "RUMBO IA",
       "claim_class": "BUILT",
-      "publication_state": "CANDIDATE_SAFE",
+      "publication_state": "READY_FOR_HUMAN_REVIEW",
       "evidence_refs": [
         "docs/brand/MESSAGING_V1.md"
       ],
       "publication_receipt": null,
-      "copy": "Automatizar empieza por mapear un proceso concreto: entrada, decisión, acción, excepción y revisión humana. La herramienta viene después."
+      "copy": "Automatizar empieza por mapear un proceso concreto: entrada, decisión, acción, excepción y revisión humana. La herramienta viene después.",
+      "review_packet_ref": "docs/brand/CONTENT_REVIEW_PACKET_V1.md",
+      "target_channels": [
+        "LinkedIn",
+        "X"
+      ]
     },
     {
       "id": "W2-02",
       "lane": "RUMBO_BRAND",
       "identity": "RUMBO IA",
       "claim_class": "DEMO",
-      "publication_state": "CANDIDATE_SAFE",
+      "publication_state": "READY_FOR_HUMAN_REVIEW",
       "evidence_refs": [
         "docs/brand/CLAIMS_POLICY_V1.md"
       ],
       "publication_receipt": null,
-      "copy": "DEMO: una IA puede proponer un rango de precio usando supuestos explícitos. La decisión final requiere criterio humano, costos reales y contexto comercial."
+      "copy": "DEMO: una IA puede proponer un rango de precio usando supuestos explícitos. La decisión final requiere criterio humano, costos reales y contexto comercial.",
+      "review_packet_ref": "docs/brand/CONTENT_REVIEW_PACKET_V1.md",
+      "target_channels": [
+        "LinkedIn",
+        "X"
+      ]
     },
     {
       "id": "W2-03",

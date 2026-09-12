@@ -14,6 +14,7 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 REGISTRY = pathlib.Path("docs/brand/content_registry_v2.json")
 DISTRIBUTION_LOCK = pathlib.Path("docs/brand/distribution_lock_v1.json")
 CANON = pathlib.Path("docs/brand/CONTENT_CANON_V2.md")
+CHANNEL_MATRIX = pathlib.Path("docs/brand/CHANNEL_MATRIX_V1.md")
 
 EXPECTED_DOMAIN = "https://rumbo.verso.fans"
 ALLOWED_LANES = {"RUMBO_BRAND", "PERSONAL_BRAND"}
@@ -120,6 +121,30 @@ def verify(root: pathlib.Path = ROOT) -> list[str]:
 
         if state == "READY_FOR_HUMAN_REVIEW" and not evidence:
             errors.append(f"{item_id}: review-ready item requires evidence")
+        if state == "READY_FOR_HUMAN_REVIEW":
+            packet_ref = item.get("review_packet_ref")
+            if not isinstance(packet_ref, str) or not packet_ref.strip():
+                errors.append(f"{item_id}: review-ready item requires review_packet_ref")
+            else:
+                packet_path = root / packet_ref
+                if not packet_path.is_file():
+                    errors.append(f"{item_id}: review_packet_ref missing")
+                else:
+                    packet_text = packet_path.read_text(encoding="utf-8-sig")
+                    if item_id not in packet_text or (isinstance(copy, str) and copy.strip() not in packet_text):
+                        errors.append(f"{item_id}: review packet must contain exact id and copy")
+            channels = item.get("target_channels")
+            if not isinstance(channels, list) or not channels or not all(isinstance(ch, str) and ch.strip() for ch in channels):
+                errors.append(f"{item_id}: review-ready item requires target_channels")
+            else:
+                matrix_path = root / CHANNEL_MATRIX
+                if not matrix_path.is_file():
+                    errors.append(f"{item_id}: channel matrix missing")
+                else:
+                    matrix_text = matrix_path.read_text(encoding="utf-8-sig")
+                    for channel in channels:
+                        if f"| {channel} |" not in matrix_text:
+                            errors.append(f"{item_id}: target channel not in CHANNEL_MATRIX_V1: {channel}")
         if state in {"READY_FOR_HUMAN_REVIEW", "PUBLISHED"} and distribution_status != "PASS":
             errors.append(f"{item_id}: release state requires DISTRIBUTION=PASS")
         if claim == "MEASURED" and state not in {"QUARANTINED", "SOURCE_MATERIAL"}:

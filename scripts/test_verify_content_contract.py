@@ -15,7 +15,7 @@ def make_root(tmp: str) -> pathlib.Path:
     root = pathlib.Path(tmp)
     brand = root / "docs" / "brand"
     brand.mkdir(parents=True)
-    for name in ("content_registry_v2.json", "identity_registry_v1.json", "distribution_lock_v1.json", "CONTENT_CANON_V2.md"):
+    for name in ("content_registry_v2.json", "identity_registry_v1.json", "distribution_lock_v1.json", "CONTENT_CANON_V2.md", "CHANNEL_MATRIX_V1.md", "CONTENT_REVIEW_PACKET_V1.md"):
         shutil.copy2(ROOT / "docs" / "brand" / name, brand / name)
     return root
 
@@ -119,6 +119,27 @@ class ContentContractTests(unittest.TestCase):
             lock["schema_version"] = 999
             lock_path.write_text(json.dumps(lock, indent=2), encoding="utf-8")
             self.assertTrue(any("distribution authority invalid" in e for e in content.verify(root)))
+
+    def test_review_ready_requires_review_packet_ref(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = make_root(td)
+            data = load_registry(root)
+            item = data["items"][0]
+            item["publication_state"] = "READY_FOR_HUMAN_REVIEW"
+            item.pop("review_packet_ref", None)
+            save_registry(root, data)
+            self.assertTrue(any("review_packet_ref" in e for e in content.verify(root)))
+
+    def test_review_ready_rejects_unknown_target_channel(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = make_root(td)
+            data = load_registry(root)
+            item = data["items"][0]
+            item["publication_state"] = "READY_FOR_HUMAN_REVIEW"
+            item["review_packet_ref"] = "docs/brand/CONTENT_REVIEW_PACKET_V1.md"
+            item["target_channels"] = ["UnknownChannel"]
+            save_registry(root, data)
+            self.assertTrue(any("target channel" in e for e in content.verify(root)))
 
     def test_personal_lane_cannot_inherit_rumbo_identity(self):
         with tempfile.TemporaryDirectory() as td:
