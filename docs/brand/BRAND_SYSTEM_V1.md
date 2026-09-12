@@ -23,6 +23,8 @@ Documentation and registry must change together in one reviewed change. Registry
 ## Negative canon and admission
 `Avanza` is explicitly NON_CANONICAL for RUMBO. It must not be generated, inferred, published or promoted as a RUMBO parent or product brand unless a future reviewed canon change explicitly authorizes it.
 
+`RUMBO Labs` is explicitly NON_CANONICAL for RUMBO because an independently operated AI/automation company already uses that public name in an overlapping market. Historical RUMBO references remain evidence only; the token must not be generated, inferred, published or promoted as a current RUMBO identity unless a future reviewed canon change resolves the collision.
+
 Unknown generated names are deny-by-default. Absence from the canon is not authority to invent a new brand.
 
 Every identity token used in generated or publishable material must be classified as one of: PARENT_BRAND, PUBLIC_EXPRESSION, PRODUCT, OFFER, PROFILE, TECH_NAMESPACE, SHORT_FORM.

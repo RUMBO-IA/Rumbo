@@ -22,7 +22,7 @@ REGISTRY = {
         "RUMBO Guardian": ["PRODUCT"],
         "Revenue Recovery Sprint": ["OFFER"],
     },
-    "non_canonical": ["Avanza"],
+    "non_canonical": ["Avanza", "RUMBO Labs"],
     "invariants": ["KNOWN_NAME != ALLOWED_ROLE","UNKNOWN_NAME != NEW_BRAND_AUTHORITY","NON_CANONICAL_NAME = SAFE_STOP"],
 }
 PRODUCTION_LOCK = {
@@ -102,6 +102,11 @@ class BrandContractTests(unittest.TestCase):
             root = pathlib.Path(td); make_surface(root)
             (root / "apps/landing-publica/index-es.html").write_text(SECONDARY + "<p>Avanza</p>", encoding="utf-8")
             self.assertTrue(any("non-canonical brand present" in e for e in brand.verify(root)))
+
+    def test_rumbo_labs_collision_is_explicitly_noncanonical(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = pathlib.Path(td); make_surface(root)
+            self.assertEqual(("SAFE_STOP", "non_canonical"), brand.admit_identity("RUMBO Labs", "PUBLIC_EXPRESSION", root))
 
     def test_unknown_identity_fails_closed(self):
         with tempfile.TemporaryDirectory() as td:

@@ -88,7 +88,7 @@ Precio actual: USD 149, pago único antes del inicio. No se garantiza ROI.
 
 ## EP001
 Working title: **Construí un sistema para que ChatGPT y Codex no pierdan el contexto**.
-Series: `RUMBO Labs`. State: `SPECIFIED_NOT_RENDERED`.
+Series: `RUMBO IA`. State: `SPECIFIED_NOT_RENDERED`.
 Rendering, upload and publication require separate receipts.
 
 ## Visual and channel boundary
