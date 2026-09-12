@@ -61,6 +61,24 @@ class ContentContractTests(unittest.TestCase):
             save_registry(root, data)
             self.assertTrue(any("denied" in e for e in content.verify(root)))
 
+    def test_releaseable_state_requires_nonempty_copy(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = make_root(td)
+            data = load_registry(root)
+            data["items"][0]["copy"] = ""
+            save_registry(root, data)
+            self.assertTrue(any("non-empty copy" in e for e in content.verify(root)))
+
+    def test_demo_releaseable_copy_requires_visible_label(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = make_root(td)
+            data = load_registry(root)
+            item = data["items"][0]
+            item["claim_class"] = "DEMO"
+            item["copy"] = "Una IA puede proponer un rango de precio usando supuestos expl?citos."
+            save_registry(root, data)
+            self.assertTrue(any("visible demo/example label" in e for e in content.verify(root)))
+
     def test_measured_claim_requires_receipt_before_release(self):
         with tempfile.TemporaryDirectory() as td:
             root = make_root(td)
@@ -92,6 +110,15 @@ class ContentContractTests(unittest.TestCase):
             lock["overall_status"] = "PARTIAL_PASS"
             lock_path.write_text(json.dumps(lock, indent=2), encoding="utf-8")
             self.assertTrue(any("DISTRIBUTION=PASS" in e for e in content.verify(root)))
+
+    def test_malformed_distribution_lock_fails_closed(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = make_root(td)
+            lock_path = root / "docs" / "brand" / "distribution_lock_v1.json"
+            lock = json.loads(lock_path.read_text(encoding="utf-8-sig"))
+            lock["schema_version"] = 999
+            lock_path.write_text(json.dumps(lock, indent=2), encoding="utf-8")
+            self.assertTrue(any("distribution authority invalid" in e for e in content.verify(root)))
 
     def test_personal_lane_cannot_inherit_rumbo_identity(self):
         with tempfile.TemporaryDirectory() as td:

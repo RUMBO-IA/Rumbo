@@ -5,9 +5,13 @@ import pathlib
 import re
 import sys
 
+try:
+    from scripts import verify_brand_contract as brand
+except ImportError:  # direct execution: python scripts/verify_content_contract.py
+    import verify_brand_contract as brand
+
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 REGISTRY = pathlib.Path("docs/brand/content_registry_v2.json")
-IDENTITY_REGISTRY = pathlib.Path("docs/brand/identity_registry_v1.json")
 DISTRIBUTION_LOCK = pathlib.Path("docs/brand/distribution_lock_v1.json")
 CANON = pathlib.Path("docs/brand/CONTENT_CANON_V2.md")
 
@@ -18,6 +22,8 @@ ALLOWED_STATES = {
     "READY_FOR_HUMAN_REVIEW", "PUBLISHED",
 }
 ALLOWED_CLAIMS = {"BUILT", "DEMO", "PILOT", "PRODUCTION", "MEASURED"}
+RELEASEABLE_STATES = {"CANDIDATE_SAFE", "READY_FOR_HUMAN_REVIEW", "PUBLISHED"}
+DEMO_LABEL = re.compile(r"\b(demo|simulad[oa]|example|ejemplo)\b", re.I)
 DENIED_COPY = (
     r"\bnexo(?:\s+3\.0)?\b",
     r"\brumboia\.com\b",
@@ -39,13 +45,6 @@ def _load_json(root: pathlib.Path, rel: pathlib.Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8-sig"))
 
 
-def _identity_allowed(root: pathlib.Path, name: str, role: str) -> bool:
-    data = _load_json(root, IDENTITY_REGISTRY)
-    identities = data.get("identities", {})
-    for canonical, roles in identities.items():
-        if canonical.casefold() == name.casefold():
-            return role in roles
-    return False
 
 def verify(root: pathlib.Path = ROOT) -> list[str]:
     errors: list[str] = []
@@ -64,12 +63,10 @@ def verify(root: pathlib.Path = ROOT) -> list[str]:
         errors.append("distribution authority ref must bind distribution_lock_v1.json")
 
     try:
-        distribution = _load_json(root, DISTRIBUTION_LOCK)
+        distribution = brand.load_distribution_lock(root)
     except (OSError, ValueError, json.JSONDecodeError) as exc:
         return errors + [f"distribution authority invalid: {exc}"]
-    distribution_status = distribution.get("overall_status")
-    if distribution_status not in {"PARTIAL_PASS", "PASS"}:
-        errors.append("distribution authority status invalid")
+    distribution_status = distribution["overall_status"]
 
     items = data.get("items")
     if not isinstance(items, list) or not items:
@@ -99,14 +96,18 @@ def verify(root: pathlib.Path = ROOT) -> list[str]:
         if lane == "RUMBO_BRAND":
             if identity != "RUMBO IA":
                 errors.append(f"{item_id}: RUMBO_BRAND identity must be RUMBO IA")
-            elif not _identity_allowed(root, identity, "PUBLIC_EXPRESSION"):
-                errors.append(f"{item_id}: identity is not admitted as PUBLIC_EXPRESSION")
+            else:
+                identity_status, identity_reason = brand.admit_identity(identity, "PUBLIC_EXPRESSION", root)
+                if identity_status != "PASS":
+                    errors.append(f"{item_id}: identity is not admitted as PUBLIC_EXPRESSION ({identity_reason})")
         if lane == "PERSONAL_BRAND" and identity == "RUMBO IA":
             errors.append(f"{item_id}: personal lane cannot inherit RUMBO IA identity")
 
         copy = item.get("copy", "")
-        if state == "CANDIDATE_SAFE" and not isinstance(copy, str):
-            errors.append(f"{item_id}: CANDIDATE_SAFE copy must be text")
+        if state in RELEASEABLE_STATES and (not isinstance(copy, str) or not copy.strip()):
+            errors.append(f"{item_id}: releaseable state requires non-empty copy")
+        if claim == "DEMO" and state in RELEASEABLE_STATES and isinstance(copy, str) and not DEMO_LABEL.search(copy):
+            errors.append(f"{item_id}: DEMO releaseable copy requires visible demo/example label")
         if isinstance(copy, str):
             for pattern in DENIED_COPY:
                 if re.search(pattern, copy, re.I):
