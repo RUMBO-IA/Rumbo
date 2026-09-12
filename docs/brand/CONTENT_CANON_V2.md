@@ -1,6 +1,6 @@
 # RUMBO IA Content Canon V2
 
-Status: CANDIDATE — content approval, publication authority and production deployment remain separate gates.
+Status: GOVERNED — content approval, publication authority and production deployment remain separate gates.
 
 ## Purpose
 Turn RUMBO content into an evidence-backed system instead of a collection of copy drafts.
@@ -32,7 +32,7 @@ Founder identity and RUMBO IA remain separate public surfaces unless a reviewed 
 - `CANDIDATE_SAFE`: reconciled to current policy but not publication-approved.
 - `READY_FOR_HUMAN_REVIEW`: evidence and channel requirements are satisfied; human review still required.
 - `APPROVED`: explicit human approval receipt binds the exact copy SHA-256, review packet and target channels; publication has not occurred.
-- `PUBLISHED`: requires a valid approval receipt plus a publication receipt and authenticated readback.
+- `PUBLISHED`: requires a separate explicit human publication-authorization receipt plus a valid approval receipt and a hash-bound publication receipt with one authenticated remote record and `readback_status=PASS` for every target channel.
 
 `CANDIDATE_SAFE != READY_FOR_HUMAN_REVIEW != APPROVED != PUBLISHED`.
 
@@ -54,28 +54,12 @@ Sensitive actions remain human-supervised. No ROI guarantee.
 Canonical public domain: `https://rumbo.verso.fans`.
 
 ## Canonical Week 1
-### W1-01 — Brand introduction
-Lane: `RUMBO_BRAND` · Claim: `BUILT` · State: `CANDIDATE_SAFE`
+The authoritative copy, claim class and publication state for each item live only in `content_registry_v2.json`.
+This canon names the governed concepts without duplicating mutable item state or copy.
 
-La IA no debería quitarte el control de tu negocio. Debería ayudarte a ordenar mejor lo que ya pasa todos los días.
-RUMBO IA construye sistemas de CRM y automatización con IA para pequeñas empresas.
-El producto está construido y los pilotos controlados están en preparación.
-Construimos. Probamos. Auditamos.
-### W1-02 — Process-first education
-Lane: `RUMBO_BRAND` · Claim: `BUILT` · State: `CANDIDATE_SAFE`
-
-Cinco procesos para revisar antes de sumar más trabajo manual: preguntas repetitivas,
-registro de consultas, seguimientos pendientes, clasificación inicial de oportunidades
-y consulta de información interna aprobada.
-Primero entender el proceso, después automatizarlo y recién entonces medir si mejoró.
-
-### W1-03 — Commercial entry
-Lane: `RUMBO_BRAND` · Claim: `BUILT` · State: `CANDIDATE_SAFE`
-
-El Revenue Recovery Sprint toma un único flujo comercial durante 14 días.
-Se define alcance y línea base, se automatiza solo el circuito acordado,
-se mantiene supervisión humana y se mide antes de afirmar resultados.
-Precio actual: USD 149, pago único antes del inicio. No se garantiza ROI.
+- `W1-01`: brand introduction.
+- `W1-02`: process-first education.
+- `W1-03`: bounded commercial entry for Revenue Recovery Sprint.
 
 ## Week 2 reconciliation
 - Education about automation: preserve concept; rewrite to current claim vocabulary.
@@ -105,6 +89,12 @@ A publish-capable connection is not profile-edit authority; a draft is not publi
 - `AGENT_MAY_ISSUE_APPROVAL_RECEIPT = FALSE`.
 - `APPROVED != PUBLISHED`.
 - `PUBLISHED_ONCE != AUTO_PUBLISH_AUTHORITY`.
+- `PUBLISHED_REQUIRES_EXPLICIT_HUMAN_PUBLICATION_AUTHORIZATION`.
+- `PUBLISHED_REQUIRES_HASH_BOUND_PUBLICATION_RECEIPT`.
+- `PUBLISHED_REQUIRES_PER_CHANNEL_READBACK_PASS`.
+- `PUBLISHED_BINDS_CURRENT_DISTRIBUTION_LOCK_SHA256`.
+- `PUBLISHED_BINDS_CANONICAL_REMOTE_ACCOUNT`.
+- `AGENT_MAY_PUBLISH = FALSE`.
 - `MEASURED_CLAIM_REQUIRES_EVIDENCE_RECEIPT`.
 - `PERSONAL_BRAND != RUMBO_BRAND`.
 - `UNKNOWN_IDENTITY = SAFE_STOP`.

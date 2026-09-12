@@ -1,0 +1,122 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rumbo.verso.fans/schemas/content-publication-receipt-v1.json",
+  "title": "RUMBO IA Content Publication Receipt V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "item_id",
+    "status",
+    "content_sha256",
+    "distribution_lock_sha256",
+    "approval_receipt_ref",
+    "publication_authorization_receipt_ref",
+    "review_packet_ref",
+    "target_channels",
+    "publications",
+    "publisher",
+    "source"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "item_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "const": "PUBLISHED"
+    },
+    "content_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "approval_receipt_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "review_packet_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "target_channels": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "publications": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "channel",
+          "account_identity",
+          "remote_url",
+          "remote_id",
+          "published_at",
+          "readback_at",
+          "readback_status",
+          "account_binding_ref"
+        ],
+        "properties": {
+          "channel": {
+            "type": "string",
+            "minLength": 1
+          },
+          "remote_url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "remote_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "published_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "readback_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "readback_status": {
+            "const": "PASS"
+          },
+          "account_binding_ref": {
+            "const": "docs/brand/distribution_lock_v1.json"
+          },
+          "account_identity": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "publisher": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source": {
+      "const": "authenticated_publication_action"
+    },
+    "notes": {
+      "type": "string"
+    },
+    "distribution_lock_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "publication_authorization_receipt_ref": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

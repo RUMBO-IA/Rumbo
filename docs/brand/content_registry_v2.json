@@ -169,5 +169,16 @@
     "receipt_directory": "docs/brand/content_approval_receipts",
     "required_source": "explicit_human_approval",
     "agent_may_issue_receipts": false
+  },
+  "publication_policy": {
+    "receipt_schema_ref": "docs/brand/CONTENT_PUBLICATION_RECEIPT_SCHEMA_V1.json",
+    "receipt_directory": "docs/brand/content_publication_receipts",
+    "required_source": "authenticated_publication_action",
+    "required_readback_status": "PASS",
+    "agent_may_publish": false,
+    "bind_current_distribution_lock_sha256": true,
+    "authorization_schema_ref": "docs/brand/CONTENT_PUBLICATION_AUTHORIZATION_RECEIPT_SCHEMA_V1.json",
+    "authorization_directory": "docs/brand/content_publication_authorization_receipts",
+    "required_authorization_source": "explicit_human_publication_authorization"
   }
 }
