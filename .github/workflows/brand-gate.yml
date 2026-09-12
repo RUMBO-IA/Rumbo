@@ -1,0 +1,54 @@
+name: RUMBO Brand Contract
+
+on:
+  pull_request:
+    paths:
+      - "index.html"
+      - "README.md"
+      - "apps/landing-publica/**"
+      - "docs/brand/**"
+      - "assets/brand/**"
+      - "scripts/verify_brand_contract.py"
+      - "scripts/test_verify_brand_contract.py"
+      - "scripts/verify_content_contract.py"
+      - "scripts/test_verify_content_contract.py"
+      - ".github/workflows/brand-gate.yml"
+  push:
+    paths:
+      - "index.html"
+      - "README.md"
+      - "apps/landing-publica/**"
+      - "docs/brand/**"
+      - "assets/brand/**"
+      - "scripts/verify_brand_contract.py"
+      - "scripts/test_verify_brand_contract.py"
+      - "scripts/verify_content_contract.py"
+      - "scripts/test_verify_content_contract.py"
+      - ".github/workflows/brand-gate.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  brand-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: "3.12"
+      - name: Compile verifier
+        run: python -m py_compile scripts/verify_brand_contract.py scripts/test_verify_brand_contract.py scripts/verify_content_contract.py scripts/test_verify_content_contract.py
+      - name: Verify public brand contract
+        run: python scripts/verify_brand_contract.py
+      - name: Verify content contract
+        run: python scripts/verify_content_contract.py
+      - name: Run brand adversarial unit tests
+        run: python -m unittest scripts.test_verify_brand_contract -v
+      - name: Run content adversarial unit tests
+        run: python -m unittest scripts.test_verify_content_contract -v

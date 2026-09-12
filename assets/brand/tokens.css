@@ -1,0 +1,41 @@
+:root {
+  --rumbo-bg: #080c12;
+  --rumbo-panel: #101722;
+  --rumbo-panel-2: #141e2c;
+  --rumbo-line: #263246;
+  --rumbo-text: #f7f9fc;
+  --rumbo-muted: #9aa8ba;
+  --rumbo-orange: #ff7a45;
+  --rumbo-green: #63ddb0;
+  --rumbo-blue: #7aa7ff;
+  --rumbo-red: #ff7b88;
+
+  --rumbo-radius-sm: 10px;
+  --rumbo-radius-md: 14px;
+  --rumbo-radius-lg: 20px;
+  --rumbo-radius-xl: 28px;
+
+  --rumbo-space-1: 4px;
+  --rumbo-space-2: 8px;
+  --rumbo-space-3: 12px;
+  --rumbo-space-4: 16px;
+  --rumbo-space-6: 24px;
+  --rumbo-space-8: 32px;
+
+  --rumbo-font-sans: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+  --rumbo-font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+:focus-visible {
+  outline: 3px solid var(--rumbo-blue);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}

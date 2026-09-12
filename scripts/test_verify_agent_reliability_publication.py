@@ -72,7 +72,7 @@ class ReviewerPacketTests(unittest.TestCase):
         self.assertEqual(listing["availability"]["state"], "UNSET_FAIL_CLOSED")
         self.assertEqual(listing["publisher_urls"]["privacy"], "https://rumbo.verso.fans/openai-privacy")
         self.assertEqual(listing["publisher_urls"]["terms"], "https://rumbo.verso.fans/openai-terms")
-        self.assertEqual(listing["publisher_urls"]["support"], "https://rumbo.verso.fans/openai-support")
+        self.assertEqual(listing["publisher_urls"]["support"], "https://rumbo-openai-support.val.run/")
 
     def test_reviewer_cases_meet_minimums_and_are_bounded(self):
         packet = json.loads((PUB / "submission" / "reviewer-cases.json").read_text(encoding="utf-8"))
