@@ -88,7 +88,6 @@
     "short_description_max_chars": 30,
     "starter_prompt_max_chars": 128,
     "skills_only_interface_screenshots_allowed": false,
-    "author_name_matches_developer_name": true,
     "manifest_short_description_chars": 30,
     "listing_short_description_chars": 30,
     "public_legal_operator_disclosure": "PENDING_VERIFIED_IDENTITY_READBACK",
