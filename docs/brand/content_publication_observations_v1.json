@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "canonical_main_at_reconciliation": "3ee060c260d48483613279b75a52270c320e1d9f",
+  "observations": [
+    {
+      "schema_version": 1, "item_id": "W1-01", "channel": "X",
+      "content_sha256": "4c56f7a914493a7f8d5a8027edf9a58db8beffade1919aca75482f4dca3a0114",
+      "account_identity": "handle:RumboAGI", "provider": "Upload-Post",
+      "provider_request_id": "257de160c10b4b2b99d31e90ed6933de", "provider_job_id": "7eab3b3681034d04b568f04b69d5dac6",
+      "account_binding_ref": "docs/brand/distribution_lock_v1.json",
+      "remote_records": [{"remote_id":"2098939758869086610","remote_url":"https://x.com/RumboAGI/status/2098939758869086610","published_at":"2026-09-12T22:00:09-03:00","readback_at":"2026-09-13T02:34:00-03:00","readback_status":"PASS","record_role":"ROOT"}],
+      "authority_chain_state": "OBSERVED_REMOTE_EFFECT_OUTSIDE_COMPLETE_CANONICAL_AUTHORITY_CHAIN", "canonical_promotion": "NO_GO"
+    },
+    {
+      "schema_version": 1, "item_id": "W1-02", "channel": "X",
+      "content_sha256": "5ad8b69876b5c1551664df9b68b42151b4686b3bbefbd5c4cece4270e6b8fb16",
+      "account_identity": "handle:RumboAGI", "provider": "Upload-Post",
+      "provider_request_id": "70ae845cf27d4130a711a7b5370f9606", "provider_job_id": "d3871f26366e47b1b62df01fb3f38739",
+      "account_binding_ref": "docs/brand/distribution_lock_v1.json",
+      "remote_records": [
+        {"remote_id":"2098944645887635894","remote_url":"https://x.com/RumboAGI/status/2098944645887635894","published_at":"2026-09-12T22:19:35-03:00","readback_at":"2026-09-13T02:34:00-03:00","readback_status":"PASS","record_role":"ROOT"},
+        {"remote_id":"2098944647510868385","remote_url":"https://x.com/i/status/2098944647510868385","published_at":"2026-09-12T22:19:35-03:00","readback_at":"2026-09-13T02:34:00-03:00","readback_status":"PASS","record_role":"ADDITIONAL_REMOTE_RECORD"}
+      ],
+      "authority_chain_state": "OBSERVED_REMOTE_EFFECT_OUTSIDE_COMPLETE_CANONICAL_AUTHORITY_CHAIN", "canonical_promotion": "NO_GO",
+      "notes": "One provider request produced two observed X records. The provider readback does not expose a reply edge."
+    },
+    {
+      "schema_version": 1, "item_id": "W1-03", "channel": "X",
+      "content_sha256": "b02f528ad2b06a17507c5d6b4a588ee5e63a49d5e27624ecee9ccdf75e68a31d",
+      "account_identity": "handle:RumboAGI", "provider": "Upload-Post",
+      "provider_request_id": "4fd6d34a280d442ca9ec9814051bdda8", "provider_job_id": "4f0e4b433e8f48509cf53fef55b21933",
+      "account_binding_ref": "docs/brand/distribution_lock_v1.json",
+      "remote_records": [
+        {"remote_id":"2098944731589816820","remote_url":"https://x.com/RumboAGI/status/2098944731589816820","published_at":"2026-09-12T22:19:55-03:00","readback_at":"2026-09-13T02:34:00-03:00","readback_status":"PASS","record_role":"ROOT"},
+        {"remote_id":"2098944733120811152","remote_url":"https://x.com/i/status/2098944733120811152","published_at":"2026-09-12T22:19:55-03:00","readback_at":"2026-09-13T02:34:00-03:00","readback_status":"PASS","record_role":"ADDITIONAL_REMOTE_RECORD"}
+      ],
+      "authority_chain_state": "OBSERVED_REMOTE_EFFECT_OUTSIDE_COMPLETE_CANONICAL_AUTHORITY_CHAIN", "canonical_promotion": "NO_GO",
+      "notes": "One provider request produced two observed X records. The provider readback does not expose a reply edge."
+    },
+    {
+      "schema_version": 1, "item_id": "W2-01", "channel": "X",
+      "content_sha256": "be2d7f4300aee96b95d0e0f3b74781c5ddbc417ac67e370675fabe0ba9d6b820",
+      "account_identity": "handle:RumboAGI", "provider": "Upload-Post",
+      "provider_request_id": "f029cdae17744ac1bd3f0c54197f692e", "provider_job_id": "7befbef5832e477da7704dc8d052f0d9",
+      "account_binding_ref": "docs/brand/distribution_lock_v1.json",
+      "remote_records": [{"remote_id":"2098939562844123514","remote_url":"https://x.com/RumboAGI/status/2098939562844123514","published_at":"2026-09-12T21:59:22-03:00","readback_at":"2026-09-13T02:34:00-03:00","readback_status":"PASS","record_role":"ROOT"}],
+      "authority_chain_state": "OBSERVED_REMOTE_EFFECT_OUTSIDE_COMPLETE_CANONICAL_AUTHORITY_CHAIN", "canonical_promotion": "NO_GO"
+    },
+    {
+      "schema_version": 1, "item_id": "W2-02", "channel": "X",
+      "content_sha256": "06f8f64d0253fc07f1c58777b1b4e235b9c4b45d49b527797867bcfc56ba8518",
+      "account_identity": "handle:RumboAGI", "provider": "Upload-Post",
+      "provider_request_id": "fb67744b24e044b8a356f7aa36f7629c", "provider_job_id": "3da0fa67d9534d359f40d99b08e7c46e",
+      "account_binding_ref": "docs/brand/distribution_lock_v1.json",
+      "remote_records": [{"remote_id":"2098939957326819550","remote_url":"https://x.com/RumboAGI/status/2098939957326819550","published_at":"2026-09-12T22:00:56-03:00","readback_at":"2026-09-13T02:34:00-03:00","readback_status":"PASS","record_role":"ROOT"}],
+      "authority_chain_state": "OBSERVED_REMOTE_EFFECT_OUTSIDE_COMPLETE_CANONICAL_AUTHORITY_CHAIN", "canonical_promotion": "NO_GO"
+    },
+    {
+      "schema_version": 1, "item_id": "W2-01", "channel": "LinkedIn",
+      "content_sha256": "be2d7f4300aee96b95d0e0f3b74781c5ddbc417ac67e370675fabe0ba9d6b820",
+      "account_identity": "company:145014017:rumbo-ia", "provider": "Upload-Post",
+      "provider_request_id": "f0612269c92c4e07b293ff8a314094b8", "provider_job_id": "7d5147b075f748d1a945684284034b25",
+      "account_binding_ref": "docs/brand/distribution_lock_v1.json",
+      "remote_records": [{"remote_id":"urn:li:share:7504710585230524416","remote_url":"https://www.linkedin.com/feed/update/urn:li:share:7504710585230524416/","published_at":"2026-09-12T22:20:34-03:00","readback_at":"2026-09-13T02:34:00-03:00","readback_status":"PASS","record_role":"ROOT"}],
+      "authority_chain_state": "OBSERVED_REMOTE_EFFECT_OUTSIDE_COMPLETE_CANONICAL_AUTHORITY_CHAIN", "canonical_promotion": "NO_GO"
+    }
+  ],
+  "coverage": {"logical_targets_observed": 6, "logical_targets_total": 10, "physical_remote_records": 8},
+  "invariant": "OBSERVED_REMOTE_EFFECT_DOES_NOT_IMPLY_CANONICAL_PUBLISHED"
+}

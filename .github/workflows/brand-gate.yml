@@ -12,6 +12,8 @@ on:
       - "scripts/test_verify_brand_contract.py"
       - "scripts/verify_content_contract.py"
       - "scripts/test_verify_content_contract.py"
+      - "scripts/verify_content_evidence_v2.py"
+      - "scripts/test_verify_content_evidence_v2.py"
       - ".github/workflows/brand-gate.yml"
   push:
     paths:
@@ -24,6 +26,8 @@ on:
       - "scripts/test_verify_brand_contract.py"
       - "scripts/verify_content_contract.py"
       - "scripts/test_verify_content_contract.py"
+      - "scripts/verify_content_evidence_v2.py"
+      - "scripts/test_verify_content_evidence_v2.py"
       - ".github/workflows/brand-gate.yml"
 
 permissions:
@@ -43,12 +47,16 @@ jobs:
         with:
           python-version: "3.12"
       - name: Compile verifier
-        run: python -m py_compile scripts/verify_brand_contract.py scripts/test_verify_brand_contract.py scripts/verify_content_contract.py scripts/test_verify_content_contract.py
+        run: python -m py_compile scripts/verify_brand_contract.py scripts/test_verify_brand_contract.py scripts/verify_content_contract.py scripts/test_verify_content_contract.py scripts/verify_content_evidence_v2.py scripts/test_verify_content_evidence_v2.py
       - name: Verify public brand contract
         run: python scripts/verify_brand_contract.py
       - name: Verify content contract
         run: python scripts/verify_content_contract.py
+      - name: Verify content evidence V2
+        run: python scripts/verify_content_evidence_v2.py
       - name: Run brand adversarial unit tests
         run: python -m unittest scripts.test_verify_brand_contract -v
       - name: Run content adversarial unit tests
         run: python -m unittest scripts.test_verify_content_contract -v
+      - name: Run content evidence V2 adversarial tests
+        run: python -m unittest scripts.test_verify_content_evidence_v2 -v

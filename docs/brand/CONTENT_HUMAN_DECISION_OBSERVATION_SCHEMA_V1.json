@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rumbo.verso.fans/schemas/content-human-decision-observation-v1.json",
+  "title": "RUMBO IA Human Decision Observation V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "observation_id", "decision_type", "decision_origin",
+    "decision_text_sha256", "item_ids", "target_channels", "source_surface",
+    "recorder_type", "recorded_at", "human_signature_present", "proof_strength"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "observation_id": {"type": "string", "minLength": 1},
+    "decision_type": {"enum": [
+      "EDITORIAL_APPROVAL", "AUTHORIZE_PUBLICATION",
+      "AUTHORIZE_ONE_SHOT_AGENT_PUBLICATION_OVERRIDE"
+    ]},
+    "decision_origin": {"const": "human"},
+    "decision_text_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "item_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "target_channels": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "source_surface": {"const": "chatgpt_chat"},
+    "recorder_type": {"enum": ["agent", "human"]},
+    "recorded_at": {"type": "string", "format": "date-time"},
+    "human_signature_present": {"type": "boolean"},
+    "proof_strength": {"enum": ["CHAT_OBSERVED_NOT_INDEPENDENTLY_SIGNED", "HUMAN_SIGNED"]},
+    "notes": {"type": "string"}
+  }
+}
