@@ -185,5 +185,14 @@
     "authorization_schema_ref": "docs/brand/CONTENT_PUBLICATION_AUTHORIZATION_RECEIPT_SCHEMA_V1.json",
     "authorization_directory": "docs/brand/content_publication_authorization_receipts",
     "required_authorization_source": "explicit_human_publication_authorization"
+  },
+  "evidence_observation_policy": {
+    "decision_observation_schema_ref": "docs/brand/CONTENT_HUMAN_DECISION_OBSERVATION_SCHEMA_V1.json",
+    "decision_observation_ledger_ref": "docs/brand/content_human_decision_observations_v1.json",
+    "publication_observation_schema_ref": "docs/brand/CONTENT_PUBLICATION_OBSERVATION_SCHEMA_V1.json",
+    "publication_observation_ledger_ref": "docs/brand/content_publication_observations_v1.json",
+    "publication_receipt_v2_schema_ref": "docs/brand/CONTENT_PUBLICATION_RECEIPT_SCHEMA_V2.json",
+    "observations_grant_authority": false,
+    "observations_promote_state": false
   }
 }

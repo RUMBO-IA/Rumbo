@@ -36,6 +36,18 @@ Founder identity and RUMBO IA remain separate public surfaces unless a reviewed 
 
 `CANDIDATE_SAFE != READY_FOR_HUMAN_REVIEW != APPROVED != PUBLISHED`.
 
+## Evidence observations and V2 migration
+Observed human decisions and remote effects may be recorded without upgrading authority or publication state.
+`content_human_decision_observations_v1.json` records who was observed to decide separately from who serialized the observation.
+`content_publication_observations_v1.json` records authenticated remote effects, including provider request/job IDs and multiple remote records per logical channel.
+
+`HUMAN_DECISION_OBSERVATION != HUMAN_SIGNED_RECEIPT`.
+`PUBLICATION_OBSERVATION != PUBLICATION_AUTHORIZATION != PUBLISHED`.
+`OBSERVED_REMOTE_EFFECT != RETROACTIVE_AUTHORITY`.
+
+`CONTENT_PUBLICATION_RECEIPT_SCHEMA_V2.json` can represent multiple remote records for one logical channel (for example an X long-text split) and binds provider request/job IDs.
+V2 is additive evidence infrastructure only. Publication state remains governed by the existing fail-closed publication contract until a separate reviewed migration explicitly promotes V2 into state authority.
+
 ## Historical kits
 Recovered Week 1 and Week 2 HTML kits are source material only.
 Their former “ready to publish” labels have no publication authority.
@@ -98,4 +110,9 @@ A publish-capable connection is not profile-edit authority; a draft is not publi
 - `MEASURED_CLAIM_REQUIRES_EVIDENCE_RECEIPT`.
 - `PERSONAL_BRAND != RUMBO_BRAND`.
 - `UNKNOWN_IDENTITY = SAFE_STOP`.
+- `OBSERVED_HUMAN_DECISION != HUMAN_SIGNED_RECEIPT`.
+- `OBSERVED_REMOTE_EFFECT != CANONICAL_PUBLISHED`.
+- `OBSERVATIONS_GRANT_AUTHORITY = FALSE`.
+- `OBSERVATIONS_PROMOTE_STATE = FALSE`.
+- `PUBLICATION_RECEIPT_V2_SUPPORTS_MULTI_REMOTE_RECORD_CHANNELS`.
 - `AUTO_PUBLISH = NO_GO` unless a future reviewed policy explicitly changes this invariant.
