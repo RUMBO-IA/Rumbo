@@ -1,6 +1,6 @@
 {
   "schema": "rumbo.openai-agent-reliability-publication-readiness/v1",
-  "observed_at_art": "2026-09-12T16:49:27-03:00",
+  "observed_at_art": "2026-09-13T05:37:51-03:00",
   "candidate": "RUMBO Agent Reliability",
   "package_slug": "rumbo-coding-agent-reliability",
   "source_commit": "3a7bff2a139cb6840ab6e23a2c19e315000e8b13",
@@ -19,16 +19,20 @@
     "permissions_probe": "CONTRADICTORY_NOT_USED_AS_AUTHORITY"
   },
   "account_gates": {
-    "apps_management_write": "UNVERIFIED",
-    "publisher_identity_verified": "UNVERIFIED",
-    "same_publishing_organization": "UNVERIFIED"
+    "apps_management_write": "PASS_OWNER",
+    "publisher_identity_verified": "NOT_PROVEN_FRESH",
+    "individual_identity_last_authenticated_state": "IDENTITY_IN_REVIEW",
+    "fresh_identity_readback_this_execution": "NOT_AVAILABLE",
+    "business_identity_last_known_state": "IDENTITY_INCOMPLETE_NOT_USED",
+    "same_publishing_organization": "PASS_RUMBO_ORGANIZATION",
+    "publisher_identity_alignment": "BLOCKED_PENDING_VERIFIED_IDENTITY_AND_PUBLIC_DISCLOSURE"
   },
   "external_effects": {
     "portal_draft_write": false,
     "submitted_for_review": false,
     "published": false
   },
-  "state": "SUBMISSION_PACKET_READY_ACCOUNT_GATES_OPEN",
+  "state": "DRAFT_READY_SUBMISSION_IDENTITY_ALIGNMENT_PENDING",
   "publisher_support_semantic": {
     "state": "PASS",
     "url": "https://rumbo-openai-support.val.run/",
@@ -44,8 +48,12 @@
   },
   "test_revalidation": {
     "publication_and_support": "10/10 PASS",
-    "brand_contract": "26/26 PASS",
-    "combined": "36/36 PASS",
+    "brand_contract": "27/27 PASS",
+    "content_contract": "42/42 PASS",
+    "combined": "79/79 PASS",
+    "publication_verifier": "PASS",
+    "brand_verifier": "PASS",
+    "content_verifier": "PASS",
     "git_diff_check": "PASS"
   },
   "lineage_reconciliation": {
@@ -66,5 +74,31 @@
     "negative_why_not_complete": "3/3 PRESENT",
     "external_test_account_required": false,
     "state": "PASS"
+  },
+  "main_reconciliation": {
+    "base_before": "9c4b59bd5f6c448c2cedfc5b1e529367831cfa53",
+    "current_main": "3ee060c260d48483613279b75a52270c320e1d9f",
+    "merge_conflicts": 0,
+    "package_skill_bytes_changed_by_main": false,
+    "state": "PASS"
+  },
+  "directory_contract_revalidation": {
+    "official_docs_observed": "2026-09-12",
+    "display_name_max_chars": 30,
+    "short_description_max_chars": 30,
+    "starter_prompt_max_chars": 128,
+    "skills_only_interface_screenshots_allowed": false,
+    "author_name_matches_developer_name": true,
+    "manifest_short_description_chars": 30,
+    "listing_short_description_chars": 30,
+    "public_legal_operator_disclosure": "PENDING_VERIFIED_IDENTITY_READBACK",
+    "metadata_remediation": "PASS",
+    "skills_only_zip_validation": "PASS",
+    "zip_sha256": "d251abfc82e1c424d340987cc9b699682e406a281ec045328af9714f0730a194",
+    "zip_size_bytes": 4974,
+    "zip_entries": 8,
+    "zip_uncompressed_bytes": 6908,
+    "zip_skill_count": 5,
+    "zip_structural_errors": 0
   }
 }

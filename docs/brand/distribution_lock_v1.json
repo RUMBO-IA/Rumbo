@@ -3,11 +3,30 @@
   "registry_issue": "RUMBO-IA/Rumbo#72",
   "observed_at": "2026-09-12",
   "overall_status": "PASS",
-  "required_channels": ["website", "youtube", "x", "linkedin"],
+  "required_channels": [
+    "website",
+    "youtube",
+    "x",
+    "linkedin"
+  ],
   "channels": {
-    "website": {"binding": "PASS", "profile_alignment": "PASS", "readback": "PASS"},
-    "youtube": {"binding": "PASS", "profile_alignment": "PASS", "readback": "PASS"},
-    "x": {"binding": "PASS", "profile_alignment": "PASS", "readback": "PASS"},
+    "website": {
+      "binding": "PASS",
+      "profile_alignment": "PASS",
+      "readback": "PASS"
+    },
+    "youtube": {
+      "binding": "PASS",
+      "profile_alignment": "PASS",
+      "readback": "PASS",
+      "public_handle": "RumboAGI"
+    },
+    "x": {
+      "binding": "PASS",
+      "profile_alignment": "PASS",
+      "readback": "PASS",
+      "public_handle": "RumboAGI"
+    },
     "linkedin": {
       "binding": "PASS",
       "profile_alignment": "PASS",
@@ -18,7 +37,11 @@
     }
   },
   "optional_channels": {
-    "metricool": {"binding": "CONNECTED_NO_NETWORKS", "profile_alignment": "N/A", "readback": "PASS"}
+    "metricool": {
+      "binding": "CONNECTED_NO_NETWORKS",
+      "profile_alignment": "N/A",
+      "readback": "PASS"
+    }
   },
   "invariant": "DISTRIBUTION_PASS_REQUIRES_ALL_REQUIRED_CHANNELS_PASS"
 }

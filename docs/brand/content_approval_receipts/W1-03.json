@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "item_id": "W1-03",
+  "decision": "APPROVED",
+  "content_sha256": "b02f528ad2b06a17507c5d6b4a588ee5e63a49d5e27624ecee9ccdf75e68a31d",
+  "review_packet_ref": "docs/brand/CONTENT_REVIEW_PACKET_V1.md",
+  "target_channels": [
+    "LinkedIn",
+    "X"
+  ],
+  "reviewer": "human_user",
+  "reviewed_at": "2026-09-12T20:09:36-03:00",
+  "source": "explicit_human_approval",
+  "notes": "Explicit human approval supplied by the user in ChatGPT on 2026-09-12 via the message “autorizo”. This approves the reviewed copy for the listed target channels only; it does not authorize publication."
+}
