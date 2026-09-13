@@ -41,8 +41,8 @@ class PolicyTests(unittest.TestCase):
     def test_privacy_workflow_identity_is_pinned(self):
         self.assertEqual(policy.DEFAULT_POLICY.privacy_workflow_id, 347174988)
         self.assertEqual(policy.DEFAULT_POLICY.privacy_workflow_path, ".github/workflows/privacy-gate.yml")
-        self.assertEqual(policy.DEFAULT_POLICY.privacy_workflow_blob, "3ab38299fd55f9182e9e10834b04550cc832557a")
-        self.assertEqual(policy.DEFAULT_POLICY.privacy_workflow_sha256, "e7fd1d50d447ac9ffcc255766d14cab0f41979d9115607845745943bb8e0d96b")
+        self.assertEqual(policy.DEFAULT_POLICY.privacy_workflow_blob, "376750ec7bc653c88304d70cb4b6de1b4cbcf472")
+        self.assertEqual(policy.DEFAULT_POLICY.privacy_workflow_sha256, "78b2a357e72440e9943d492009edee3315b3b7ba2f0cae9506d51fc0cd02c412")
 
 
 class ReceiptTests(unittest.TestCase):

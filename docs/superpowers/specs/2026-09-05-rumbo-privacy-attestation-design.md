@@ -28,8 +28,8 @@ The attestation is valid only when all of these values match policy:
 - accepted event: `push` when the requested base starts with `probe/safe-merge-`;
 - head SHA: exactly the requested candidate SHA;
 - conclusion: `success`;
-- workflow file Git blob: `3ab38299fd55f9182e9e10834b04550cc832557a`;
-- workflow file SHA-256: `e7fd1d50d447ac9ffcc255766d14cab0f41979d9115607845745943bb8e0d96b`.
+- workflow file Git blob: `376750ec7bc653c88304d70cb4b6de1b4cbcf472`;
+- workflow file SHA-256: `78b2a357e72440e9943d492009edee3315b3b7ba2f0cae9506d51fc0cd02c412`.
 
 The two workflow digests pin the reviewed workflow content. A future workflow change requires a separate review and explicit policy update before its runs can authorize G3.
 
