@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "base_agent_may_publish": false,
+  "one_shot_scoped_grants_allowed": true,
+  "grant_schema_ref": "docs/brand/CONTENT_EXECUTION_GRANT_SCHEMA_V1.json",
+  "grant_ledger_ref": "docs/brand/content_execution_grants_v1.json",
+  "authority_observation_ledger_ref": "docs/brand/content_human_decision_observations_v1.json",
+  "authority_anchor_commit": "377a7105dc929b0195c149b5702ac174fbabf5de",
+  "required_publication_decision_type": "AUTHORIZE_PUBLICATION",
+  "required_override_decision_type": "AUTHORIZE_ONE_SHOT_AGENT_PUBLICATION_OVERRIDE",
+  "observations_alone_grant_authority": false,
+  "grant_effective_only_when_present_on_main": true,
+  "grant_scope_must_equal_unobserved_approved_targets": true,
+  "standing_permission": false,
+  "auto_publish": "NO_GO"
+}

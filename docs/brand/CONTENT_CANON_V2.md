@@ -16,7 +16,6 @@ the identity registry and the channel/distribution locks.
 6. `distribution_lock_v1.json` for current cross-channel authority/readback.
 
 Narrative social/readback documents are historical evidence when they conflict with the fresher machine-readable distribution lock.
-
 A content draft never upgrades the product, customer, metric or deployment state.
 
 ## Lanes
@@ -32,7 +31,7 @@ Founder identity and RUMBO IA remain separate public surfaces unless a reviewed 
 - `CANDIDATE_SAFE`: reconciled to current policy but not publication-approved.
 - `READY_FOR_HUMAN_REVIEW`: evidence and channel requirements are satisfied; human review still required.
 - `APPROVED`: explicit human approval receipt binds the exact copy SHA-256, review packet and target channels; publication has not occurred.
-- `PUBLISHED`: requires a separate explicit human publication-authorization receipt plus a valid approval receipt and a hash-bound publication receipt with one authenticated remote record and `readback_status=PASS` for every target channel.
+- `PUBLISHED`: requires a separate explicit human publication-authorization receipt plus a valid approval receipt and a hash-bound publication receipt with authenticated remote readback for every target channel.
 
 `CANDIDATE_SAFE != READY_FOR_HUMAN_REVIEW != APPROVED != PUBLISHED`.
 
@@ -45,8 +44,21 @@ Observed human decisions and remote effects may be recorded without upgrading au
 `PUBLICATION_OBSERVATION != PUBLICATION_AUTHORIZATION != PUBLISHED`.
 `OBSERVED_REMOTE_EFFECT != RETROACTIVE_AUTHORITY`.
 
-`CONTENT_PUBLICATION_RECEIPT_SCHEMA_V2.json` can represent multiple remote records for one logical channel (for example an X long-text split) and binds provider request/job IDs.
-V2 is additive evidence infrastructure only. Publication state remains governed by the existing fail-closed publication contract until a separate reviewed migration explicitly promotes V2 into state authority.
+`CONTENT_PUBLICATION_RECEIPT_SCHEMA_V2.json` can represent multiple remote records for one logical channel and binds provider request/job IDs.
+V2 remains additive evidence infrastructure; publication state is still governed by the existing fail-closed publication contract.
+
+## Scoped one-shot execution grants
+The base policy remains `agent_may_publish=false` and `AUTO_PUBLISH=NO_GO`.
+An observation by itself never grants execution authority.
+
+A reviewed `CONTENT_EXECUTION_GRANT_SCHEMA_V1` grant may authorize a bounded remote publication attempt only when all of the following hold:
+- its human publication decision and one-shot override observations already exist in the immutable authority-anchor commit named by policy;
+- the grant scope equals exactly the currently unobserved item×channel targets among `APPROVED` content;
+- the remote account identity matches the canonical distribution lock;
+- the grant is one-shot, time-bounded, non-standing, exhaustible and revocation-required;
+- the grant itself is present on `main` before any newly authorized remote effect occurs.
+
+This scoped grant is an execution capability, not a human-signed receipt. It does not satisfy the separate receipt chain required to promote an item to `PUBLISHED`.
 
 ## Historical kits
 Recovered Week 1 and Week 2 HTML kits are source material only.
@@ -106,7 +118,11 @@ A publish-capable connection is not profile-edit authority; a draft is not publi
 - `PUBLISHED_REQUIRES_PER_CHANNEL_READBACK_PASS`.
 - `PUBLISHED_BINDS_CURRENT_DISTRIBUTION_LOCK_SHA256`.
 - `PUBLISHED_BINDS_CANONICAL_REMOTE_ACCOUNT`.
-- `AGENT_MAY_PUBLISH = FALSE`.
+- `AGENT_MAY_PUBLISH = FALSE` as the standing/base policy.
+- `SCOPED_ONE_SHOT_GRANT != STANDING_AGENT_PERMISSION`.
+- `SCOPED_ONE_SHOT_GRANT != PUBLICATION_AUTHORIZATION_RECEIPT`.
+- `EXECUTION_GRANT_SCOPE = EXACT_UNOBSERVED_APPROVED_TARGETS`.
+- `EXECUTION_GRANT_REQUIRES_PREEXISTING_AUTHORITY_ANCHOR`.
 - `MEASURED_CLAIM_REQUIRES_EVIDENCE_RECEIPT`.
 - `PERSONAL_BRAND != RUMBO_BRAND`.
 - `UNKNOWN_IDENTITY = SAFE_STOP`.
