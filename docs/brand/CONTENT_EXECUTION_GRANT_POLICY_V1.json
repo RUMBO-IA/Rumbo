@@ -12,5 +12,9 @@
   "grant_effective_only_when_present_on_main": true,
   "grant_scope_must_equal_unobserved_approved_targets": true,
   "standing_permission": false,
-  "auto_publish": "NO_GO"
+  "auto_publish": "NO_GO",
+  "terminal_statuses": ["CONSUMED", "REVOKED", "EXPIRED"],
+  "terminal_grants_execute": false,
+  "terminal_transition_requires_timestamp_and_reason": true,
+  "terminal_status_is_irreversible": true
 }

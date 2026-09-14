@@ -38,7 +38,7 @@ def save(root: pathlib.Path, name: str, data: dict) -> None:
 
 
 class ContentExecutionGrantTests(unittest.TestCase):
-    def test_baseline_passes(self):
+    def test_baseline_revoked_passes(self):
         with tempfile.TemporaryDirectory() as td:
             self.assertEqual(grant_verify.verify(make_root(td)), [])
 
@@ -95,11 +95,52 @@ class ContentExecutionGrantTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as td:
             root = make_root(td)
             data = load(root, "content_publication_observations_v1.json")
-            data["observations"] = [o for o in data["observations"] if not (o["item_id"] == "W2-01" and o["channel"] == "LinkedIn")]
-            data["coverage"]["logical_targets_observed"] = 5
-            data["coverage"]["physical_remote_records"] = 7
+            data["observations"] = [o for o in data["observations"] if not (o["item_id"] == "W1-01" and o["channel"] == "LinkedIn")]
+            data["coverage"]["logical_targets_observed"] = 7
+            data["coverage"]["physical_remote_records"] = 9
             save(root, "content_publication_observations_v1.json", data)
             self.assertTrue(any("exact unobserved" in e or "observed logical target count" in e for e in grant_verify.verify(root)))
+
+    def test_revoked_grant_cannot_execute(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = make_root(td)
+            data = load(root, "content_execution_grants_v1.json")
+            data["grants"][0]["scoped_agent_execution_authorized"] = True
+            save(root, "content_execution_grants_v1.json", data)
+            self.assertTrue(any("terminal grant must not authorize execution" in e for e in grant_verify.verify(root)))
+
+    def test_revoked_grant_requires_terminal_metadata(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = make_root(td)
+            data = load(root, "content_execution_grants_v1.json")
+            data["grants"][0].pop("status_reason")
+            save(root, "content_execution_grants_v1.json", data)
+            self.assertTrue(any("status_reason" in e for e in grant_verify.verify(root)))
+
+    def test_active_grant_requires_execution_true(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = make_root(td)
+            data = load(root, "content_execution_grants_v1.json")
+            grant = data["grants"][0]
+            grant["status"] = "ACTIVE"
+            grant["scoped_agent_execution_authorized"] = False
+            grant.pop("status_changed_at", None)
+            grant.pop("status_reason", None)
+            save(root, "content_execution_grants_v1.json", data)
+            self.assertTrue(any("ACTIVE grant must authorize" in e for e in grant_verify.verify(root)))
+
+    def test_consumed_requires_zero_missing_targets(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = make_root(td)
+            data = load(root, "content_execution_grants_v1.json")
+            grant = data["grants"][0]
+            grant["status"] = "CONSUMED"
+            grant["item_allowlist"] = []
+            grant["remaining_logical_target_limit"] = 0
+            grant["scope_sha256"] = grant_verify._scope_sha(grant)
+            grant["status_reason"] = "synthetic test"
+            save(root, "content_execution_grants_v1.json", data)
+            self.assertTrue(any("CONSUMED grant requires zero missing" in e for e in grant_verify.verify(root)))
 
 
 if __name__ == "__main__":

@@ -8,24 +8,26 @@
       "authority_anchor_commit": "377a7105dc929b0195c149b5702ac174fbabf5de",
       "publication_decision_observation_id": "decision-publication-authorization-20260913-001",
       "override_decision_observation_id": "decision-one-shot-agent-override-20260913-001",
-      "item_allowlist": ["W1-01", "W1-02", "W1-03", "W2-02"],
+      "item_allowlist": ["W1-03", "W2-02"],
       "channel_allowlist": ["LinkedIn"],
       "account_identity": "company:145014017:rumbo-ia",
-      "scope_sha256": "33008bc179cc386de3881b2193b3f45bca80f89c749048a079d61e6a5ea73a37",
+      "scope_sha256": "d7db98a025216baf4f3ce1fe0d1a0107878e3517d85c793808adc66e901fc632",
       "original_logical_target_limit": 10,
-      "observed_logical_targets_before_grant": 6,
-      "remaining_logical_target_limit": 4,
+      "observed_logical_targets_before_grant": 8,
+      "remaining_logical_target_limit": 2,
       "base_agent_may_publish": false,
-      "scoped_agent_execution_authorized": true,
+      "scoped_agent_execution_authorized": false,
       "standing_permission": false,
       "auto_publish": "NO_GO",
       "revocation_required": true,
       "effective_ref": "refs/heads/main",
       "granted_at": "2026-09-13T07:40:00-03:00",
       "expires_at": "2026-09-13T12:00:00-03:00",
-      "status": "ACTIVE",
+      "status": "EXPIRED",
+      "status_changed_at": "2026-09-13T15:51:00-03:00",
+      "status_reason": "The one-shot grant reached its configured expiry with two LinkedIn targets still unobserved after Upload-Post exhausted its monthly quota and no alternate authenticated write route was available.",
       "source": "derived_from_preexisting_human_decision_observations",
-      "notes": "Residual one-shot scope only. Effective only once this grant is present on main; exhaust or revoke immediately after the four remaining LinkedIn logical targets are attempted."
+      "notes": "Terminal residual scope preserved for evidence only. W1-03 and W2-02 remain unobserved on LinkedIn. This expired grant confers no execution authority and must never be reactivated."
     }
   ]
 }

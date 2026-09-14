@@ -15,6 +15,7 @@ REGISTRY = BRAND / "content_registry_v2.json"
 DECISIONS = BRAND / "content_human_decision_observations_v1.json"
 OBSERVATIONS = BRAND / "content_publication_observations_v1.json"
 DISTRIBUTION = BRAND / "distribution_lock_v1.json"
+TERMINAL = {"CONSUMED", "REVOKED", "EXPIRED"}
 
 
 def _load(root: pathlib.Path, rel: pathlib.Path) -> dict:
@@ -44,15 +45,15 @@ def _scope_sha(grant: dict) -> str:
     return hashlib.sha256(raw.encode("utf-8")).hexdigest()
 
 
-def _anchor_decisions(root: pathlib.Path, commit: str) -> dict | None:
+def _git_json(root: pathlib.Path, rev: str, rel: pathlib.Path) -> dict | None:
     if not (root / ".git").exists():
         return None
     proc = subprocess.run(
-        ["git", "-C", str(root), "show", f"{commit}:{DECISIONS.as_posix()}"],
+        ["git", "-C", str(root), "show", f"{rev}:{rel.as_posix()}"],
         capture_output=True, text=True, encoding="utf-8", errors="replace"
     )
     if proc.returncode != 0:
-        raise ValueError("authority anchor commit cannot read decision ledger")
+        return None
     return json.loads(proc.stdout)
 
 
@@ -84,25 +85,36 @@ def verify(root: pathlib.Path = ROOT) -> list[str]:
         "grant_scope_must_equal_unobserved_approved_targets": True,
         "standing_permission": False,
         "auto_publish": "NO_GO",
+        "terminal_statuses": ["CONSUMED", "REVOKED", "EXPIRED"],
+        "terminal_grants_execute": False,
+        "terminal_transition_requires_timestamp_and_reason": True,
+        "terminal_status_is_irreversible": True,
     }
     if policy != expected_policy:
         errors.append("execution grant policy must remain exact and fail-closed")
 
-    if schema.get("properties", {}).get("mode", {}).get("const") != "ONE_SHOT":
+    props = schema.get("properties", {})
+    if props.get("mode", {}).get("const") != "ONE_SHOT":
         errors.append("grant schema must remain ONE_SHOT")
+    if props.get("scoped_agent_execution_authorized", {}).get("type") != "boolean":
+        errors.append("grant schema execution flag must be boolean")
+    if props.get("remaining_logical_target_limit", {}).get("minimum") != 0:
+        errors.append("grant schema must support terminal zero remaining scope")
+
     grants = ledger.get("grants")
     if ledger.get("schema_version") != 1 or not isinstance(grants, list) or len(grants) != 1:
         return errors + ["grant ledger must contain exactly one governed grant"]
     grant = grants[0]
+    status = grant.get("status")
+    if status not in {"ACTIVE", *TERMINAL}:
+        errors.append("unknown grant lifecycle status")
 
-    if grant.get("mode") != "ONE_SHOT" or grant.get("status") != "ACTIVE":
-        errors.append("current execution grant must be ACTIVE ONE_SHOT")
+    if grant.get("mode") != "ONE_SHOT":
+        errors.append("execution grant must remain ONE_SHOT")
     if grant.get("authority_anchor_commit") != policy.get("authority_anchor_commit"):
         errors.append("grant authority anchor mismatch")
     if grant.get("base_agent_may_publish") is not False:
         errors.append("base agent permission must remain false")
-    if grant.get("scoped_agent_execution_authorized") is not True:
-        errors.append("scoped execution authorization missing")
     if grant.get("standing_permission") is not False:
         errors.append("standing permission must remain false")
     if grant.get("auto_publish") != "NO_GO":
@@ -113,14 +125,14 @@ def verify(root: pathlib.Path = ROOT) -> list[str]:
         errors.append("grant effective_ref must be main")
     if grant.get("source") != "derived_from_preexisting_human_decision_observations":
         errors.append("grant source invalid")
+
     try:
         granted_at = _dt(grant.get("granted_at"))
         expires_at = _dt(grant.get("expires_at"))
         if expires_at <= granted_at:
             errors.append("grant expiry must follow grant time")
-        if datetime.now(timezone.utc) >= expires_at.astimezone(timezone.utc):
-            errors.append("ACTIVE execution grant is expired")
     except ValueError:
+        granted_at = expires_at = None
         errors.append("grant timestamps must be timezone-aware")
 
     items = {i.get("id"): i for i in registry.get("items", []) if isinstance(i, dict)}
@@ -129,23 +141,50 @@ def verify(root: pathlib.Path = ROOT) -> list[str]:
     observed_pairs = {(o.get("item_id"), o.get("channel")) for o in observations.get("observations", []) if isinstance(o, dict)}
     missing = all_targets - observed_pairs
     grant_pairs = {(item_id, ch) for item_id in grant.get("item_allowlist", []) for ch in grant.get("channel_allowlist", [])}
-    if grant_pairs != missing:
+
+    if status in {"ACTIVE", "REVOKED", "EXPIRED"} and grant_pairs != missing:
         errors.append("grant scope must equal exact unobserved approved targets")
+    if status == "CONSUMED" and (missing or grant_pairs):
+        errors.append("CONSUMED grant requires zero missing and zero grant targets")
     if grant.get("original_logical_target_limit") != len(all_targets):
         errors.append("original logical target limit mismatch")
     if grant.get("observed_logical_targets_before_grant") != len(observed_pairs):
         errors.append("observed logical target count mismatch")
-    if grant.get("remaining_logical_target_limit") != len(missing):
+    expected_remaining = 0 if status == "CONSUMED" else len(missing)
+    if grant.get("remaining_logical_target_limit") != expected_remaining:
         errors.append("remaining logical target limit mismatch")
     if grant.get("scope_sha256") != _scope_sha(grant):
         errors.append("grant scope_sha256 mismatch")
+
+    now = datetime.now(timezone.utc)
+    execution_flag = grant.get("scoped_agent_execution_authorized")
+    if status == "ACTIVE":
+        if execution_flag is not True:
+            errors.append("ACTIVE grant must authorize scoped execution")
+        if expires_at is not None and now >= expires_at.astimezone(timezone.utc):
+            errors.append("ACTIVE execution grant is expired")
+        if grant.get("status_changed_at") is not None or grant.get("status_reason") is not None:
+            errors.append("ACTIVE grant must not carry terminal status metadata")
+    else:
+        if execution_flag is not False:
+            errors.append("terminal grant must not authorize execution")
+        try:
+            changed_at = _dt(grant.get("status_changed_at"))
+            if granted_at is not None and changed_at < granted_at:
+                errors.append("terminal status cannot predate grant")
+        except ValueError:
+            errors.append("terminal grant requires timezone-aware status_changed_at")
+        if not isinstance(grant.get("status_reason"), str) or not grant["status_reason"].strip():
+            errors.append("terminal grant requires status_reason")
+        if status == "EXPIRED" and expires_at is not None and now < expires_at.astimezone(timezone.utc):
+            errors.append("EXPIRED grant cannot precede expires_at")
 
     linkedin = distribution.get("channels", {}).get("linkedin", {})
     expected_identity = f"company:{linkedin.get('company_id')}:{linkedin.get('public_slug')}"
     if grant.get("account_identity") != expected_identity:
         errors.append("grant account identity mismatch")
     if set(grant.get("channel_allowlist", [])) != {"LinkedIn"}:
-        errors.append("current residual grant may authorize LinkedIn only")
+        errors.append("current residual grant may reference LinkedIn only")
 
     decision_map = {o.get("observation_id"): o for o in decisions.get("observations", []) if isinstance(o, dict)}
     pub = decision_map.get(grant.get("publication_decision_observation_id"))
@@ -167,12 +206,17 @@ def verify(root: pathlib.Path = ROOT) -> list[str]:
             errors.append(f"{name} decision does not cover all grant channels")
 
     try:
-        anchored = _anchor_decisions(root, policy["authority_anchor_commit"])
+        anchored = _git_json(root, policy["authority_anchor_commit"], DECISIONS)
         if anchored is not None:
             anchor_map = {o.get("observation_id"): o for o in anchored.get("observations", []) if isinstance(o, dict)}
             for obs_id in (grant.get("publication_decision_observation_id"), grant.get("override_decision_observation_id")):
                 if anchor_map.get(obs_id) != decision_map.get(obs_id):
                     errors.append(f"decision observation not identical to authority anchor: {obs_id}")
+        previous = _git_json(root, "HEAD^", GRANTS)
+        if previous and previous.get("grants"):
+            prior = previous["grants"][0]
+            if prior.get("grant_id") == grant.get("grant_id") and prior.get("status") in TERMINAL and status != prior.get("status"):
+                errors.append("terminal grant lifecycle is irreversible")
     except (ValueError, json.JSONDecodeError) as exc:
         errors.append(str(exc))
 
