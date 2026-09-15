@@ -3,6 +3,41 @@
   "grants": [
     {
       "schema_version": 1,
+      "grant_id": "content-linkedin-remaining-one-shot-20260913-001",
+      "mode": "ONE_SHOT",
+      "authority_anchor_commit": "377a7105dc929b0195c149b5702ac174fbabf5de",
+      "publication_decision_observation_id": "decision-publication-authorization-20260913-001",
+      "override_decision_observation_id": "decision-one-shot-agent-override-20260913-001",
+      "item_allowlist": [
+        "W1-01",
+        "W1-02",
+        "W1-03",
+        "W2-02"
+      ],
+      "channel_allowlist": [
+        "LinkedIn"
+      ],
+      "account_identity": "company:145014017:rumbo-ia",
+      "scope_sha256": "33008bc179cc386de3881b2193b3f45bca80f89c749048a079d61e6a5ea73a37",
+      "original_logical_target_limit": 10,
+      "observed_logical_targets_before_grant": 6,
+      "remaining_logical_target_limit": 4,
+      "base_agent_may_publish": false,
+      "scoped_agent_execution_authorized": false,
+      "standing_permission": false,
+      "auto_publish": "NO_GO",
+      "revocation_required": true,
+      "effective_ref": "refs/heads/main",
+      "granted_at": "2026-09-13T07:40:00-03:00",
+      "expires_at": "2026-09-13T12:00:00-03:00",
+      "status": "EXPIRED",
+      "status_changed_at": "2026-09-13T15:51:00-03:00",
+      "status_reason": "The one-shot grant reached its configured expiry with two LinkedIn targets still unobserved after Upload-Post exhausted its monthly quota and no alternate authenticated write route was available.",
+      "source": "derived_from_preexisting_human_decision_observations",
+      "notes": "Terminal grant with immutable issuance scope. W1-01 and W1-02 LinkedIn effects are recorded in the observation ledger; W1-03 and W2-02 remain currently unobserved. This expired grant confers no execution authority and must never be reactivated."
+    },
+    {
+      "schema_version": 1,
       "grant_id": "content-linkedin-r26-one-shot-20260914-001",
       "mode": "ONE_SHOT",
       "authority_anchor_commit": "c277753a8ba8e3a770daf928d88603355fe2413f",

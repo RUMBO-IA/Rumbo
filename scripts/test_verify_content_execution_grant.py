@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import json
 import pathlib
@@ -42,12 +42,12 @@ def save(root: pathlib.Path, name: str, data: dict) -> None:
 
 
 def grant(root: pathlib.Path) -> dict:
-    return load(root, "content_execution_grants_v1.json")["grants"][0]
+    return load(root, "content_execution_grants_v1.json")["grants"][-1]
 
 
 def make_terminal(root: pathlib.Path, status: str = "EXPIRED") -> dict:
     data = load(root, "content_execution_grants_v1.json")
-    g = data["grants"][0]
+    g = data["grants"][-1]
     g["status"] = status
     g["scoped_agent_execution_authorized"] = False
     g["status_changed_at"] = "2026-09-15T02:26:00-03:00"
@@ -65,7 +65,7 @@ class ContentExecutionGrantTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as td:
             root = make_root(td)
             data = load(root, "content_execution_grants_v1.json")
-            data["grants"][0]["item_allowlist"].append("W2-01")
+            data["grants"][-1]["item_allowlist"].append("W2-01")
             save(root, "content_execution_grants_v1.json", data)
             self.assertTrue(any("issuance snapshot" in e or "scope_sha256" in e for e in grant_verify.verify(root)))
 
@@ -73,7 +73,7 @@ class ContentExecutionGrantTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as td:
             root = make_root(td)
             data = load(root, "content_execution_grants_v1.json")
-            data["grants"][0]["auto_publish"] = "GO"
+            data["grants"][-1]["auto_publish"] = "GO"
             save(root, "content_execution_grants_v1.json", data)
             self.assertTrue(any("AUTO_PUBLISH" in e for e in grant_verify.verify(root)))
 
@@ -81,7 +81,7 @@ class ContentExecutionGrantTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as td:
             root = make_root(td)
             data = load(root, "content_execution_grants_v1.json")
-            data["grants"][0]["standing_permission"] = True
+            data["grants"][-1]["standing_permission"] = True
             save(root, "content_execution_grants_v1.json", data)
             self.assertTrue(any("standing permission" in e for e in grant_verify.verify(root)))
 
@@ -89,7 +89,7 @@ class ContentExecutionGrantTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as td:
             root = make_root(td)
             data = load(root, "content_execution_grants_v1.json")
-            data["grants"][0]["base_agent_may_publish"] = True
+            data["grants"][-1]["base_agent_may_publish"] = True
             save(root, "content_execution_grants_v1.json", data)
             self.assertTrue(any("base agent permission" in e for e in grant_verify.verify(root)))
 
@@ -97,7 +97,7 @@ class ContentExecutionGrantTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as td:
             root = make_root(td)
             data = load(root, "content_execution_grants_v1.json")
-            data["grants"][0]["account_identity"] = "company:999:wrong"
+            data["grants"][-1]["account_identity"] = "company:999:wrong"
             save(root, "content_execution_grants_v1.json", data)
             self.assertTrue(any("account identity" in e for e in grant_verify.verify(root)))
 
@@ -123,7 +123,7 @@ class ContentExecutionGrantTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as td:
             root = make_root(td)
             data = load(root, "content_execution_grants_v1.json")
-            data["grants"][0]["item_allowlist"].append("W2-01")
+            data["grants"][-1]["item_allowlist"].append("W2-01")
             save(root, "content_execution_grants_v1.json", data)
             self.assertTrue(any("ACTIVE grant scope must equal exact current unobserved" in e for e in grant_verify.verify(root)))
 
@@ -132,7 +132,7 @@ class ContentExecutionGrantTests(unittest.TestCase):
             root = make_root(td)
             make_terminal(root)
             data = load(root, "content_execution_grants_v1.json")
-            data["grants"][0]["scoped_agent_execution_authorized"] = True
+            data["grants"][-1]["scoped_agent_execution_authorized"] = True
             save(root, "content_execution_grants_v1.json", data)
             self.assertTrue(any("terminal grant must not authorize execution" in e for e in grant_verify.verify(root)))
 
@@ -141,7 +141,7 @@ class ContentExecutionGrantTests(unittest.TestCase):
             root = make_root(td)
             make_terminal(root)
             data = load(root, "content_execution_grants_v1.json")
-            data["grants"][0].pop("status_reason")
+            data["grants"][-1].pop("status_reason")
             save(root, "content_execution_grants_v1.json", data)
             self.assertTrue(any("status_reason" in e for e in grant_verify.verify(root)))
 
@@ -150,7 +150,7 @@ class ContentExecutionGrantTests(unittest.TestCase):
             root = make_root(td)
             make_terminal(root)
             data = load(root, "content_execution_grants_v1.json")
-            data["grants"][0]["status_changed_at"] = "2026-09-15T02:24:59-03:00"
+            data["grants"][-1]["status_changed_at"] = "2026-09-15T02:24:59-03:00"
             save(root, "content_execution_grants_v1.json", data)
             self.assertTrue(any("status_changed_at cannot predate expires_at" in e for e in grant_verify.verify(root)))
 
@@ -164,7 +164,7 @@ class ContentExecutionGrantTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as td:
             root = make_root(td)
             data = load(root, "content_execution_grants_v1.json")
-            data["grants"][0]["observed_logical_targets_before_grant"] = 7
+            data["grants"][-1]["observed_logical_targets_before_grant"] = 7
             save(root, "content_execution_grants_v1.json", data)
             self.assertTrue(any("issuance snapshot differs" in e for e in grant_verify.verify(root)))
 
@@ -180,9 +180,9 @@ class ContentExecutionGrantTests(unittest.TestCase):
 
     def test_policy_pins_r26_issuance(self):
         policy = load(ROOT, "CONTENT_EXECUTION_GRANT_POLICY_V1.json")
-        self.assertEqual(policy["authority_anchor_commit"], "c277753a8ba8e3a770daf928d88603355fe2413f")
-        self.assertEqual(policy["grant_issuance_commit"], "b9b29f40204ee24ee873df253b7bb505080813cd")
-        self.assertEqual(policy["grant_issuance_state_sha256"], "29d807872b12e2a2003ec1c1d54caad2b83276d3daf7c11f675a4b6d6b1eee55")
+        self.assertEqual(policy["active_authority_anchor_commit"], "c277753a8ba8e3a770daf928d88603355fe2413f")
+        self.assertEqual(policy["active_grant_issuance_commit"], "b9b29f40204ee24ee873df253b7bb505080813cd")
+        self.assertEqual(policy["active_grant_issuance_state_sha256"], "29d807872b12e2a2003ec1c1d54caad2b83276d3daf7c11f675a4b6d6b1eee55")
 
     def test_r26_exact_scope_and_identity(self):
         with tempfile.TemporaryDirectory() as td:
