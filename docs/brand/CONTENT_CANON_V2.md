@@ -53,12 +53,14 @@ An observation by itself never grants execution authority.
 
 A reviewed `CONTENT_EXECUTION_GRANT_SCHEMA_V1` grant may authorize a bounded remote publication attempt only when all of the following hold:
 - its human publication decision and one-shot override observations already exist in the immutable authority-anchor commit named by policy;
-- the grant scope equals exactly the currently unobserved item×channel targets among `APPROVED` content;
+- at issuance, the grant scope equals exactly the currently unobserved item×channel targets among `APPROVED` content; once effective on `main`, its issuance allowlists, counters and scope hash are immutable and later effects are recorded only as observations;
 - the remote account identity matches the canonical distribution lock;
 - the grant is one-shot, time-bounded, non-standing, exhaustible and revocation-required;
 - the grant itself is present on `main` before any newly authorized remote effect occurs.
 
 This scoped grant is an execution capability, not a human-signed receipt. It does not satisfy the separate receipt chain required to promote an item to `PUBLISHED`.
+
+Terminal grants retain the immutable issuance snapshot. Their current unobserved targets are derived from the observation ledger and must remain a subset of that issuance scope; terminalization may change lifecycle fields but must not rewrite the authority that was originally issued.
 
 ## Historical kits
 Recovered Week 1 and Week 2 HTML kits are source material only.
@@ -121,7 +123,8 @@ A publish-capable connection is not profile-edit authority; a draft is not publi
 - `AGENT_MAY_PUBLISH = FALSE` as the standing/base policy.
 - `SCOPED_ONE_SHOT_GRANT != STANDING_AGENT_PERMISSION`.
 - `SCOPED_ONE_SHOT_GRANT != PUBLICATION_AUTHORIZATION_RECEIPT`.
-- `EXECUTION_GRANT_SCOPE = EXACT_UNOBSERVED_APPROVED_TARGETS`.
+- `EXECUTION_GRANT_ISSUANCE_SCOPE = EXACT_UNOBSERVED_APPROVED_TARGETS_AT_ISSUANCE`.
+- `TERMINAL_GRANT_CURRENT_MISSING_SUBSET_OF_ISSUANCE_SCOPE = TRUE`.
 - `EXECUTION_GRANT_REQUIRES_PREEXISTING_AUTHORITY_ANCHOR`.
 - `MEASURED_CLAIM_REQUIRES_EVIDENCE_RECEIPT`.
 - `PERSONAL_BRAND != RUMBO_BRAND`.

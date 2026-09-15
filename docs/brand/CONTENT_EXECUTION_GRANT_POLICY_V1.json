@@ -6,14 +6,21 @@
   "grant_ledger_ref": "docs/brand/content_execution_grants_v1.json",
   "authority_observation_ledger_ref": "docs/brand/content_human_decision_observations_v1.json",
   "authority_anchor_commit": "377a7105dc929b0195c149b5702ac174fbabf5de",
+  "grant_issuance_commit": "cec887029a78974f23e530772e3bb46b2054ae02",
+  "grant_issuance_state_sha256": "3484247f05ffede2bd463b4521d67b061781d5601b731f0fbc715e9049b82ba2",
   "required_publication_decision_type": "AUTHORIZE_PUBLICATION",
   "required_override_decision_type": "AUTHORIZE_ONE_SHOT_AGENT_PUBLICATION_OVERRIDE",
   "observations_alone_grant_authority": false,
   "grant_effective_only_when_present_on_main": true,
-  "grant_scope_must_equal_unobserved_approved_targets": true,
+  "grant_scope_must_equal_unobserved_approved_targets_at_issuance": true,
+  "terminal_grant_scope_is_immutable_issuance_snapshot": true,
   "standing_permission": false,
   "auto_publish": "NO_GO",
-  "terminal_statuses": ["CONSUMED", "REVOKED", "EXPIRED"],
+  "terminal_statuses": [
+    "CONSUMED",
+    "REVOKED",
+    "EXPIRED"
+  ],
   "terminal_grants_execute": false,
   "terminal_transition_requires_timestamp_and_reason": true,
   "terminal_status_is_irreversible": true

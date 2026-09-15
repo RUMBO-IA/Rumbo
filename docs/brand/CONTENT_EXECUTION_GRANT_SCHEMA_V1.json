@@ -5,40 +5,200 @@
   "type": "object",
   "additionalProperties": false,
   "required": [
-    "schema_version", "grant_id", "mode", "authority_anchor_commit",
-    "publication_decision_observation_id", "override_decision_observation_id",
-    "item_allowlist", "channel_allowlist", "account_identity", "scope_sha256",
-    "original_logical_target_limit", "observed_logical_targets_before_grant",
-    "remaining_logical_target_limit", "base_agent_may_publish",
-    "scoped_agent_execution_authorized", "standing_permission", "auto_publish",
-    "revocation_required", "effective_ref", "granted_at", "expires_at", "status", "source"
+    "schema_version",
+    "grant_id",
+    "mode",
+    "authority_anchor_commit",
+    "publication_decision_observation_id",
+    "override_decision_observation_id",
+    "item_allowlist",
+    "channel_allowlist",
+    "account_identity",
+    "scope_sha256",
+    "original_logical_target_limit",
+    "observed_logical_targets_before_grant",
+    "remaining_logical_target_limit",
+    "base_agent_may_publish",
+    "scoped_agent_execution_authorized",
+    "standing_permission",
+    "auto_publish",
+    "revocation_required",
+    "effective_ref",
+    "granted_at",
+    "expires_at",
+    "status",
+    "source"
   ],
   "properties": {
-    "schema_version": {"const": 1},
-    "grant_id": {"type": "string", "minLength": 1},
-    "mode": {"const": "ONE_SHOT"},
-    "authority_anchor_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
-    "publication_decision_observation_id": {"type": "string", "minLength": 1},
-    "override_decision_observation_id": {"type": "string", "minLength": 1},
-    "item_allowlist": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
-    "channel_allowlist": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
-    "account_identity": {"type": "string", "minLength": 1},
-    "scope_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
-    "original_logical_target_limit": {"type": "integer", "minimum": 1},
-    "observed_logical_targets_before_grant": {"type": "integer", "minimum": 0},
-    "remaining_logical_target_limit": {"type": "integer", "minimum": 0},
-    "base_agent_may_publish": {"const": false},
-    "scoped_agent_execution_authorized": {"type": "boolean"},
-    "standing_permission": {"const": false},
-    "auto_publish": {"const": "NO_GO"},
-    "revocation_required": {"const": true},
-    "effective_ref": {"const": "refs/heads/main"},
-    "granted_at": {"type": "string", "format": "date-time"},
-    "expires_at": {"type": "string", "format": "date-time"},
-    "status": {"enum": ["ACTIVE", "CONSUMED", "REVOKED", "EXPIRED"]},
-    "status_changed_at": {"type": "string", "format": "date-time"},
-    "status_reason": {"type": "string", "minLength": 1},
-    "source": {"const": "derived_from_preexisting_human_decision_observations"},
-    "notes": {"type": "string"}
-  }
+    "schema_version": {
+      "const": 1
+    },
+    "grant_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "mode": {
+      "const": "ONE_SHOT"
+    },
+    "authority_anchor_commit": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "publication_decision_observation_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "override_decision_observation_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "item_allowlist": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "channel_allowlist": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "account_identity": {
+      "type": "string",
+      "minLength": 1
+    },
+    "scope_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "original_logical_target_limit": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "observed_logical_targets_before_grant": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "remaining_logical_target_limit": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "base_agent_may_publish": {
+      "const": false
+    },
+    "scoped_agent_execution_authorized": {
+      "type": "boolean"
+    },
+    "standing_permission": {
+      "const": false
+    },
+    "auto_publish": {
+      "const": "NO_GO"
+    },
+    "revocation_required": {
+      "const": true
+    },
+    "effective_ref": {
+      "const": "refs/heads/main"
+    },
+    "granted_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "status": {
+      "enum": [
+        "ACTIVE",
+        "CONSUMED",
+        "REVOKED",
+        "EXPIRED"
+      ]
+    },
+    "status_changed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "status_reason": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source": {
+      "const": "derived_from_preexisting_human_decision_observations"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "ACTIVE"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "scoped_agent_execution_authorized": {
+            "const": true
+          }
+        },
+        "not": {
+          "anyOf": [
+            {
+              "required": [
+                "status_changed_at"
+              ]
+            },
+            {
+              "required": [
+                "status_reason"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "enum": [
+              "CONSUMED",
+              "REVOKED",
+              "EXPIRED"
+            ]
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "scoped_agent_execution_authorized": {
+            "const": false
+          }
+        },
+        "required": [
+          "status_changed_at",
+          "status_reason"
+        ]
+      }
+    }
+  ]
 }

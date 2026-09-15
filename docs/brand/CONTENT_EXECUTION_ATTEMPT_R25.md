@@ -10,6 +10,7 @@ Observed on 2026-09-13:
 
 Reconciled coverage after readback: `8/10` logical targets and `10` physical remote records.
 Residual unobserved targets: W1-03 → LinkedIn and W2-02 → LinkedIn.
+These residual targets are derived from current observations; they do not rewrite the four-target issuance snapshot recorded by commit `cec887029a78974f23e530772e3bb46b2054ae02`.
 
 Grant lifecycle reconciliation:
 - original one-shot expiry: `2026-09-13T12:00:00-03:00`;
