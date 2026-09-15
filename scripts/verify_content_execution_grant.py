@@ -133,6 +133,10 @@ def verify(root: pathlib.Path = ROOT) -> list[str]:
         "authority_anchor_commit": "377a7105dc929b0195c149b5702ac174fbabf5de",
         "grant_issuance_commit": "cec887029a78974f23e530772e3bb46b2054ae02",
         "grant_issuance_state_sha256": "3484247f05ffede2bd463b4521d67b061781d5601b731f0fbc715e9049b82ba2",
+        "active_authority_anchor_commit": "c277753a8ba8e3a770daf928d88603355fe2413f",
+        "active_grant_issuance_commit": "184436cca436e4354d65d8d050495c315b161977",
+        "active_grant_issuance_state_sha256": "29d807872b12e2a2003ec1c1d54caad2b83276d3daf7c11f675a4b6d6b1eee55",
+        "historical_terminal_grants_preserved": True,
         "required_publication_decision_type": "AUTHORIZE_PUBLICATION",
         "required_override_decision_type": "AUTHORIZE_ONE_SHOT_AGENT_PUBLICATION_OVERRIDE",
         "observations_alone_grant_authority": False,
@@ -160,18 +164,21 @@ def verify(root: pathlib.Path = ROOT) -> list[str]:
         errors.append("grant schema must preserve positive issuance remaining limit")
 
     grants = ledger.get("grants")
-    if ledger.get("schema_version") != 1 or not isinstance(grants, list) or len(grants) != 1:
-        return errors + ["grant ledger must contain exactly one governed grant"]
-    grant = grants[0]
+    if ledger.get("schema_version") != 1 or not isinstance(grants, list) or len(grants) != 2:
+        return errors + ["grant ledger must preserve R25 terminal grant and contain exactly one R26 grant"]
+    historical = grants[0]
+    grant = grants[1]
+    if historical.get("grant_id") != "content-linkedin-remaining-one-shot-20260913-001" or historical.get("status") != "EXPIRED" or historical.get("scoped_agent_execution_authorized") is not False:
+        errors.append("R25 terminal grant history must remain preserved and non-executable")
     status = grant.get("status")
     if status not in {"ACTIVE", *TERMINAL}:
         errors.append("unknown grant lifecycle status")
 
     if grant.get("mode") != "ONE_SHOT":
         errors.append("execution grant must remain ONE_SHOT")
-    if grant.get("authority_anchor_commit") != policy.get("authority_anchor_commit"):
+    if grant.get("authority_anchor_commit") != policy.get("active_authority_anchor_commit"):
         errors.append("grant authority anchor mismatch")
-    if _issuance_state_sha(grant) != policy.get("grant_issuance_state_sha256"):
+    if _issuance_state_sha(grant) != policy.get("active_grant_issuance_state_sha256"):
         errors.append("grant issuance snapshot differs from pinned issuance state")
     if grant.get("base_agent_may_publish") is not False:
         errors.append("base agent permission must remain false")
@@ -275,7 +282,7 @@ def verify(root: pathlib.Path = ROOT) -> list[str]:
     try:
         anchored = _git_json(
             root,
-            policy["authority_anchor_commit"],
+            policy["active_authority_anchor_commit"],
             DECISIONS,
             required=True,
         )
@@ -294,31 +301,31 @@ def verify(root: pathlib.Path = ROOT) -> list[str]:
 
         issuance_ledger = _git_json(
             root,
-            policy["grant_issuance_commit"],
+            policy["active_grant_issuance_commit"],
             GRANTS,
             required=True,
         )
         issuance_registry = _git_json(
             root,
-            policy["grant_issuance_commit"],
+            policy["active_grant_issuance_commit"],
             REGISTRY,
             required=True,
         )
         issuance_observations = _git_json(
             root,
-            policy["grant_issuance_commit"],
+            policy["active_grant_issuance_commit"],
             OBSERVATIONS,
             required=True,
         )
         if issuance_ledger is not None and issuance_registry is not None and issuance_observations is not None:
             issuance_grants = issuance_ledger.get("grants", [])
-            if len(issuance_grants) != 1:
-                errors.append("issuance commit must contain exactly one governed grant")
+            if len(issuance_grants) != 2:
+                errors.append("R26 issuance commit must contain preserved R25 plus R26 grant")
             else:
-                issuance_grant = issuance_grants[0]
+                issuance_grant = issuance_grants[1]
                 if issuance_grant.get("grant_id") != grant.get("grant_id"):
                     errors.append("issuance grant identity mismatch")
-                if _issuance_state_sha(issuance_grant) != policy.get("grant_issuance_state_sha256"):
+                if _issuance_state_sha(issuance_grant) != policy.get("active_grant_issuance_state_sha256"):
                     errors.append("pinned issuance commit does not match issuance-state digest")
                 issuance_targets = _approved_targets(issuance_registry)
                 issuance_observed = _observed_pairs(issuance_observations)
@@ -339,9 +346,10 @@ def verify(root: pathlib.Path = ROOT) -> list[str]:
 
         previous = _git_json(root, "HEAD^", GRANTS)
         if previous and previous.get("grants"):
-            prior = previous["grants"][0]
+            prior = next((g for g in previous["grants"] if g.get("grant_id") == grant.get("grant_id")), None)
             if (
-                prior.get("grant_id") == grant.get("grant_id")
+                prior is not None
+                and prior.get("grant_id") == grant.get("grant_id")
                 and prior.get("status") in TERMINAL
                 and status != prior.get("status")
             ):

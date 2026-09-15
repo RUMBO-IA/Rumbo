@@ -23,5 +23,9 @@
   ],
   "terminal_grants_execute": false,
   "terminal_transition_requires_timestamp_and_reason": true,
-  "terminal_status_is_irreversible": true
+  "terminal_status_is_irreversible": true,
+  "active_authority_anchor_commit": "c277753a8ba8e3a770daf928d88603355fe2413f",
+  "active_grant_issuance_commit": "184436cca436e4354d65d8d050495c315b161977",
+  "active_grant_issuance_state_sha256": "29d807872b12e2a2003ec1c1d54caad2b83276d3daf7c11f675a4b6d6b1eee55",
+  "historical_terminal_grants_preserved": true
 }
