@@ -1,1 +1,44 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Privacy — RUMBO IA</title><link rel="stylesheet" href="styles.css"></head><body><header class="nav"><a class="brand" href="index.html">RUMBO <span>IA</span></a></header><main class="section"><div class="section-heading"><span>Privacy</span><h2>Privacy notice</h2></div><p>This website describes RUMBO IA and offers a way to get in touch. The contact details you send are used to reply to you and to keep the business records that follow from that. They are not sold and are not used for anything else.</p><p>If you contact RUMBO IA by email, the information you provide will be used to respond to your inquiry and maintain necessary business records. It will not be sold.</p><p>Technical hosting providers may process standard logs such as IP address, browser type and request timestamps for security and service operation.</p><p>For privacy requests, contact <a href="mailto:sebastian@rumbo.verso.fans">sebastian@rumbo.verso.fans</a>.</p><p><strong>Last updated:</strong> 26 July 2026.</p></main></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Privacy notice for RUMBO IA and the bounded RUMBO CRM app and MCP surface used with OpenAI products.">
+  <title>RUMBO CRM Privacy — RUMBO IA</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="nav">
+    <a class="brand" href="/" aria-label="RUMBO IA home">RUMBO <span>IA</span></a>
+    <nav><a href="/">Home</a><a href="/openai-support">Support</a><a href="/openai-terms">Terms</a></nav>
+  </header>
+  <main id="top">
+    <section class="hero">
+      <div class="eyebrow">RUMBO IA · RUMBO CRM PRIVACY</div>
+      <h1>Privacy for the bounded RUMBO CRM app.</h1>
+      <p class="lead">This notice covers the public RUMBO CRM app and remote MCP surface used with OpenAI products, as well as this website and support contact.</p>
+    </section>
+    <section class="section" id="mcp-data">
+      <div class="section-heading"><span>01 / MCP data</span><h2>What the bounded app processes.</h2></div>
+      <p>RUMBO CRM processes only the values a user or ChatGPT submits to the four exposed tools. Depending on the requested tool, these values can include workspace identifiers, subject or lead identifiers, a note, current and proposed lead stages, an optional reason, an outreach channel, and an outreach objective.</p>
+      <p>The bounded public v1 does not expose customer-record search, contact retrieval, conversation search, analytics retrieval, CRM mutation, message sending, deployment authority, or publication authority.</p>
+      <p>The proposal tools return reviewable artifacts containing the submitted fields and explicit control metadata such as <strong>REVIEW_REQUIRED</strong> and <strong>side_effect=false</strong>. The outreach tool also returns <strong>send_authorized=false</strong>.</p>
+    </section>
+    <section class="section dark" id="handling">
+      <div class="section-heading"><span>02 / Handling</span><h2>Bounded processing and minimization.</h2></div>
+      <p>RUMBO CRM does not sell submitted app data. The bounded MCP adapter does not persist submitted tool arguments to a CRM database and does not use them to perform external side effects. Technical hosting providers may process standard service logs such as IP address, request timestamps, response status, and runtime diagnostics for security and operation.</p>
+      <p>Users should avoid entering passwords, API keys, authentication tokens, payment-card details, private keys, seed phrases, or other secrets into RUMBO CRM tools or support requests.</p>
+    </section>
+    <section class="section" id="website-contact">
+      <div class="section-heading"><span>03 / Website and support</span><h2>Contact information.</h2></div>
+      <p>If you contact RUMBO IA by email, the information you provide is used to respond to your inquiry and maintain necessary business records. It is not sold.</p>
+      <p>For privacy requests, contact <a href="mailto:sebastian@rumbo.verso.fans">sebastian@rumbo.verso.fans</a>.</p>
+      <p><strong>Last updated:</strong> 11 September 2026.</p>
+    </section>
+  </main>
+  <footer>
+    <div>© 2026 RUMBO IA · Argentina</div>
+    <div><a href="/openai-support">Support</a><a href="/openai-terms">Terms</a></div>
+  </footer>
+</body>
+</html>
