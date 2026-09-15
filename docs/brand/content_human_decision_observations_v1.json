@@ -7,8 +7,17 @@
       "decision_type": "EDITORIAL_APPROVAL",
       "decision_origin": "human",
       "decision_text_sha256": "f54d0bf3c6c609d5e7f93d348d4332364fdee0edc1592ea2a30137ba31ead0e1",
-      "item_ids": ["W1-01", "W1-02", "W1-03", "W2-01", "W2-02"],
-      "target_channels": ["LinkedIn", "X"],
+      "item_ids": [
+        "W1-01",
+        "W1-02",
+        "W1-03",
+        "W2-01",
+        "W2-02"
+      ],
+      "target_channels": [
+        "LinkedIn",
+        "X"
+      ],
       "source_surface": "chatgpt_chat",
       "recorder_type": "agent",
       "recorded_at": "2026-09-13T02:34:00-03:00",
@@ -22,8 +31,17 @@
       "decision_type": "AUTHORIZE_PUBLICATION",
       "decision_origin": "human",
       "decision_text_sha256": "28ffca93589f6742e8c9e33b982665c6e27d54a37e4fd4c8503aa61930691fe5",
-      "item_ids": ["W1-01", "W1-02", "W1-03", "W2-01", "W2-02"],
-      "target_channels": ["LinkedIn", "X"],
+      "item_ids": [
+        "W1-01",
+        "W1-02",
+        "W1-03",
+        "W2-01",
+        "W2-02"
+      ],
+      "target_channels": [
+        "LinkedIn",
+        "X"
+      ],
       "source_surface": "chatgpt_chat",
       "recorder_type": "agent",
       "recorded_at": "2026-09-13T02:34:00-03:00",
@@ -37,14 +55,63 @@
       "decision_type": "AUTHORIZE_ONE_SHOT_AGENT_PUBLICATION_OVERRIDE",
       "decision_origin": "human",
       "decision_text_sha256": "71d00d94872d1f49f5f1a5f298ff22583cd356983291b9c7ba61a69c1d02ce99",
-      "item_ids": ["W1-01", "W1-02", "W1-03", "W2-01", "W2-02"],
-      "target_channels": ["LinkedIn", "X"],
+      "item_ids": [
+        "W1-01",
+        "W1-02",
+        "W1-03",
+        "W2-01",
+        "W2-02"
+      ],
+      "target_channels": [
+        "LinkedIn",
+        "X"
+      ],
       "source_surface": "chatgpt_chat",
       "recorder_type": "agent",
       "recorded_at": "2026-09-13T02:34:00-03:00",
       "human_signature_present": false,
       "proof_strength": "CHAT_OBSERVED_NOT_INDEPENDENTLY_SIGNED",
       "notes": "Observed one-shot override decision with AUTO_PUBLISH remaining NO_GO; not a standing permission."
+    },
+    {
+      "schema_version": 1,
+      "decision_origin": "human",
+      "decision_text_sha256": "c7c3cda72c0077465971082ce0d40c3afbca764fbe6e5aebec8b7f50c8a2a020",
+      "item_ids": [
+        "W1-03",
+        "W2-02"
+      ],
+      "target_channels": [
+        "LinkedIn"
+      ],
+      "source_surface": "chatgpt_chat",
+      "recorder_type": "agent",
+      "recorded_at": "2026-09-13T22:10:46-03:00",
+      "human_signature_present": false,
+      "proof_strength": "CHAT_OBSERVED_NOT_INDEPENDENTLY_SIGNED",
+      "observation_id": "decision-publication-authorization-r26-20260913-001",
+      "decision_type": "AUTHORIZE_PUBLICATION",
+      "notes": "Observed explicit R26 publication decision scoped only to W1-03 and W2-02 on LinkedIn company 145014017; not a human-signed receipt."
+    },
+    {
+      "schema_version": 1,
+      "decision_origin": "human",
+      "decision_text_sha256": "c7c3cda72c0077465971082ce0d40c3afbca764fbe6e5aebec8b7f50c8a2a020",
+      "item_ids": [
+        "W1-03",
+        "W2-02"
+      ],
+      "target_channels": [
+        "LinkedIn"
+      ],
+      "source_surface": "chatgpt_chat",
+      "recorder_type": "agent",
+      "recorded_at": "2026-09-13T22:10:46-03:00",
+      "human_signature_present": false,
+      "proof_strength": "CHAT_OBSERVED_NOT_INDEPENDENTLY_SIGNED",
+      "observation_id": "decision-one-shot-agent-override-r26-20260913-001",
+      "decision_type": "AUTHORIZE_ONE_SHOT_AGENT_PUBLICATION_OVERRIDE",
+      "notes": "Observed R26 one-shot agent publication override scoped only to W1-03 and W2-02 on LinkedIn; AUTO_PUBLISH remains NO_GO and this is not standing authority."
     }
   ]
 }
