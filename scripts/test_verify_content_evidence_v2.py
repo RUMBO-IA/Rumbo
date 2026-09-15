@@ -125,5 +125,36 @@ class ContentEvidenceV2Tests(unittest.TestCase):
             self.assertEqual(evidence.verify(root), [])
 
 
+    def test_scoped_publication_decision_subset_supported(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = make_root(td)
+            data = load(root, "content_human_decision_observations_v1.json")
+            obs = next(o for o in data["observations"] if o["decision_type"] == "AUTHORIZE_PUBLICATION")
+            obs["item_ids"] = ["W1-03", "W2-02"]
+            obs["target_channels"] = ["LinkedIn"]
+            save(root, "content_human_decision_observations_v1.json", data)
+            self.assertEqual(evidence.verify(root), [])
+
+    def test_publication_decision_outside_item_scope_rejected(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = make_root(td)
+            data = load(root, "content_human_decision_observations_v1.json")
+            obs = next(o for o in data["observations"] if o["decision_type"] == "AUTHORIZE_PUBLICATION")
+            obs["item_ids"] = ["W1-03"]
+            obs["target_channels"] = ["LinkedIn", "YouTube"]
+            save(root, "content_human_decision_observations_v1.json", data)
+            self.assertTrue(any("outside item scope" in e for e in evidence.verify(root)))
+
+    def test_editorial_approval_partial_scope_rejected(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = make_root(td)
+            data = load(root, "content_human_decision_observations_v1.json")
+            obs = next(o for o in data["observations"] if o["decision_type"] == "EDITORIAL_APPROVAL")
+            obs["item_ids"] = ["W1-03"]
+            obs["target_channels"] = ["LinkedIn"]
+            save(root, "content_human_decision_observations_v1.json", data)
+            self.assertTrue(any("target_channels mismatch" in e for e in evidence.verify(root)))
+
+
 if __name__ == "__main__":
     unittest.main()

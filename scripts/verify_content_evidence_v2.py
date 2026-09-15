@@ -93,8 +93,17 @@ def _decision_errors(root: pathlib.Path, registry: dict) -> list[str]:
             if item is None:
                 errors.append(f"{oid}: unknown item_id {item_id}")
                 continue
-            if set(channels) != set(item.get("target_channels", [])):
-                errors.append(f"{oid}: target_channels mismatch for {item_id}")
+            item_channels = set(item.get("target_channels", []))
+            requested_channels = set(channels)
+            decision_type = obs.get("decision_type")
+            if decision_type == "EDITORIAL_APPROVAL":
+                if requested_channels != item_channels:
+                    errors.append(f"{oid}: target_channels mismatch for {item_id}")
+            elif decision_type in {"AUTHORIZE_PUBLICATION", "AUTHORIZE_ONE_SHOT_AGENT_PUBLICATION_OVERRIDE"}:
+                if not requested_channels.issubset(item_channels):
+                    errors.append(f"{oid}: target_channels outside item scope for {item_id}")
+            else:
+                errors.append(f"{oid}: decision_type invalid")
         if obs.get("source_surface") != "chatgpt_chat":
             errors.append(f"{oid}: source_surface must be chatgpt_chat")
         signed = obs.get("human_signature_present")
