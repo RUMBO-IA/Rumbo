@@ -319,10 +319,10 @@ def verify(root: pathlib.Path = ROOT) -> list[str]:
         )
         if issuance_ledger is not None and issuance_registry is not None and issuance_observations is not None:
             issuance_grants = issuance_ledger.get("grants", [])
-            if len(issuance_grants) != 2:
-                errors.append("R26 issuance commit must contain preserved R25 plus R26 grant")
+            if len(issuance_grants) != 1:
+                errors.append("R26 issuance commit must contain exactly the issued R26 grant snapshot")
             else:
-                issuance_grant = issuance_grants[1]
+                issuance_grant = issuance_grants[0]
                 if issuance_grant.get("grant_id") != grant.get("grant_id"):
                     errors.append("issuance grant identity mismatch")
                 if _issuance_state_sha(issuance_grant) != policy.get("active_grant_issuance_state_sha256"):
