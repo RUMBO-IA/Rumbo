@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 import json
 import pathlib
@@ -123,7 +123,12 @@ class ContentExecutionGrantTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as td:
             root = make_root(td)
             data = load(root, "content_execution_grants_v1.json")
-            data["grants"][-1]["item_allowlist"].append("W2-01")
+            g = data["grants"][-1]
+            g["status"] = "ACTIVE"
+            g["scoped_agent_execution_authorized"] = True
+            g.pop("status_changed_at", None)
+            g.pop("status_reason", None)
+            g["item_allowlist"].append("W2-01")
             save(root, "content_execution_grants_v1.json", data)
             self.assertTrue(any("ACTIVE grant scope must equal exact current unobserved" in e for e in grant_verify.verify(root)))
 
@@ -192,7 +197,7 @@ class ContentExecutionGrantTests(unittest.TestCase):
             self.assertEqual(g["channel_allowlist"], ["LinkedIn"])
             self.assertEqual(g["account_identity"], "company:145014017:rumbo-ia")
             self.assertEqual(g["remaining_logical_target_limit"], 2)
-            self.assertTrue(g["scoped_agent_execution_authorized"])
+            self.assertEqual(g["scoped_agent_execution_authorized"], g["status"] == "ACTIVE")
             self.assertFalse(g["standing_permission"])
             self.assertEqual(g["auto_publish"], "NO_GO")
 
