@@ -88,3 +88,40 @@ test("tool execution records OpenAI subject/session after handler execution", as
     else process.env.RUMBO_ADOPTION_HMAC_SECRET = previousSecret;
   }
 });
+
+test("rejected tool calls emit no adoption event", async () => {
+  const logs = [];
+  const originalLog = console.log;
+  const previousSecret = process.env.RUMBO_ADOPTION_HMAC_SECRET;
+  process.env.RUMBO_ADOPTION_HMAC_SECRET = "test-secret";
+  console.log = (value) => logs.push(value);
+
+  try {
+    const response = await app.request("http://localhost/mcp", {
+      method: "POST",
+      headers: protocolHeaders,
+      body: JSON.stringify({
+        jsonrpc: "2.0",
+        id: 3,
+        method: "tools/call",
+        params: {
+          name: "tool-that-does-not-exist",
+          arguments: {},
+          _meta: {
+            "openai/subject": "rejected-subject",
+            "openai/session": "rejected-session",
+          },
+        },
+      }),
+    });
+
+    assert.equal(response.status, 200);
+    const text = await response.text();
+    assert.match(text, /not found|Unknown tool|unknown tool/i);
+    assert.equal(logs.length, 0);
+  } finally {
+    console.log = originalLog;
+    if (previousSecret === undefined) delete process.env.RUMBO_ADOPTION_HMAC_SECRET;
+    else process.env.RUMBO_ADOPTION_HMAC_SECRET = previousSecret;
+  }
+});
