@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rumbo.verso.fans/schemas/openai-adoption-transparency/report-envelope-v1.json",
+  "title": "OpenAI Adoption Transparency Report Envelope v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["payload", "attestation"],
+  "properties": {
+    "payload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema", "protocol_version", "source", "publisher_id", "app_id", "app_version", "reporting_period", "generated_at", "privacy", "metrics"],
+      "properties": {
+        "schema": {"const": "rumbo.openai-adoption-transparency/report-v1"},
+        "protocol_version": {"const": "1.0"},
+        "source": {"const": "openai"},
+        "publisher_id": {"type": "string", "minLength": 1, "pattern": "^pub_[A-Za-z0-9._-]+$"},
+        "app_id": {"type": "string", "minLength": 1, "pattern": "^app_[A-Za-z0-9._-]+$"},
+        "app_version": {"type": "string", "minLength": 1},
+        "reporting_period": {
+          "type": "object", "additionalProperties": false,
+          "required": ["from", "to"],
+          "properties": {
+            "from": {"type": "string", "format": "date-time"},
+            "to": {"type": "string", "format": "date-time"}
+          }
+        },
+        "generated_at": {"type": "string", "format": "date-time"},
+        "privacy": {
+          "type": "object", "additionalProperties": false,
+          "required": ["user_level_data_exported", "minimum_unique_user_cohort"],
+          "properties": {
+            "user_level_data_exported": {"const": false},
+            "minimum_unique_user_cohort": {"type": "integer", "minimum": 2}
+          }
+        },
+        "metrics": {
+          "type": "object", "additionalProperties": false,
+          "required": [
+            "listing_impressions", "installations_total", "installations_new",
+            "uninstallations", "active_users_7d", "active_users_30d",
+            "tool_calls_total", "retention_30d"
+          ],
+          "properties": {
+            "listing_impressions": {"$ref": "#/$defs/countMetric"},
+            "installations_total": {"$ref": "#/$defs/countMetric"},
+            "installations_new": {"$ref": "#/$defs/countMetric"},
+            "uninstallations": {"$ref": "#/$defs/countMetric"},
+            "active_users_7d": {"$ref": "#/$defs/countMetric"},
+            "active_users_30d": {"$ref": "#/$defs/countMetric"},
+            "tool_calls_total": {"$ref": "#/$defs/countMetric"},
+            "retention_30d": {"$ref": "#/$defs/ratioMetric"}
+          }
+        }
+      }
+    },
+    "attestation": {
+      "type": "object", "additionalProperties": false,
+      "required": ["issuer", "key_id", "algorithm", "payload_sha256", "signature"],
+      "properties": {
+        "issuer": {"const": "openai"},
+        "key_id": {"type": "string", "minLength": 1},
+        "algorithm": {"const": "Ed25519"},
+        "payload_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "signature": {"type": "string", "minLength": 1}
+      }
+    }
+  },
+  "$defs": {
+    "countMetric": {
+      "type": "object", "additionalProperties": false,
+      "required": ["status"],
+      "properties": {
+        "status": {"enum": ["exact", "suppressed"]},
+        "value": {"type": "integer", "minimum": 0},
+        "reason": {"type": "string"}
+      },
+      "allOf": [
+        {"if": {"properties": {"status": {"const": "exact"}}}, "then": {"required": ["value"]}},
+        {"if": {"properties": {"status": {"const": "suppressed"}}}, "then": {"required": ["reason"], "not": {"required": ["value"]}}}
+      ]
+    },
+    "ratioMetric": {
+      "type": "object", "additionalProperties": false,
+      "required": ["status"],
+      "properties": {
+        "status": {"enum": ["exact", "suppressed"]},
+        "value": {"type": "number", "minimum": 0, "maximum": 1},
+        "reason": {"type": "string"}
+      },
+      "allOf": [
+        {"if": {"properties": {"status": {"const": "exact"}}}, "then": {"required": ["value"]}},
+        {"if": {"properties": {"status": {"const": "suppressed"}}}, "then": {"required": ["reason"], "not": {"required": ["value"]}}}
+      ]
+    }
+  }
+}
