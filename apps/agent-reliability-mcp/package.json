@@ -1,0 +1,18 @@
+{
+  "name": "rumbo-agent-reliability-mcp",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/server": "^2.0.0",
+    "hono": "^4.0.0",
+    "mcp-handler": "^2.1.0",
+    "zod": "^4.2.0"
+  }
+}
