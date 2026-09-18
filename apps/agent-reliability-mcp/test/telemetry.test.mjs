@@ -1,25 +1,20 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { extractObservationEvents, pseudonymize, summarizeRecords } from "../lib/telemetry.mjs";
+import { extractObservationEvent, pseudonymize, summarizeRecords } from "../lib/telemetry.mjs";
 
-test("extracts only tool calls and never records raw identifiers", () => {
-  const body = {
-    jsonrpc: "2.0",
-    method: "tools/call",
-    params: {
-      name: "rumbo_reliability_context",
-      _meta: {
-        "openai/subject": "subject-123",
-        "openai/session": "session-456",
-      },
+test("extracts OpenAI subject/session metadata from an executed-tool context", () => {
+  const event = extractObservationEvent({
+    toolName: "rumbo_reliability_context",
+    meta: {
+      "openai/subject": "subject-123",
+      "openai/session": "session-456",
     },
-  };
-  const events = extractObservationEvents(body);
-  assert.deepEqual(events, [{
+  });
+  assert.deepEqual(event, {
     toolName: "rumbo_reliability_context",
     subject: "subject-123",
     session: "session-456",
-  }]);
+  });
 });
 
 test("pseudonymization is keyed and deterministic", () => {

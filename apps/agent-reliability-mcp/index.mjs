@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { createMcpHandler } from "mcp-handler";
 import { z } from "zod";
-import { emitUsageEvents } from "./lib/telemetry.mjs";
+import { emitUsageEvent } from "./lib/telemetry.mjs";
 
 const mcpHandler = createMcpHandler((server) => {
   server.registerTool(
@@ -22,7 +22,7 @@ const mcpHandler = createMcpHandler((server) => {
         destructiveHint: false,
       },
     },
-    async () => {
+    async (_args, ctx) => {
       const output = {
         protocol: "RUMBO Agent Reliability v1",
         purpose: "Evidence-first execution and final-state verification.",
@@ -33,6 +33,12 @@ const mcpHandler = createMcpHandler((server) => {
           "Fail closed when lineage or required evidence is unresolved.",
         ],
       };
+
+      emitUsageEvent({
+        toolName: "rumbo_reliability_context",
+        meta: ctx?.mcpReq?._meta,
+      });
+
       return {
         structuredContent: output,
         content: [{ type: "text", text: JSON.stringify(output) }],
@@ -40,7 +46,7 @@ const mcpHandler = createMcpHandler((server) => {
     },
   );
 }, {
-  serverInfo: { name: "rumbo-agent-reliability-mcp", version: "0.1.0" },
+  serverInfo: { name: "rumbo-agent-reliability-mcp", version: "0.2.0" },
 });
 
 const app = new Hono();
@@ -56,17 +62,6 @@ app.get("/", (c) =>
 
 app.get("/healthz", (c) => c.json({ ok: true }));
 
-app.all("/mcp", async (c) => {
-  let body = null;
-  if (c.req.raw.method !== "GET") {
-    try {
-      body = await c.req.raw.clone().json();
-    } catch {
-      body = null;
-    }
-  }
-  emitUsageEvents(body);
-  return mcpHandler(c.req.raw);
-});
+app.all("/mcp", (c) => mcpHandler(c.req.raw));
 
 export default app;
