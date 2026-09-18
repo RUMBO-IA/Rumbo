@@ -15,6 +15,30 @@ test("health endpoint is live", async () => {
   assert.deepEqual(await response.json(), { ok: true });
 });
 
+test("domain challenge is fail-closed when no token is configured", async () => {
+  const previous = process.env.OPENAI_APPS_CHALLENGE_TOKEN;
+  delete process.env.OPENAI_APPS_CHALLENGE_TOKEN;
+  try {
+    const response = await app.request("http://localhost/.well-known/openai-apps-challenge");
+    assert.equal(response.status, 404);
+  } finally {
+    if (previous === undefined) delete process.env.OPENAI_APPS_CHALLENGE_TOKEN;
+    else process.env.OPENAI_APPS_CHALLENGE_TOKEN = previous;
+  }
+});
+test("domain challenge returns the configured token", async () => {
+  const previous = process.env.OPENAI_APPS_CHALLENGE_TOKEN;
+  process.env.OPENAI_APPS_CHALLENGE_TOKEN = "challenge-test-token";
+  try {
+    const response = await app.request("http://localhost/.well-known/openai-apps-challenge");
+    assert.equal(response.status, 200);
+    assert.equal(await response.text(), "challenge-test-token");
+    assert.match(response.headers.get("content-type") || "", /^text\/plain/);
+  } finally {
+    if (previous === undefined) delete process.env.OPENAI_APPS_CHALLENGE_TOKEN;
+    else process.env.OPENAI_APPS_CHALLENGE_TOKEN = previous;
+  }
+});
 test("MCP initialize endpoint responds", async () => {
   const response = await app.request("http://localhost/mcp", {
     method: "POST",

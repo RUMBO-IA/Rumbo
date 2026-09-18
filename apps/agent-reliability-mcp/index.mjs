@@ -62,6 +62,12 @@ app.get("/", (c) =>
 
 app.get("/healthz", (c) => c.json({ ok: true }));
 
+app.get("/.well-known/openai-apps-challenge", (c) => {
+  const token = process.env.OPENAI_APPS_CHALLENGE_TOKEN;
+  if (!token) return c.text("Not Found", 404);
+  return c.text(token, 200, { "Cache-Control": "public, max-age=300" });
+});
+
 app.all("/mcp", (c) => mcpHandler(c.req.raw));
 
 export default app;
