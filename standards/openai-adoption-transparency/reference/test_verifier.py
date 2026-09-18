@@ -11,6 +11,7 @@ def make_payload():
     return {
         "schema": "rumbo.openai-adoption-transparency/report-v1",
         "protocol_version": "1.0",
+        "report_revision": 1,
         "source": "openai",
         "publisher_id": "pub_rumbo",
         "app_id": "app_rumbo_agent_reliability",
@@ -98,6 +99,11 @@ def main():
         print("PASS chronology rejected")
     else:
         raise AssertionError("invalid chronology was accepted")
+
+    vector = json.loads((Path(__file__).with_name("test-vector.json")).read_text(encoding="utf-8"))
+    digest = verify(vector["report"], vector["public_key_hex"])
+    assert digest == vector["report"]["attestation"]["payload_sha256"]
+    print("PASS published test vector")
 
 if __name__ == "__main__":
     main()

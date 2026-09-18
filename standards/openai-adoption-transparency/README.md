@@ -3,7 +3,7 @@
 ## Purpose
 Give app/plugin publishers a trustworthy way to know how their distribution is performing without exposing user identities.
 
-OpenAI already operates the distribution layer and, for authenticated MCP integrations, can identify a stable profile represented by credentials. OpenAI documentation currently describes profile identities for connected accounts, but does not establish a publisher-facing adoption analytics contract. This protocol defines that missing contract.
+OpenAI operates the distribution layer and, for authenticated integrations, can represent a stable profile identity. OpenAI also provides workspace-level analytics for eligible Business workspaces. As of 18 September 2026, the public app/plugin submission documentation does not define a publisher-facing install/active-user analytics contract for a published app. This protocol defines that missing contract without exporting user identities.
 
 ## Design
 1. OpenAI is the source of truth for platform-side distribution facts.

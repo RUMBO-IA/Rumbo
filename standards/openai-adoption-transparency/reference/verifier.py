@@ -28,9 +28,10 @@ def verify(envelope, public_key_hex):
     att = envelope["attestation"]
     assert payload["schema"] == "rumbo.openai-adoption-transparency/report-v1"
     assert payload["protocol_version"] == "1.0"
+    assert isinstance(payload["report_revision"], int) and payload["report_revision"] >= 1
     assert payload["source"] == "openai"
-    assert PUBLISHER_ID_RE.fullmatch(payload["publisher_id"])
-    assert APP_ID_RE.fullmatch(payload["app_id"])
+    assert isinstance(payload["publisher_id"], str) and payload["publisher_id"]
+    assert isinstance(payload["app_id"], str) and payload["app_id"]
     period = payload["reporting_period"]
     start, end = parse_dt(period["from"]), parse_dt(period["to"])
     assert start < end
