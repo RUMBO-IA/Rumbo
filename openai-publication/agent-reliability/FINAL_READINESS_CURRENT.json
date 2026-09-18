@@ -1,0 +1,54 @@
+{
+    "schema":  "rumbo.openai-agent-reliability-publication-readiness/v2",
+    "observed_date":  "2026-09-18",
+    "candidate":  "RUMBO Agent Reliability",
+    "package_slug":  "rumbo-coding-agent-reliability",
+    "source_commit":  "89d92bee837c19c38cd7a07a4178ee030c1ab33d",
+    "local_package":  "PASS",
+    "mcp_tests":  "9/9 PASS",
+    "public_url_http":  {
+                            "website":  200,
+                            "support":  200,
+                            "privacy":  200,
+                            "terms":  200
+                        },
+    "mcp_production":  {
+                           "deployment":  "dpl_AiwwgGxVpSjp9GFJBkARphT3vdFA",
+                           "state":  "READY",
+                           "alias":  "https://agent-reliability-mcp.vercel.app",
+                           "healthz":  200,
+                           "initialize":  200,
+                           "tools_list":  200,
+                           "tool_count":  1,
+                           "tool_name":  "rumbo_reliability_context",
+                           "readOnlyHint":  true,
+                           "openWorldHint":  false,
+                           "destructiveHint":  false
+                       },
+    "domain_verification":  {
+                                "challenge_endpoint":  "https://agent-reliability-mcp.vercel.app/.well-known/openai-apps-challenge",
+                                "current_state":  "FAIL_CLOSED_404",
+                                "token_source":  "OPENAI_SUBMISSION_PORTAL",
+                                "verified":  false
+                            },
+    "submission":  {
+                       "reviewer_cases":  "5 positive + 3 negative",
+                       "recorded_demo_url":  "NOT_PROVIDED",
+                       "tool_scan":  "NOT_RUN_PORTAL",
+                       "developer_identity":  "UNVERIFIED_IN_SESSION",
+                       "apps_management_write":  "UNVERIFIED_IN_SESSION",
+                       "submitted_for_review":  false,
+                       "published":  false
+                   },
+    "telemetry":  {
+                      "real_production_user_tool_call":  "NOT_PROVEN",
+                      "synthetic_adoption_events_created":  false
+                  },
+    "historical_snapshot":  {
+                                "file":  "FINAL_READINESS.json",
+                                "observed_at":  "2026-09-07T13:32:00-03:00",
+                                "state":  "SUBMISSION_PACKET_READY_ACCOUNT_GATES_OPEN",
+                                "preserved":  true
+                            },
+    "state":  "SUBMISSION_PACKET_READY_PORTAL_GATES_OPEN"
+}
