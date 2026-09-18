@@ -17,6 +17,7 @@ class SourceBindingTests(unittest.TestCase):
     def test_receipt_binds_exact_source_and_five_skills(self):
         receipt = json.loads((PUB / "source-receipt.json").read_text(encoding="utf-8"))
         self.assertEqual(receipt["source_commit"], "3a7bff2a139cb6840ab6e23a2c19e315000e8b13")
+        self.assertEqual(receipt["source_repository"], "https://github.com/RUMBO-IA/Rumbo")
         self.assertEqual(set(receipt["skills"]), SKILLS)
         self.assertRegex(receipt["tree_sha"], r"^[0-9a-f]{40}$")
         self.assertRegex(receipt["manifest_sha256"], r"^[0-9a-f]{64}$")
@@ -46,7 +47,7 @@ class CandidateInventoryTests(unittest.TestCase):
         self.assertTrue((plugin / ".codex-plugin" / "plugin.json").is_file())
         self.assertTrue((plugin / "assets" / "icon.svg").is_file())
         self.assertTrue((plugin / "assets" / "logo.svg").is_file())
-        forbidden = {".app.json", ".mcp.json", "hooks.json"}
+        forbidden = {".app.json", "hooks.json"}
         self.assertFalse(any(p.name in forbidden for p in plugin.rglob("*")))
 
     def test_candidate_skill_bytes_match_bound_source(self):

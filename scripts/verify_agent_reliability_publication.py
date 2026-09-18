@@ -34,7 +34,7 @@ def build_source_receipt() -> dict:
     manifest = git_bytes(f"{PLUGIN}/.codex-plugin/plugin.json")
     return {
         "schema": "rumbo.openai-agent-reliability-source/v1",
-        "source_repository": "https://github.com/fscfede-beep/Rumbo",
+        "source_repository": "https://github.com/RUMBO-IA/Rumbo",
         "source_commit": SOURCE_COMMIT,
         "tree_sha": tree,
         "manifest_sha256": sha256(manifest),
