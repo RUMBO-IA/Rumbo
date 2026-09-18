@@ -1,0 +1,16 @@
+{
+  "protocol": "OpenAI Adoption Transparency Protocol",
+  "version": "1.0",
+  "publisher": "RUMBO IA",
+  "specification": "https://rumbo.verso.fans/openai-adoption-transparency",
+  "schema": "https://rumbo.verso.fans/schemas/openai-adoption-transparency/report-envelope-v1.json",
+  "repository": "https://github.com/RUMBO-IA/Rumbo/tree/main/standards/openai-adoption-transparency",
+  "reference_verifier": "https://github.com/RUMBO-IA/Rumbo/tree/main/standards/openai-adoption-transparency/reference",
+  "principles": [
+    "aggregate_only",
+    "no_user_level_export",
+    "cryptographic_attestation",
+    "explicit_metric_semantics",
+    "fail_closed_on_invalid_evidence"
+  ]
+}

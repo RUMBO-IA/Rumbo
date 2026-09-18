@@ -1,0 +1,41 @@
+{
+  "public_key_hex": "03a107bff3ce10be1d70dd18e74bc09967e4d6309ba50d5f1ddc8664125531b8",
+  "test_key_warning": "TEST ONLY — not a production OpenAI key",
+  "report": {
+    "payload": {
+      "schema": "rumbo.openai-adoption-transparency/report-v1",
+      "protocol_version": "1.0",
+      "report_revision": 1,
+      "source": "openai",
+      "publisher_id": "pub_example",
+      "app_id": "plugin_asdk_app_example",
+      "app_version": "1.0.0",
+      "reporting_period": {
+        "from": "2026-09-01T00:00:00Z",
+        "to": "2026-09-18T00:00:00Z"
+      },
+      "generated_at": "2026-09-18T13:00:00Z",
+      "privacy": {
+        "user_level_data_exported": false,
+        "minimum_unique_user_cohort": 5
+      },
+      "metrics": {
+        "listing_impressions": {"status": "exact", "value": 100},
+        "installations_total": {"status": "exact", "value": 25},
+        "installations_new": {"status": "exact", "value": 8},
+        "uninstallations": {"status": "exact", "value": 5},
+        "active_users_7d": {"status": "exact", "value": 10},
+        "active_users_30d": {"status": "exact", "value": 14},
+        "tool_calls_total": {"status": "exact", "value": 90},
+        "retention_30d": {"status": "exact", "value": 0.5}
+      }
+    },
+    "attestation": {
+      "issuer": "openai",
+      "key_id": "rumbo-test-key-1",
+      "algorithm": "Ed25519",
+      "payload_sha256": "d538237a8ee7dcae6e13ffa6f1b57b15a9688acdb0d3d97b5ac7705cfbd5cc67",
+      "signature": "QNlyoxPajrMrvJgg3RTFzTsTcpWOdXyqGsCNpzHPKxTrXzHvg2YtGPnjFeji8uEl21IQGC9Zp8DbZmi6YDYNCQ=="
+    }
+  }
+}

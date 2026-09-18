@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI Adoption Transparency — RUMBO</title>
+<meta name="description" content="Open protocol for verifiable, privacy-preserving adoption analytics for AI apps and plugins.">
+<style>
+:root{color-scheme:dark;font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;line-height:1.55;background:#0b0b0b;color:#f2f2f2}
+body{max-width:980px;margin:0 auto;padding:48px 22px}a{color:#8fd3ff}h1{font-size:44px;line-height:1.05;margin:0 0 18px}h2{margin-top:38px}.lead{font-size:20px;color:#c8c8c8}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin:22px 0}.card{border:1px solid #2d2d2d;border-radius:14px;padding:18px;background:#121212}.tag{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#9b9b9b}.code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;background:#111;border:1px solid #2d2d2d;border-radius:8px;padding:3px 7px}.flow{font-family:ui-monospace,monospace;white-space:pre-wrap;background:#111;border:1px solid #2d2d2d;border-radius:12px;padding:20px}.notice{border-left:3px solid #fff;padding:12px 16px;background:#151515}.muted{color:#a6a6a6}footer{margin-top:48px;padding-top:20px;border-top:1px solid #2d2d2d;font-size:14px}
+</style>
+</head>
+<body>
+<div class="tag">RUMBO / Open standard</div>
+<h1>AI Adoption Transparency Protocol</h1>
+<p class="lead">A privacy-preserving way for an AI platform to tell publishers how their app or plugin is actually performing — with evidence that can be independently verified.</p>
+<div class="notice"><strong>Current gap:</strong> publishers may be able to see their own backend activity, while platform-side installs and account-level adoption can remain opaque. This protocol defines a common, auditable contract for that missing layer.</div>
+<h2>What the protocol measures</h2>
+<div class="grid">
+<div class="card"><strong>Discovery</strong><br><span class="muted">listing_impressions</span></div>
+<div class="card"><strong>Distribution</strong><br><span class="muted">installations_total / new / uninstallations</span></div>
+<div class="card"><strong>Usage</strong><br><span class="muted">active_users_7d / 30d</span></div>
+<div class="card"><strong>Execution</strong><br><span class="muted">tool_calls_total</span></div>
+<div class="card"><strong>Retention</strong><br><span class="muted">retention_30d</span></div>
+</div>
+<h2>How it works</h2>
+<div class="flow">OPENAI PLATFORM
+   │
+   ├─ distribution state
+   ├─ authenticated usage state
+   └─ execution telemetry
+   │
+   ▼
+aggregate report → SHA-256 → Ed25519 signature
+   │
+   ▼
+PUBLISHER / RUMBO VERIFIER
+   │
+   ├─ verify source
+   ├─ verify hash + signature
+   ├─ verify privacy rules
+   └─ append evidence
+</div>
+<h2>Privacy boundary</h2>
+<p>The publisher receives aggregates, not user records. No prompts, conversations, IP addresses, emails, raw account identifiers, or tool inputs are required. Small unique-user cohorts are explicitly suppressed instead of being guessed.</p>
+<h2>Truth boundary</h2>
+<p>An installation is not a user. A user is not a tool call. A listing view is not an installation. Every metric therefore carries explicit semantics, time period, freshness and status.</p>
+<h2>Open implementation</h2>
+<p>The RUMBO repository contains the protocol specification, JSON Schema, Ed25519 reference verifier, test cases, and an OpenAI implementation proposal.</p>
+<p><a href="https://github.com/RUMBO-IA/Rumbo/tree/main/standards/openai-adoption-transparency">Specification</a> · <a href="https://github.com/RUMBO-IA/Rumbo/pull/159">Implementation proposal PR #159</a> · <a href="/schemas/openai-adoption-transparency/report-envelope-v1.json">Canonical schema</a></p>
+<h2>Current status</h2>
+<p class="muted">This is a proposed interoperable standard. OpenAI’s current public submission documentation describes publishing and distribution, but does not document a publisher-facing adoption analytics API. Community reports from July–September 2026 likewise describe the absence of such a dashboard; those reports are community evidence, not OpenAI policy.</p>
+<footer>RUMBO IA · Evidence-first systems · <a href="/security">Security</a> · <a href="/openai-privacy">Privacy</a> · <a href="/openai-terms">Terms</a></footer>
+</body>
+</html>

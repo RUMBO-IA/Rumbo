@@ -1,0 +1,38 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "rumbo-coding-agent-reliability",
+  "version": "0.2.0",
+  "description": "Evidence-first workflows for reliable coding-agent execution, continuity, scope control, final-state verification, and privacy-preserving adoption telemetry.",
+  "author": {
+    "name": "RUMBO IA",
+    "url": "https://rumbo.verso.fans"
+  },
+  "homepage": "https://rumbo.verso.fans",
+  "repository": "https://github.com/RUMBO-IA/Rumbo",
+  "keywords": ["coding agents", "agent reliability", "governance", "verification", "audit", "continuity", "adoption analytics"],
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "RUMBO Agent Reliability",
+        "shortDescription": "Reliable agent workflows",
+        "longDescription": "Recover authoritative state, reconcile conflicting evidence, control agent loops, verify real effects, audit final state, and expose privacy-preserving runtime adoption observations.",
+        "developerName": "RUMBO IA",
+        "category": "Productivity",
+        "capabilities": ["Read"],
+        "websiteURL": "https://rumbo.verso.fans",
+        "privacyPolicyURL": "https://rumbo.verso.fans/openai-privacy",
+        "termsOfServiceURL": "https://rumbo.verso.fans/openai-terms",
+        "supportURL": "https://rumbo.verso.fans/openai-support",
+        "defaultPrompt": [
+          "Recover the canonical state before changing this workflow.",
+          "Reconcile conflicting agent execution receipts.",
+          "Audit this agent run and report what is actually proven."
+        ],
+        "brandColor": "#111111",
+        "screenshots": [],
+        "composerIcon": "./assets/icon.svg",
+        "logo": "./assets/logo.svg"
+      }
+    }
+  }
+}

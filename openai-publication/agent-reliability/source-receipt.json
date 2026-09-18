@@ -1,6 +1,6 @@
 {
   "schema": "rumbo.openai-agent-reliability-source/v1",
-  "source_repository": "https://github.com/fscfede-beep/Rumbo",
+  "source_repository": "https://github.com/RUMBO-IA/Rumbo",
   "source_commit": "3a7bff2a139cb6840ab6e23a2c19e315000e8b13",
   "tree_sha": "bdb15b47bf350c52b5712b4e2b3e86970a78a138",
   "manifest_sha256": "3aecd7c41470b842f00e16d524a680ea9dbc7dfede2c4492198d7f83b375e828",
