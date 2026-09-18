@@ -78,5 +78,26 @@ def main():
     else:
         raise AssertionError("small cohort was accepted")
 
+    wrong_issuer = copy.deepcopy(report)
+    wrong_issuer["attestation"]["issuer"] = "attacker"
+    try:
+        verify(wrong_issuer, public_hex)
+    except AssertionError:
+        print("PASS wrong issuer rejected")
+    else:
+        raise AssertionError("wrong issuer was accepted")
+
+    bad_time = copy.deepcopy(report)
+    bad_time["payload"]["generated_at"] = "2026-09-17T13:00:00Z"
+    raw = canonical_json(bad_time["payload"])
+    bad_time["attestation"]["payload_sha256"] = hashlib.sha256(raw).hexdigest()
+    bad_time["attestation"]["signature"] = base64.b64encode(private.sign(raw)).decode("ascii")
+    try:
+        verify(bad_time, public_hex)
+    except AssertionError:
+        print("PASS chronology rejected")
+    else:
+        raise AssertionError("invalid chronology was accepted")
+
 if __name__ == "__main__":
     main()
