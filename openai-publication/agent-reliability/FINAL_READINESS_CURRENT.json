@@ -3,7 +3,7 @@
     "observed_date":  "2026-09-18",
     "candidate":  "RUMBO Agent Reliability",
     "package_slug":  "rumbo-coding-agent-reliability",
-    "source_commit":  "58fd26b708267c22685a8626705e94203dfa08d3",
+    "source_commit":  "e9b50c7e0fe64cb14135569181843212ce03fd86",
     "local_package":  "PASS",
     "mcp_tests":  "9/9 PASS",
     "public_url_http":  {
