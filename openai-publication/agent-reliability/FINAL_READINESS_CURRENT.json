@@ -4,6 +4,8 @@
     "candidate":  "RUMBO Agent Reliability",
     "package_slug":  "rumbo-coding-agent-reliability",
     "source_commit":  "e9b50c7e0fe64cb14135569181843212ce03fd86",
+    "source_commit_role":  "functional_candidate_base",
+    "branch_head":  "3269a5fd5a1eb120bfc2d982f8df8392ed58edb4",
     "local_package":  "PASS",
     "mcp_tests":  "9/9 PASS",
     "public_url_http":  {
