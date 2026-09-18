@@ -4,7 +4,6 @@ import argparse
 import base64
 import hashlib
 import json
-import re
 from datetime import datetime
 
 try:
@@ -12,8 +11,6 @@ try:
 except ImportError as exc:
     raise SystemExit("cryptography is required: pip install cryptography") from exc
 
-APP_ID_RE = re.compile(r"^app_[A-Za-z0-9._-]+$")
-PUBLISHER_ID_RE = re.compile(r"^pub_[A-Za-z0-9._-]+$")
 PROTECTED = {"installations_total", "installations_new", "uninstallations", "active_users_7d", "active_users_30d", "retention_30d"}
 
 def canonical_json(value):

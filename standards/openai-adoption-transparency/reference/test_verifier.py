@@ -50,6 +50,14 @@ def main():
     verify(report, public_hex)
     print("PASS valid envelope")
 
+    opaque_id = copy.deepcopy(report)
+    opaque_id["payload"]["app_id"] = "plugin_asdk_app_6a9b9c5f7a708191a145dddc5734dff2"
+    raw = canonical_json(opaque_id["payload"])
+    opaque_id["attestation"]["payload_sha256"] = hashlib.sha256(raw).hexdigest()
+    opaque_id["attestation"]["signature"] = base64.b64encode(private.sign(raw)).decode("ascii")
+    verify(opaque_id, public_hex)
+    print("PASS opaque platform app id")
+
     tampered = copy.deepcopy(report)
     tampered["payload"]["metrics"]["tool_calls_total"]["value"] = 451
     try:

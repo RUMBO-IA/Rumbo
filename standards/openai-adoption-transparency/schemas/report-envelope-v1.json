@@ -9,13 +9,14 @@
     "payload": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["schema", "protocol_version", "source", "publisher_id", "app_id", "app_version", "reporting_period", "generated_at", "privacy", "metrics"],
+      "required": ["schema", "protocol_version", "report_revision", "source", "publisher_id", "app_id", "app_version", "reporting_period", "generated_at", "privacy", "metrics"],
       "properties": {
         "schema": {"const": "rumbo.openai-adoption-transparency/report-v1"},
         "protocol_version": {"const": "1.0"},
+        "report_revision": {"type": "integer", "minimum": 1},
         "source": {"const": "openai"},
         "publisher_id": {"type": "string", "minLength": 1, "pattern": "^pub_[A-Za-z0-9._-]+$"},
-        "app_id": {"type": "string", "minLength": 1, "pattern": "^app_[A-Za-z0-9._-]+$"},
+        "app_id": {"type": "string", "minLength": 1},
         "app_version": {"type": "string", "minLength": 1},
         "reporting_period": {
           "type": "object", "additionalProperties": false,
