@@ -22,6 +22,7 @@
         "websiteURL": "https://rumbo.verso.fans",
         "privacyPolicyURL": "https://rumbo.verso.fans/openai-privacy",
         "termsOfServiceURL": "https://rumbo.verso.fans/openai-terms",
+        "supportURL": "https://rumbo.verso.fans/openai-support",
         "defaultPrompt": [
           "Recover the canonical state before changing this workflow.",
           "Reconcile conflicting agent execution receipts.",
