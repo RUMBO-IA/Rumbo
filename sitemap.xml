@@ -6,4 +6,10 @@
   <url>
     <loc>https://rumbo.verso.fans/security</loc>
   </url>
+  <url>
+    <loc>https://rumbo.verso.fans/openai-adoption-transparency</loc>
+  </url>
+  <url>
+    <loc>https://rumbo.verso.fans/schemas/openai-adoption-transparency/report-envelope-v1.json</loc>
+  </url>
 </urlset>
