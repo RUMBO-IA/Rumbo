@@ -14,7 +14,7 @@
     "com.openai": {
       "interface": {
         "displayName": "RUMBO Agent Reliability",
-        "shortDescription": "Evidence-first coding-agent reliability workflows",
+        "shortDescription": "Reliable agent workflows",
         "longDescription": "Recover authoritative state, reconcile conflicting evidence, control agent loops, verify real effects, audit final state, and expose privacy-preserving runtime adoption observations.",
         "developerName": "RUMBO IA",
         "category": "Productivity",
