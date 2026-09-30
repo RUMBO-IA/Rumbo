@@ -14,6 +14,11 @@ csp = headers.get("Content-Security-Policy", "")
 assert f"'sha256-{script_hash}'" in csp
 assert "script-src 'self'" in csp and "'unsafe-inline'" not in csp.split("style-src")[0]
 assert "script-src-attr 'none'" in csp
+
+COOKIEYES_SCRIPT = "https://cdn-cookieyes.com/client_data/7b543bb9f5d3733c1f7e966ca7392b40/script.js"
+assert COOKIEYES_SCRIPT in html
+assert "https://cdn-cookieyes.com" in csp
+assert "https://*.cookieyes.com" in csp
 for directive in ["object-src 'none'", "frame-ancestors 'none'", "frame-src 'none'", "base-uri 'none'", "form-action 'self'", "connect-src 'self'", "upgrade-insecure-requests"]:
     assert directive in csp, directive
 assert headers["X-Content-Type-Options"] == "nosniff"
