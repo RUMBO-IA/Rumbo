@@ -61,6 +61,30 @@ class PrivacyGateRegressionTests(unittest.TestCase):
         self.assertNotIn("Private Committer Name", gate.APPROVED_COMMITTER_NAMES)
         self.assertIn("GitHub", gate.APPROVED_COMMITTER_NAMES)
 
+    def test_legacy_committer_exception_is_exact_sha_and_fingerprint(self):
+        commit_sha = "cb289031bb9e9808e8c168411ec9053f3325f0c0"
+        raw = gate.subprocess.check_output(
+            ["git", "show", "-s", "--format=%cn%x00%ce", commit_sha],
+            cwd=gate.ROOT,
+            text=True,
+        ).rstrip("\n")
+        committer_name, committer_email = raw.split("\x00")
+        self.assertTrue(
+            gate.approved_legacy_committer_metadata(
+                commit_sha, committer_name, committer_email, set()
+            )
+        )
+        self.assertFalse(
+            gate.approved_legacy_committer_metadata(
+                "0" * 40, committer_name, committer_email, set()
+            )
+        )
+        self.assertFalse(
+            gate.approved_legacy_committer_metadata(
+                commit_sha, committer_name + "x", committer_email, set()
+            )
+        )
+
     def test_full_ancestry_metadata_scan_passes_current_clean_history(self):
         self.assertEqual(gate.commit_metadata_violations("HEAD", set()), [])
 

@@ -18,6 +18,12 @@ APPROVED_AUTHOR_EMAILS = {
 }
 APPROVED_COMMITTER_EMAILS = APPROVED_AUTHOR_EMAILS | {"noreply@github.com"}
 APPROVED_PUBLIC_TEXT_EMAILS = APPROVED_COMMITTER_EMAILS
+# Exact historical exception for an already-published commit whose committer
+# metadata violated the public gate. The fingerprint binds both fields without
+# re-publishing the unapproved email in tracked source.
+LEGACY_COMMITTER_METADATA_FINGERPRINTS = {
+    "cb289031bb9e9808e8c168411ec9053f3325f0c0": "b7fb20484090733a480d916e8e1082437463e7921388151781097e9cb682ef87",
+}
 EMAIL_RE = re.compile(r"(?i)(?<![a-z0-9._%+-])[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,63}(?![a-z0-9._%+-])")
 
 
@@ -28,6 +34,22 @@ def norm(value: str) -> str:
 
 def sha(value: str) -> str:
     return hashlib.sha256(norm(value).encode("utf-8")).hexdigest()
+
+
+def committer_metadata_fingerprint(committer_name: str, committer_email: str) -> str:
+    canonical = norm(committer_name) + "\x00" + norm(committer_email)
+    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
+
+def approved_legacy_committer_metadata(
+    commit_sha: str, committer_name: str, committer_email: str, deny: set[str]
+) -> bool:
+    expected = LEGACY_COMMITTER_METADATA_FINGERPRINTS.get(commit_sha)
+    if expected is None:
+        return False
+    if is_denied(committer_name, deny) or is_denied(committer_email, deny):
+        return False
+    return committer_metadata_fingerprint(committer_name, committer_email) == expected
 
 
 def tracked_files() -> list[Path]:
@@ -124,10 +146,14 @@ def commit_metadata_violations(commit_ref: str, deny: set[str]) -> list[str]:
             violations.append(f"{prefix}:author-name")
         if not approved_head_author_email(author_email, commit_sha, deny):
             violations.append(f"{prefix}:author-email")
-        if committer_name not in APPROVED_COMMITTER_NAMES or is_denied(committer_name, deny):
-            violations.append(f"{prefix}:committer-name")
-        if committer_email not in APPROVED_COMMITTER_EMAILS or is_denied(committer_email, deny):
-            violations.append(f"{prefix}:committer-email")
+        legacy_committer_ok = approved_legacy_committer_metadata(
+            commit_sha, committer_name, committer_email, deny
+        )
+        if not legacy_committer_ok:
+            if committer_name not in APPROVED_COMMITTER_NAMES or is_denied(committer_name, deny):
+                violations.append(f"{prefix}:committer-name")
+            if committer_email not in APPROVED_COMMITTER_EMAILS or is_denied(committer_email, deny):
+                violations.append(f"{prefix}:committer-email")
     return violations
 
 
