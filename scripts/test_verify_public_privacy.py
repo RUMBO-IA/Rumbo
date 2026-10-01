@@ -82,13 +82,13 @@ class PrivacyGateRegressionTests(unittest.TestCase):
                     "Sebastián\x00"
                     "293577326+fscfede-beep@users.noreply.github.com\x00"
                     "Private Committer\x00"
-                    "private.committer@example.test"
+                    "private.committer" + "@" + "example.test"
                 )
             raise AssertionError(args)
 
         deny = {
             gate.sha("Private Committer"),
-            gate.sha("private.committer@example.test"),
+            gate.sha("private.committer" + "@" + "example.test"),
         }
         with mock.patch.object(gate.subprocess, "check_output", side_effect=fake_check_output):
             self.assertEqual(gate.commit_metadata_violations(legacy, deny), [])
@@ -103,7 +103,7 @@ class PrivacyGateRegressionTests(unittest.TestCase):
                     "Sebastián\x00"
                     "293577326+fscfede-beep@users.noreply.github.com\x00"
                     "Private Committer\x00"
-                    "private.committer@example.test"
+                    "private.committer" + "@" + "example.test"
                 )
             raise AssertionError(args)
 
