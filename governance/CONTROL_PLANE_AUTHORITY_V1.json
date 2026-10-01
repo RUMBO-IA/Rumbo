@@ -1,0 +1,37 @@
+{
+  "schema": "rumbo.control-plane-authority/v1",
+  "authority_repository": "RUMBO-IA/Rumbo",
+  "authority_ref": "main",
+  "authority_ref_must_be_protected": true,
+  "authority_ruleset_id": 22317339,
+  "authority_required_checks": ["privacy", "Vercel"],
+  "source_repository": "RUMBO-IA/rumbo-control-queue",
+  "source_branch": "main",
+  "source_branch_is_authority": false,
+  "canonical_source_commit": "68b6ad0b883638f4d5dc15bb4f8e668267cb932e",
+  "canonical_source_tree": "7f9e32478dae0f491fdacc78a2ecfe1f0473af18",
+  "source_commit_evidence": {
+    "pull_request": 1578,
+    "candidate_head": "867b0aa47836ec3ed14bab0c6a6f478d1a3248f8",
+    "merge_group_head": "68b6ad0b883638f4d5dc15bb4f8e668267cb932e",
+    "candidate_validation": "SUCCESS",
+    "trusted_identity": "SUCCESS",
+    "governed_attestation": "SUCCESS",
+    "merged": true
+  },
+  "private_authority_regression": {
+    "observed_branch_protected": false,
+    "rulesets_api": "FORBIDDEN_PLAN_REQUIRES_UPGRADE_OR_PUBLIC_REPOSITORY",
+    "classification": "PRIVATE_MAIN_NO_LONGER_SUFFICIENT_AS_CANONICAL_AUTHORITY"
+  },
+  "authority_rule": "ONLY_THIS_PROTECTED_PUBLIC_ANCHOR_SELECTS_CANONICAL_PRIVATE_COMMITS",
+  "selection_semantics": {
+    "private_commit_is_immutable": true,
+    "private_main_may_drift_without_changing_canon": true,
+    "anchor_update_requires_protected_public_promotion": true,
+    "missing_or_unreadable_anchor": "NO_CANONICAL_PROMOTION",
+    "unlisted_private_commit": "NON_CANONICAL"
+  },
+  "production": "NO_GO",
+  "external_spend_usd": 0
+}
