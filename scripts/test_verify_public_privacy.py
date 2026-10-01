@@ -1,4 +1,5 @@
-﻿import sys
+import json
+import sys
 import unittest
 from pathlib import Path
 from unittest import mock
@@ -60,6 +61,26 @@ class PrivacyGateRegressionTests(unittest.TestCase):
     def test_committer_name_must_be_public(self):
         self.assertNotIn("Private Committer Name", gate.APPROVED_COMMITTER_NAMES)
         self.assertIn("GitHub", gate.APPROVED_COMMITTER_NAMES)
+
+    def test_historical_exception_is_exact_commit_and_field_scoped(self):
+        incident = "cb289031bb9e9808e8c168411ec9053f3325f0c0"
+        self.assertTrue(gate.is_historical_metadata_exception(incident, "committer-name"))
+        self.assertTrue(gate.is_historical_metadata_exception(incident, "committer-email"))
+        self.assertFalse(gate.is_historical_metadata_exception(incident, "author-email"))
+        self.assertFalse(gate.is_historical_metadata_exception("0" * 40, "committer-email"))
+
+    def test_historical_exception_receipt_matches_code(self):
+        receipt_path = Path(__file__).resolve().parents[1] / "governance" / "PRIVACY_HISTORY_INCIDENT_20261001.json"
+        receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+        self.assertEqual(receipt["offending_commit_sha"], "cb289031bb9e9808e8c168411ec9053f3325f0c0")
+        self.assertEqual(set(receipt["grandfathered_metadata_fields"]), {"committer-name", "committer-email"})
+        self.assertEqual(set(receipt["grandfathered_metadata_fields"]), set(gate.HISTORICAL_METADATA_EXCEPTIONS[receipt["offending_commit_sha"]]))
+        self.assertEqual(receipt["history_rewrite"], "NOT_AUTHORIZED")
+        self.assertEqual(receipt["sensitive_values_repeated_in_receipt"], False)
+
+    def test_historical_exception_does_not_approve_identity_globally(self):
+        self.assertNotIn("Sebasti?n Federico", gate.APPROVED_COMMITTER_NAMES)
+        self.assertNotIn("fscfede@gmail.com", gate.APPROVED_COMMITTER_EMAILS)
 
     def test_full_ancestry_metadata_scan_passes_current_clean_history(self):
         self.assertEqual(gate.commit_metadata_violations("HEAD", set()), [])

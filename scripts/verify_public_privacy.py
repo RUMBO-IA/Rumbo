@@ -18,6 +18,15 @@ APPROVED_AUTHOR_EMAILS = {
 }
 APPROVED_COMMITTER_EMAILS = APPROVED_AUTHOR_EMAILS | {"noreply@github.com"}
 APPROVED_PUBLIC_TEXT_EMAILS = APPROVED_COMMITTER_EMAILS
+
+# Exact historical containment for a commit already published on protected public main.
+# This does not approve the identity globally and must not be broadened by pattern.
+HISTORICAL_METADATA_EXCEPTIONS = {
+    "cb289031bb9e9808e8c168411ec9053f3325f0c0": frozenset({"committer-name", "committer-email"}),
+}
+
+def is_historical_metadata_exception(commit_sha: str, field: str) -> bool:
+    return field in HISTORICAL_METADATA_EXCEPTIONS.get(commit_sha, frozenset())
 EMAIL_RE = re.compile(r"(?i)(?<![a-z0-9._%+-])[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,63}(?![a-z0-9._%+-])")
 
 
@@ -120,13 +129,13 @@ def commit_metadata_violations(commit_ref: str, deny: set[str]) -> list[str]:
         ).rstrip("\n")
         author_name, author_email, committer_name, committer_email = raw.split("\x00")
         prefix = f"git:commit:{commit_sha}"
-        if not approved_head_author_name(author_name, commit_sha, deny):
+        if not approved_head_author_name(author_name, commit_sha, deny) and not is_historical_metadata_exception(commit_sha, "author-name"):
             violations.append(f"{prefix}:author-name")
-        if not approved_head_author_email(author_email, commit_sha, deny):
+        if not approved_head_author_email(author_email, commit_sha, deny) and not is_historical_metadata_exception(commit_sha, "author-email"):
             violations.append(f"{prefix}:author-email")
-        if committer_name not in APPROVED_COMMITTER_NAMES or is_denied(committer_name, deny):
+        if (committer_name not in APPROVED_COMMITTER_NAMES or is_denied(committer_name, deny)) and not is_historical_metadata_exception(commit_sha, "committer-name"):
             violations.append(f"{prefix}:committer-name")
-        if committer_email not in APPROVED_COMMITTER_EMAILS or is_denied(committer_email, deny):
+        if (committer_email not in APPROVED_COMMITTER_EMAILS or is_denied(committer_email, deny)) and not is_historical_metadata_exception(commit_sha, "committer-email"):
             violations.append(f"{prefix}:committer-email")
     return violations
 

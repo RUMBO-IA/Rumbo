@@ -1,0 +1,23 @@
+{
+  "schema": "rumbo.public-privacy-history-incident/v1",
+  "incident_id": "privacy-history-20261001-main-committer-metadata",
+  "offending_commit_sha": "cb289031bb9e9808e8c168411ec9053f3325f0c0",
+  "exposure_surface": "PUBLIC_GIT_COMMIT_METADATA",
+  "grandfathered_metadata_fields": [
+    "committer-name",
+    "committer-email"
+  ],
+  "sensitive_values_repeated_in_receipt": false,
+  "containment": "EXACT_SHA_AND_FIELD_SCOPED_EXCEPTION_ONLY",
+  "new_identity_approval": false,
+  "future_matching_identity_allowed": false,
+  "history_rewrite": "NOT_AUTHORIZED",
+  "true_removal_requires": [
+    "coordinated history rewrite",
+    "protected-branch force-update authority",
+    "open-PR and clone reconciliation",
+    "GitHub cached-reference cleanup where applicable"
+  ],
+  "production": "NO_GO",
+  "external_spend_usd": 0
+}
