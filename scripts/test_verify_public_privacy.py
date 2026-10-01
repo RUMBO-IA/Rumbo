@@ -1,4 +1,4 @@
-﻿import sys
+import sys
 import unittest
 from pathlib import Path
 from unittest import mock
@@ -60,6 +60,53 @@ class PrivacyGateRegressionTests(unittest.TestCase):
     def test_committer_name_must_be_public(self):
         self.assertNotIn("Private Committer Name", gate.APPROVED_COMMITTER_NAMES)
         self.assertIn("GitHub", gate.APPROVED_COMMITTER_NAMES)
+
+    def test_legacy_metadata_exception_is_exact_sha_and_field_scoped(self):
+        legacy = "7734270af5e1928215838fb0f0aee940599d43e4"
+        self.assertTrue(gate.is_legacy_metadata_exception(legacy, "committer-name"))
+        self.assertTrue(gate.is_legacy_metadata_exception(legacy, "committer-email"))
+        self.assertFalse(gate.is_legacy_metadata_exception(legacy, "author-name"))
+        self.assertFalse(gate.is_legacy_metadata_exception(legacy, "author-email"))
+        self.assertFalse(gate.is_legacy_metadata_exception("a" * 40, "committer-email"))
+
+    def test_legacy_metadata_exception_does_not_generalize(self):
+        legacy = "7734270af5e1928215838fb0f0aee940599d43e4"
+        private_email = "private.committer" + "@" + "example.test"
+
+        def fake_check_output(args, **kwargs):
+            if args[:2] == ["git", "rev-list"]:
+                return legacy + "\n"
+            if args[:3] == ["git", "show", "-s"]:
+                return (
+                    "Sebastián\x00"
+                    "293577326+fscfede-beep@users.noreply.github.com\x00"
+                    "Private Committer\x00"
+                    + private_email
+                )
+            raise AssertionError(args)
+
+        deny = {gate.sha("Private Committer"), gate.sha(private_email)}
+        with mock.patch.object(gate.subprocess, "check_output", side_effect=fake_check_output):
+            self.assertEqual(gate.commit_metadata_violations(legacy, deny), [])
+
+        other = "a" * 40
+
+        def fake_other(args, **kwargs):
+            if args[:2] == ["git", "rev-list"]:
+                return other + "\n"
+            if args[:3] == ["git", "show", "-s"]:
+                return (
+                    "Sebastián\x00"
+                    "293577326+fscfede-beep@users.noreply.github.com\x00"
+                    "Private Committer\x00"
+                    + private_email
+                )
+            raise AssertionError(args)
+
+        with mock.patch.object(gate.subprocess, "check_output", side_effect=fake_other):
+            violations = gate.commit_metadata_violations(other, deny)
+        self.assertIn(f"git:commit:{other}:committer-name", violations)
+        self.assertIn(f"git:commit:{other}:committer-email", violations)
 
     def test_full_ancestry_metadata_scan_passes_current_clean_history(self):
         self.assertEqual(gate.commit_metadata_violations("HEAD", set()), [])
