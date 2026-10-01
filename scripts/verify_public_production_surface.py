@@ -82,6 +82,9 @@ def fetch_url(url: str, timeout: float = 15.0) -> tuple[int, bytes]:
     )
     try:
         with urllib.request.urlopen(req, timeout=timeout) as response:
+            final_url = response.geturl()
+            if final_url != url:
+                raise RuntimeError(f"redirect detected: {url} -> {final_url}")
             return response.status, response.read()
     except urllib.error.HTTPError as exc:
         return exc.code, exc.read()
@@ -170,7 +173,7 @@ def verify_surface(root: pathlib.Path, lock: dict, timeout: float) -> dict:
             timeout=timeout,
         )
         checks.append(check)
-        if live_raw is None or check["status"] not in ("PASS", "DRIFT"):
+        if live_raw is None or check["status"] != "PASS":
             continue
         page_url = check["url"]
         stylesheet_routes.update(
