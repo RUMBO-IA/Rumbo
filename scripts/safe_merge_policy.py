@@ -39,8 +39,8 @@ DEFAULT_POLICY = MergePolicy(
     live_domain="rumbo.verso.fans",
     privacy_workflow_id=347174988,
     privacy_workflow_path=".github/workflows/privacy-gate.yml",
-    privacy_workflow_blob="376750ec7bc653c88304d70cb4b6de1b4cbcf472",
-    privacy_workflow_sha256="78b2a357e72440e9943d492009edee3315b3b7ba2f0cae9506d51fc0cd02c412",
+    privacy_workflow_blob="1cb3ed7881961516b54fb5ab663890914440463a",
+    privacy_workflow_sha256="b2f9e4919268b618e6d601c0e9280df8b376a9dec338e71483d3c4a551795bc6",
 )
 
 
