@@ -39,3 +39,7 @@ jobs:
         run: python scripts/verify_commercial_coherence.py
       - name: Verify security headers configuration
         run: python scripts/verify_security_headers.py
+      - name: Test public control authority anchor
+        run: python -m unittest scripts.test_control_authority_anchor -v
+      - name: Verify public control authority anchor offline
+        run: python scripts/verify_control_authority_anchor.py --anchor docs/control-authority-anchor-v1.json --offline
