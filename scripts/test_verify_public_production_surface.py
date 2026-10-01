@@ -2,6 +2,7 @@ import json
 import pathlib
 import tempfile
 import unittest
+from unittest import mock
 
 from scripts import verify_public_production_surface as surface
 
@@ -27,7 +28,6 @@ class PublicProductionSurfaceTests(unittest.TestCase):
     def test_invalid_utf8_fails_closed(self):
         with self.assertRaises(UnicodeDecodeError):
             surface.normalize_html(b"\xff\xfe")
-
     def test_lock_requires_authorized_status(self):
         with tempfile.TemporaryDirectory() as td:
             path = pathlib.Path(td) / "lock.json"
@@ -50,6 +50,99 @@ class PublicProductionSurfaceTests(unittest.TestCase):
             }), encoding="utf-8")
             with self.assertRaisesRegex(ValueError, "missing domain"):
                 surface.load_lock(path)
+
+    def test_discovers_relative_same_origin_stylesheet(self):
+        html = b'<html><head><link rel="stylesheet" href="styles.css"></head></html>'
+        result = surface.discover_same_origin_stylesheets(
+            html,
+            "https://rumbo.verso.fans/openai-support",
+            "rumbo.verso.fans",
+        )
+        self.assertEqual(["/styles.css"], result)
+
+    def test_ignores_external_stylesheet(self):
+        html = (
+            b'<link rel="stylesheet" href="https://cdn.example.com/x.css">'
+            b'<link rel="stylesheet" href="/styles.css">'
+        )
+        result = surface.discover_same_origin_stylesheets(
+            html,
+            "https://rumbo.verso.fans/openai-support",
+            "rumbo.verso.fans",
+        )
+        self.assertEqual(["/styles.css"], result)
+
+    def test_source_path_for_asset_strips_query(self):
+        self.assertEqual(
+            "styles.css",
+            surface.source_path_for_asset("/styles.css?v=1"),
+        )
+
+    @mock.patch.object(surface, "fetch_url")
+    @mock.patch.object(surface, "read_authorized_source")
+    def test_verify_asset_reports_http_failure(self, read_source, fetch_url):
+        read_source.return_value = b"body"
+        fetch_url.return_value = (404, b"missing")
+        check, body = surface.verify_asset(
+            domain="rumbo.verso.fans",
+            route="/styles.css",
+            source_path="styles.css",
+            root=pathlib.Path("."),
+            app_sha="a" * 40,
+            timeout=1.0,
+        )
+        self.assertEqual("HTTP_FAIL", check["status"])
+        self.assertIsNone(body)
+
+    @mock.patch.object(surface, "read_authorized_source")
+    def test_verify_asset_reports_missing_authorized_source(self, read_source):
+        read_source.side_effect = RuntimeError("missing")
+        check, body = surface.verify_asset(
+            domain="rumbo.verso.fans",
+            route="/privacy",
+            source_path="privacy.html",
+            root=pathlib.Path("."),
+            app_sha="a" * 40,
+            timeout=1.0,
+        )
+        self.assertEqual("SOURCE_MISSING", check["status"])
+        self.assertIsNone(body)
+
+    @mock.patch.object(surface, "verify_asset")
+    def test_verify_surface_discovers_stylesheet_from_each_html_route(self, verify_asset):
+        def fake_verify_asset(**kwargs):
+            route = kwargs["route"]
+            if route == "/styles.css":
+                return ({
+                    "route": route,
+                    "source_path": "styles.css",
+                    "url": "https://rumbo.verso.fans/styles.css",
+                    "status": "PASS",
+                }, b"body{}")
+            return ({
+                "route": route,
+                "source_path": kwargs["source_path"],
+                "url": "https://rumbo.verso.fans" + route,
+                "status": "PASS",
+            }, b'<link rel="stylesheet" href="/styles.css">')
+
+        verify_asset.side_effect = fake_verify_asset
+        result = surface.verify_surface(
+            pathlib.Path("."),
+            {
+                "domain": "rumbo.verso.fans",
+                "application_sha": "a" * 40,
+                "deployment_id": "dpl_test",
+            },
+            1.0,
+        )
+        stylesheet_checks = [
+            check for check in result["checks"]
+            if check.get("dependency_type") == "stylesheet"
+        ]
+        self.assertEqual(1, len(stylesheet_checks))
+        self.assertEqual("/styles.css", stylesheet_checks[0]["route"])
+        self.assertEqual("PASS", result["status"])
 
 
 if __name__ == "__main__":
