@@ -144,6 +144,43 @@ class PublicProductionSurfaceTests(unittest.TestCase):
         self.assertEqual("/styles.css", stylesheet_checks[0]["route"])
         self.assertEqual("PASS", result["status"])
 
+    @mock.patch.object(surface.urllib.request, "urlopen")
+    def test_fetch_url_rejects_redirected_final_url(self, urlopen):
+        response = mock.MagicMock()
+        response.status = 200
+        response.read.return_value = b"same-body"
+        response.geturl.return_value = "https://rumbo.verso.fans/openai-privacy"
+        urlopen.return_value.__enter__.return_value = response
+
+        with self.assertRaisesRegex(RuntimeError, "redirect"):
+            surface.fetch_url("https://rumbo.verso.fans/privacy", timeout=1.0)
+
+    @mock.patch.object(surface, "verify_asset")
+    def test_verify_surface_does_not_discover_dependencies_from_drift(self, verify_asset):
+        def fake_verify_asset(**kwargs):
+            route = kwargs["route"]
+            if route.startswith("/evil.css"):
+                self.fail("dependency discovery must not use drifted HTML")
+            return ({
+                "route": route,
+                "source_path": kwargs["source_path"],
+                "url": "https://rumbo.verso.fans" + route,
+                "status": "DRIFT",
+            }, b'<link rel="stylesheet" href="/evil.css?v=1">')
+
+        verify_asset.side_effect = fake_verify_asset
+        result = surface.verify_surface(
+            pathlib.Path("."),
+            {
+                "domain": "rumbo.verso.fans",
+                "application_sha": "a" * 40,
+                "deployment_id": "dpl_test",
+            },
+            1.0,
+        )
+        self.assertEqual(len(surface.HTML_ROUTES), verify_asset.call_count)
+        self.assertEqual("DRIFT", result["status"])
+
 
 if __name__ == "__main__":
     unittest.main()
