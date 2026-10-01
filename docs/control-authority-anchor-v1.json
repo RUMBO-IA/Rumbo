@@ -1,0 +1,32 @@
+{
+  "schema": "rumbo.public-protected-authority-anchor/v1",
+  "observed_at": "2026-10-01T03:20:00Z",
+  "authority_effect": "PRIVATE_CONTROL_PROMOTION_ANCHOR",
+  "public_authority": {
+    "repository": "RUMBO-IA/Rumbo",
+    "branch": "main",
+    "required_readback": {
+      "protected": true,
+      "required_status_checks": ["privacy", "Vercel"]
+    }
+  },
+  "subject": {
+    "kind": "PRIVATE_CONTROL_REPOSITORY",
+    "repository_identity_sha256": "91032dab12172e730c93b2032b03d59df1401339ef1681af0a86158c723eb8a7",
+    "authorized_main_sha": "68b6ad0b883638f4d5dc15bb4f8e668267cb932e"
+  },
+  "private_native_enforcement": {
+    "state": "NOT_PROVEN_POST_ENTERPRISE",
+    "provider_readback": "PRIVATE_REPO_RULESETS_AND_BRANCH_PROTECTION_REQUIRE_UPGRADE_OR_PUBLIC_VISIBILITY",
+    "private_repository_must_remain_private": true
+  },
+  "policy": {
+    "canonical_private_state_requires_exact_sha_match": true,
+    "private_main_alone_is_not_promotion_authority": true,
+    "public_anchor_update_requires_protected_public_path": true,
+    "production": "NO_GO",
+    "external_spend_usd": 0,
+    "paid_upgrade_authorized": false,
+    "make_private_repo_public_authorized": false
+  }
+}
