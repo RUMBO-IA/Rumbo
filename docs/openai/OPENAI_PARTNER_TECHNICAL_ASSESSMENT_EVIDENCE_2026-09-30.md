@@ -44,7 +44,7 @@ No production-traffic volume, customer count, or production-scale OpenAI workloa
 
 ## Governance and Responsible AI
 
-**Designated owner:** Sebastián Federico Cesaratto, Founder / Partner Admin.
+**Designated owner:** Founder / Partner Admin.
 
 Operational governance is fail-closed:
 - capability does not equal authorization;
