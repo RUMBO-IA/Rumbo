@@ -1,6 +1,6 @@
 {
     "name":  "rumbo-coding-agent-reliability",
-    "version":  "0.2.0",
+    "version":  "0.4.0",
     "description":  "Evidence-first workflows for reliable coding-agent execution, continuity, scope control, and final-state verification.",
     "author":  {
                    "name":  "RUMBO IA",
