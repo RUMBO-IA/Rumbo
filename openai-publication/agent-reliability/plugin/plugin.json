@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "rumbo-coding-agent-reliability",
-  "version": "0.4.0",
+  "version": "0.2.0",
   "description": "Evidence-first workflows for reliable coding-agent execution, continuity, scope control, final-state verification, and privacy-preserving adoption telemetry.",
   "author": {
     "name": "RUMBO IA",
