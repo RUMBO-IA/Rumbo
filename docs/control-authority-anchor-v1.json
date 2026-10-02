@@ -1,42 +1,45 @@
 {
-  "schema": "rumbo.public-protected-authority-anchor/v1",
-  "observed_at": "2026-10-01T03:47:54Z",
-  "authority_effect": "PRIVATE_CONTROL_PROMOTION_ANCHOR",
-  "public_authority": {
-    "repository": "RUMBO-IA/Rumbo",
-    "branch": "main",
-    "ruleset_id": 22317339,
-    "required_readback": {
-      "protected": true,
-      "required_status_checks": ["privacy", "Vercel"]
-    }
-  },
-  "subject": {
-    "kind": "PRIVATE_CONTROL_REPOSITORY",
-    "repository": "RUMBO-IA/rumbo-control-queue",
-    "repository_identity_sha256": "91032dab12172e730c93b2032b03d59df1401339ef1681af0a86158c723eb8a7",
-    "authorized_main_sha": "68b6ad0b883638f4d5dc15bb4f8e668267cb932e",
-    "authorized_tree_sha": "7f9e32478dae0f491fdacc78a2ecfe1f0473af18"
-  },
-  "private_native_enforcement": {
-    "state": "DISABLED_ON_GITHUB_FREE_PRIVATE_REPOSITORY",
-    "provider_readback": "private main reports protected=false after RUMBO-IA reverted to GitHub Free",
-    "private_repository_must_remain_private": true
-  },
-  "selection_semantics": {
-    "private_commit_is_immutable": true,
-    "private_main_may_drift_without_changing_canon": true,
-    "anchor_update_requires_protected_public_promotion": true,
-    "missing_or_unreadable_anchor": "NO_CANONICAL_PROMOTION",
-    "unlisted_private_commit": "NON_CANONICAL"
-  },
-  "policy": {
-    "canonical_private_state_requires_exact_sha_match": true,
-    "private_main_alone_is_not_promotion_authority": true,
-    "public_anchor_update_requires_protected_public_path": true,
-    "production": "NO_GO",
-    "external_spend_usd": 0,
-    "paid_upgrade_authorized": false,
-    "make_private_repo_public_authorized": false
-  }
+    "schema":  "rumbo.public-protected-authority-anchor/v1",
+    "observed_at":  "2026-10-02T07:59:00Z",
+    "authority_effect":  "PRIVATE_CONTROL_PROMOTION_ANCHOR",
+    "public_authority":  {
+                             "repository":  "RUMBO-IA/Rumbo",
+                             "branch":  "main",
+                             "ruleset_id":  22317339,
+                             "required_readback":  {
+                                                       "protected":  true,
+                                                       "required_status_checks":  [
+                                                                                      "privacy",
+                                                                                      "Vercel"
+                                                                                  ]
+                                                   }
+                         },
+    "subject":  {
+                    "kind":  "PRIVATE_CONTROL_REPOSITORY",
+                    "repository":  "RUMBO-IA/rumbo-control-queue",
+                    "repository_identity_sha256":  "91032dab12172e730c93b2032b03d59df1401339ef1681af0a86158c723eb8a7",
+                    "authorized_main_sha":  "165c174881689aea665d006bb269b1efd6e0038a",
+                    "authorized_tree_sha":  "356c00f0a91133b5d95b93d45a6f913ac8d23f58"
+                },
+    "private_native_enforcement":  {
+                                       "state":  "DISABLED_ON_GITHUB_FREE_PRIVATE_REPOSITORY",
+                                       "provider_readback":  "private main reports protected=false after RUMBO-IA reverted to GitHub Free",
+                                       "private_repository_must_remain_private":  true
+                                   },
+    "selection_semantics":  {
+                                "private_commit_is_immutable":  true,
+                                "private_main_may_drift_without_changing_canon":  true,
+                                "anchor_update_requires_protected_public_promotion":  true,
+                                "missing_or_unreadable_anchor":  "NO_CANONICAL_PROMOTION",
+                                "unlisted_private_commit":  "NON_CANONICAL"
+                            },
+    "policy":  {
+                   "canonical_private_state_requires_exact_sha_match":  true,
+                   "private_main_alone_is_not_promotion_authority":  true,
+                   "public_anchor_update_requires_protected_public_path":  true,
+                   "production":  "NO_GO",
+                   "external_spend_usd":  0,
+                   "paid_upgrade_authorized":  false,
+                   "make_private_repo_public_authorized":  false
+               }
 }
