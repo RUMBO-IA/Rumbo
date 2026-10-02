@@ -1,59 +1,25 @@
 # RUMBO IA Profile Copy V1
 
-> Compatibility filename retained. Current reconciliation: 2026-10-02.
-> This content supersedes the earlier CRM-first copy stored at this path.
-
-## Public identity
-
-**Display name:** RUMBO IA  
-**Positioning:** Operational AI Systems  
-**Public pillars:** Revenue Recovery · Agent Reliability · Guardian
-
-Founder identity remains separate: Sebastián Federico.
-
 ## GitHub organization
-
-RUMBO IA — Operational AI Systems. Supervised, bounded and verifiable AI systems for real operational workflows: Revenue Recovery, Agent Reliability and Guardian.
+RUMBO IA — human-controlled AI CRM and automation for small businesses in Latin America. Building supervised commercial workflows, reliability controls and evidence-backed automation.
 
 ## LinkedIn company/about
-
-RUMBO IA builds operational AI systems with human control, explicit boundaries and verifiable outcomes.
-
-Our public work is organized around three pillars:
-- Revenue Recovery — controlled workflows for follow-up, proposals and commercial recovery.
-- Agent Reliability — state, continuity, execution controls, readback and evidence for AI agents.
-- Guardian — defensive assurance, policy boundaries and auditability for higher-risk workflows.
-
-Capability is not authority, execution is not verified outcome, and demos are not production evidence.
+RUMBO IA builds human-controlled AI systems for small businesses in Argentina and Latin America. We connect CRM, conversations, lead workflows, approved business knowledge and bounded automation while keeping sensitive decisions under human supervision. Current focus: controlled pilots, revenue recovery, opportunity management and reliability infrastructure.
 
 ## X / short bio
-
-Operational AI Systems with human control. Revenue Recovery · Agent Reliability · Guardian. Evidence before claims.
+Human-controlled AI CRM + automation for LATAM small businesses. CRM, opportunities, revenue recovery and reliability controls.
 
 ## YouTube channel description
-
-RUMBO IA documents operational AI systems with human control, explicit boundaries and verifiable outcomes. Public work covers Revenue Recovery, Agent Reliability and Guardian. Demos, pilots, source changes and production are labeled as different evidence states.
+RUMBO IA documents practical AI systems for commercial operations: CRM, lead workflows, voice, revenue recovery, automation reliability and human-control patterns. Demonstrations and simulated data are labeled as such; production claims require evidence.
 
 ## Marketplace / app directory
-
-RUMBO IA builds bounded AI systems for operational workflows. Revenue Recovery addresses commercial follow-up and recovery; Agent Reliability focuses on execution state, continuity and readback; Guardian focuses on defensive assurance and policy boundaries. Consequential actions remain inside explicit authority and human-control constraints.
+RUMBO IA organizes customer conversations, leads, follow-ups and approved business knowledge in one human-controlled AI workspace. It supports bounded automation for commercial operations while keeping sensitive actions supervised.
 
 ## Short description <=160 chars
-
-Operational AI systems with human control, explicit boundaries and verifiable outcomes. Revenue Recovery, Agent Reliability and Guardian.
+Human-controlled AI CRM and automation for small businesses in Latin America.
 
 ## Medium description
-
-RUMBO IA builds supervised, bounded and verifiable AI systems for real operational workflows across Revenue Recovery, Agent Reliability and Guardian.
+RUMBO IA connects CRM, customer conversations, leads, follow-ups and approved knowledge with supervised AI automation for small businesses in Argentina and Latin America.
 
 ## Naming rule
-
-Use `RUMBO IA` as the public display name. Use `RUMBO` only after the full identity is established and only as a short form. `RUMBO-IA` is the technical GitHub namespace. Handles such as `RumboAGI`, `rumboai`, `rumbo.ia` and `rumboia.bsky.social` are addresses, not alternate brand names.
-
-Do not use `RUMBO AGI`, `Rumbo AI`, `RUMBO.AI` or handle-derived strings as display-name substitutes.
-
-## Evidence boundary
-
-`PROFILE_COPY_DEFINED != PROFILE_WRITE_EXECUTED != PUBLIC_READBACK`
-
-A profile is aligned only after the target platform is written through an authorized writer and the public/provider state is read back.
+Use `RUMBO IA` on first mention. Use `RUMBO` only after context is established. Do not use RUMBO.AI, Rumbo AI or RumboIA unless a platform constraint requires it.
