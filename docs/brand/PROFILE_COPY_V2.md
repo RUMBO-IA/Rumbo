@@ -1,7 +1,7 @@
-# RUMBO IA Profile Copy V1
+# RUMBO IA Profile Copy V2
 
-> Compatibility filename retained. Current reconciliation: 2026-10-02.
-> This content supersedes the earlier CRM-first copy stored at this path.
+> Current candidate public-profile copy. Observed/reconciled: 2026-10-02.
+> V1 remains historical evidence and is not rewritten.
 
 ## Public identity
 
