@@ -1,55 +1,45 @@
 {
   "schema_version": 1,
   "registry_issue": "RUMBO-IA/Rumbo#72",
-  "observed_at": "2026-10-02",
-  "overall_status": "PARTIAL_PASS",
-  "required_channels": ["website", "youtube", "x", "linkedin"],
+  "observed_at": "2026-09-12",
+  "overall_status": "PASS",
+  "required_channels": [
+    "website",
+    "youtube",
+    "x",
+    "linkedin"
+  ],
   "channels": {
     "website": {
       "binding": "PASS",
-      "profile_alignment": "LEGACY_PRODUCTION_DRIFT",
+      "profile_alignment": "PASS",
       "readback": "PASS"
     },
     "youtube": {
       "binding": "PASS",
       "profile_alignment": "PASS",
-      "readback": "PASS"
+      "readback": "PASS",
+      "public_handle": "RumboAGI"
     },
     "x": {
       "binding": "PASS",
-      "profile_alignment": "DISPLAY_NAME_DRIFT",
-      "readback": "PASS"
+      "profile_alignment": "PASS",
+      "readback": "PASS",
+      "public_handle": "RumboAGI"
     },
     "linkedin": {
       "binding": "PASS",
       "profile_alignment": "PASS",
-      "readback": "PASS"
+      "readback": "PASS",
+      "company_id": "145014017",
+      "public_slug": "rumbo-ia",
+      "superadmin": "PASS"
     }
   },
   "optional_channels": {
     "metricool": {
-      "binding": "CONNECTED",
+      "binding": "CONNECTED_NO_NETWORKS",
       "profile_alignment": "N/A",
-      "readback": "PASS"
-    },
-    "bluesky": {
-      "binding": "PASS",
-      "profile_alignment": "ADDRESS_STYLE_DISPLAY_DRIFT",
-      "readback": "PASS"
-    },
-    "instagram": {
-      "binding": "PASS",
-      "profile_alignment": "HANDLE_DERIVED_DISPLAY_DRIFT",
-      "readback": "PASS"
-    },
-    "threads": {
-      "binding": "PASS",
-      "profile_alignment": "FOUNDER_DISPLAY_DRIFT",
-      "readback": "PASS"
-    },
-    "tiktok": {
-      "binding": "PASS",
-      "profile_alignment": "HANDLE_DERIVED_DISPLAY_DRIFT",
       "readback": "PASS"
     }
   },
