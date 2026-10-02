@@ -8,6 +8,7 @@ Implement a useful everyday RUMBO agent that reads email/calendar context, produ
 - Cloud Agents API: not required for v1 because no sandbox/Codex harness is needed.
 - Development project: existing OpenAI Platform project `RUMBO-AI-DEV`.
 - Live provider reads already demonstrated from connected Gmail and Google Calendar in ChatGPT.
+- Boundary: ChatGPT connector OAuth is not assumed reusable by an external SDK app; production provider access requires a separately authorized MCP server/tunnel or other app-owned OAuth path.
 - External spend during this implementation: 0 USD.
 
 ## Safety/authority invariants
@@ -23,7 +24,7 @@ Implement a useful everyday RUMBO agent that reads email/calendar context, produ
 - `daily_ops.py`: runtime, instructions, mock backend, receipts, idempotency, approval-gated tools.
 - `test_daily_ops.py`: offline governance/adversarial tests.
 - `README.md`: runbook and acceptance gates.
-- `requirements.txt`: Agents SDK dependency.
+- `requirements.txt`: Agents SDK pinned to current 0.22.x minor.
 
 ## Verification state
 - GitHub branch isolation: PROVEN
@@ -37,6 +38,7 @@ Implement a useful everyday RUMBO agent that reads email/calendar context, produ
 - Unit test execution: PASS — 8/8 on DESKTOP-QUGVQLB, Python 3.14.6, exit code 0
 - Live OpenAI inference: NOT RUN (would require API model usage)
 - Live Gmail/Calendar mutation: NOT RUN
+- External SDK provider adapter (MCP/tunnel/OAuth): NOT CONFIGURED
 - Production status: NO_GO until tests execute and live writes are verified in an authorized test target
 
 ## Promotion gate
