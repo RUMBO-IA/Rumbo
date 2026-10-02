@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "registry_issue": "RUMBO-IA/Rumbo#72",
+  "observed_at": "2026-10-02",
+  "overall_status": "PARTIAL_PASS",
+  "required_channels": ["website", "youtube", "x", "linkedin"],
+  "channels": {
+    "website": {
+      "binding": "PASS",
+      "profile_alignment": "LEGACY_PRODUCTION_DRIFT",
+      "readback": "PASS"
+    },
+    "youtube": {
+      "binding": "PASS",
+      "profile_alignment": "PASS",
+      "readback": "PASS"
+    },
+    "x": {
+      "binding": "PASS",
+      "profile_alignment": "DISPLAY_NAME_DRIFT",
+      "readback": "PASS"
+    },
+    "linkedin": {
+      "binding": "PASS",
+      "profile_alignment": "PASS",
+      "readback": "PASS"
+    }
+  },
+  "optional_channels": {
+    "metricool": {
+      "binding": "CONNECTED",
+      "profile_alignment": "N/A",
+      "readback": "PASS"
+    },
+    "bluesky": {
+      "binding": "PASS",
+      "profile_alignment": "ADDRESS_STYLE_DISPLAY_DRIFT",
+      "readback": "PASS"
+    },
+    "instagram": {
+      "binding": "PASS",
+      "profile_alignment": "HANDLE_DERIVED_DISPLAY_DRIFT",
+      "readback": "PASS"
+    },
+    "threads": {
+      "binding": "PASS",
+      "profile_alignment": "FOUNDER_DISPLAY_DRIFT",
+      "readback": "PASS"
+    },
+    "tiktok": {
+      "binding": "PASS",
+      "profile_alignment": "HANDLE_DERIVED_DISPLAY_DRIFT",
+      "readback": "PASS"
+    }
+  },
+  "invariant": "DISTRIBUTION_PASS_REQUIRES_ALL_REQUIRED_CHANNELS_PASS"
+}
