@@ -33,6 +33,13 @@ LEGACY_METADATA_EXCEPTIONS = {
     "a80215e0fe334b8cec6976da2fc7bf20fe61d4da": frozenset(
         {"committer-name"}
     ),
+    # PR #199 candidate metadata was approved, but GitHub's server-side merge
+    # rewrote only the committer name on the already-public main commit.
+    # Keep this exception exact-SHA and exact-field; it does not authorize
+    # the same committer name on any future commit.
+    "5b27fce34ac1884312bfd4c5293bd5fa8fd84b51": frozenset(
+        {"committer-name"}
+    ),
 }
 
 
