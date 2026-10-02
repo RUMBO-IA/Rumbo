@@ -119,6 +119,5 @@ The canonical production domain remains governed by #72 and `production_lock_v1.
 
 ## Governance
 
-V2 becomes source canon only after normal review/merge. Public production promotion, logo/avatar promotion and remote profile edits remain separate gates with independent authority and readback.
 
 `BRAND_SPEC_PASS != PUBLICATION_AUTHORITY != PRODUCTION_DEPLOYMENT`
