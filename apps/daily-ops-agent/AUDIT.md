@@ -9,7 +9,7 @@ Implement a useful everyday RUMBO agent that reads email/calendar context, produ
 - Development project: existing OpenAI Platform project `RUMBO-AI-DEV`.
 - Live provider reads already demonstrated from connected Gmail and Google Calendar in ChatGPT.
 - Boundary: ChatGPT connector OAuth is not assumed reusable by an external SDK app; production provider access requires a separately authorized MCP server/tunnel or other app-owned OAuth path.
-- External spend during this implementation: 0 USD.
+- OpenAI API model inference during this implementation: 0 calls. Total provider billing (GitHub/Vercel/etc.): NOT_VERIFIED.
 
 ## Safety/authority invariants
 - AUTHENTICATED != AUTHORIZED
