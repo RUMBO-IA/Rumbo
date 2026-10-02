@@ -1,15 +1,15 @@
 :root {
-  --rumbo-bg: #080c12;
-  --rumbo-panel: #101722;
-  --rumbo-panel-2: #141e2c;
-  --rumbo-line: #263246;
-  --rumbo-text: #f7f9fc;
-  --rumbo-muted: #9aa8ba;
-  --rumbo-orange: #ff7a45;
-  --rumbo-green: #63ddb0;
-  --rumbo-blue: #7aa7ff;
-  --rumbo-red: #ff7b88;
-  --rumbo-font-sans: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+  --rumbo-bg: #171918;
+  --rumbo-panel: #1f2220;
+  --rumbo-panel-2: #252927;
+  --rumbo-line: #343835;
+  --rumbo-text: #F2EFE7;
+  --rumbo-muted: #A9AAA4;
+  --rumbo-orange: #E66A2C;
+  --rumbo-green: #8AB7A2;
+  --rumbo-blue: #54788A;
+  --rumbo-red: #C76868;
+  --rumbo-font-sans: "IBM Plex Sans", Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
 }
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
@@ -42,7 +42,7 @@ a:hover { color: var(--rumbo-text); }
   padding: clamp(48px, 7vw, 88px) 0;
 }
 .section-heading { max-width: 780px; margin-bottom: 30px; }
-h1, h2, h3 { line-height: 1.1; letter-spacing: -.025em; }
+h1, h2, h3 { font-family: "Space Grotesk", Inter, ui-sans-serif, system-ui, sans-serif; line-height: 1.1; letter-spacing: -.025em; }
 h1 { font-size: clamp(44px, 7vw, 84px); margin: 16px 0 22px; }
 h2 { font-size: clamp(30px, 5vw, 54px); margin: 12px 0 18px; }
 h3 { margin: 0 0 8px; }

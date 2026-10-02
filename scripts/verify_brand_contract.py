@@ -21,8 +21,7 @@ PUBLIC_GLOBS = ("apps/landing-publica/*.html",)
 LEGAL_EXEMPT_NAMES = {"privacy.html", "terms.html"}
 
 REQUIRED_PRIMARY_COLORS = {
-    "#080c12", "#101722", "#141e2c", "#263246", "#f7f9fc",
-    "#9aa8ba", "#ff7a45", "#63ddb0", "#7aa7ff", "#ff7b88",
+    "#171918", "#f2efe7", "#e66a2c", "#54788a",
 }
 FORBIDDEN_PUBLIC_CLAIMS = (
     "100% secure", "guaranteed roi", "roi guaranteed",
