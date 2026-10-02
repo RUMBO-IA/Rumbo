@@ -50,7 +50,6 @@ No profile is considered visually aligned merely because a candidate logo exists
 
 ## Production boundary
 
-Social/profile authority is independent of web-production authority.
 
 The canonical domain remains governed by issue #72 and `production_lock_v1.json`. Social alignment does not authorize Vercel alias, DNS or production deployment changes.
 
