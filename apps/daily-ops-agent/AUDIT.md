@@ -34,14 +34,14 @@ Implement a useful everyday RUMBO agent that reads email/calendar context, produ
 - Prompt-injection fixture: PRESENT
 - Live Gmail read plane: previously PROVEN in this chat
 - Live Calendar read plane: previously PROVEN in this chat
-- Unit test execution: pending until a Python runtime executes the test file
+- Unit test execution: PASS — 8/8 on DESKTOP-QUGVQLB, Python 3.14.6, exit code 0
 - Live OpenAI inference: NOT RUN (would require API model usage)
 - Live Gmail/Calendar mutation: NOT RUN
 - Production status: NO_GO until tests execute and live writes are verified in an authorized test target
 
 ## Promotion gate
 Promote only after:
-1. offline tests PASS;
+1. offline tests PASS (completed 2026-10-02);
 2. approved OpenAI model is configured explicitly;
 3. a bounded live read-only run PASSes;
 4. one authorized test write is followed by provider readback;
