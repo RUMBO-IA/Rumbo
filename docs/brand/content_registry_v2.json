@@ -27,7 +27,7 @@
       "lane": "RUMBO_BRAND",
       "identity": "RUMBO IA",
       "claim_class": "BUILT",
-      "publication_state": "APPROVED",
+      "publication_state": "CANDIDATE_SAFE",
       "evidence_refs": [
         "README.md",
         "docs/brand/MESSAGING_V1.md"
@@ -39,14 +39,16 @@
         "LinkedIn",
         "X"
       ],
-      "approval_receipt_ref": "docs/brand/content_approval_receipts/W1-01.json"
+      "approval_receipt_ref": "docs/brand/content_approval_receipts/W1-01.json",
+      "current_gate": "DISTRIBUTION_PARTIAL_PASS",
+      "approval_receipt_preserved": true
     },
     {
       "id": "W1-02",
       "lane": "RUMBO_BRAND",
       "identity": "RUMBO IA",
       "claim_class": "BUILT",
-      "publication_state": "APPROVED",
+      "publication_state": "CANDIDATE_SAFE",
       "evidence_refs": [
         "docs/brand/MESSAGING_V1.md"
       ],
@@ -57,14 +59,16 @@
         "LinkedIn",
         "X"
       ],
-      "approval_receipt_ref": "docs/brand/content_approval_receipts/W1-02.json"
+      "approval_receipt_ref": "docs/brand/content_approval_receipts/W1-02.json",
+      "current_gate": "DISTRIBUTION_PARTIAL_PASS",
+      "approval_receipt_preserved": true
     },
     {
       "id": "W1-03",
       "lane": "RUMBO_BRAND",
       "identity": "RUMBO IA",
       "claim_class": "BUILT",
-      "publication_state": "APPROVED",
+      "publication_state": "CANDIDATE_SAFE",
       "evidence_refs": [
         "README.md",
         "docs/brand/MESSAGING_V1.md"
@@ -76,14 +80,16 @@
         "LinkedIn",
         "X"
       ],
-      "approval_receipt_ref": "docs/brand/content_approval_receipts/W1-03.json"
+      "approval_receipt_ref": "docs/brand/content_approval_receipts/W1-03.json",
+      "current_gate": "DISTRIBUTION_PARTIAL_PASS",
+      "approval_receipt_preserved": true
     },
     {
       "id": "W2-01",
       "lane": "RUMBO_BRAND",
       "identity": "RUMBO IA",
       "claim_class": "BUILT",
-      "publication_state": "APPROVED",
+      "publication_state": "CANDIDATE_SAFE",
       "evidence_refs": [
         "docs/brand/MESSAGING_V1.md"
       ],
@@ -94,14 +100,16 @@
         "LinkedIn",
         "X"
       ],
-      "approval_receipt_ref": "docs/brand/content_approval_receipts/W2-01.json"
+      "approval_receipt_ref": "docs/brand/content_approval_receipts/W2-01.json",
+      "current_gate": "DISTRIBUTION_PARTIAL_PASS",
+      "approval_receipt_preserved": true
     },
     {
       "id": "W2-02",
       "lane": "RUMBO_BRAND",
       "identity": "RUMBO IA",
       "claim_class": "DEMO",
-      "publication_state": "APPROVED",
+      "publication_state": "CANDIDATE_SAFE",
       "evidence_refs": [
         "docs/brand/CLAIMS_POLICY_V1.md"
       ],
@@ -112,7 +120,9 @@
         "LinkedIn",
         "X"
       ],
-      "approval_receipt_ref": "docs/brand/content_approval_receipts/W2-02.json"
+      "approval_receipt_ref": "docs/brand/content_approval_receipts/W2-02.json",
+      "current_gate": "DISTRIBUTION_PARTIAL_PASS",
+      "approval_receipt_preserved": true
     },
     {
       "id": "W2-03",
