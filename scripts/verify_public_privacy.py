@@ -26,7 +26,13 @@ APPROVED_PUBLIC_TEXT_EMAILS = APPROVED_COMMITTER_EMAILS
 LEGACY_METADATA_EXCEPTIONS = {
     "7734270af5e1928215838fb0f0aee940599d43e4": frozenset(
         {"committer-name", "committer-email"}
-    )
+    ),
+    "a276feac777f51320c451a935659ace32db071be": frozenset(
+        {"committer-name"}
+    ),
+    "a80215e0fe334b8cec6976da2fc7bf20fe61d4da": frozenset(
+        {"committer-name"}
+    ),
 }
 
 

@@ -16,8 +16,8 @@
 - `RUMBO_PRIVACY_DENY_HASHES` remains only in GitHub Actions; never retrieve, print, copy, or persist it.
 - Pinned workflow ID: `347174988`.
 - Pinned workflow path: `.github/workflows/privacy-gate.yml`.
-- Pinned workflow Git blob: `376750ec7bc653c88304d70cb4b6de1b4cbcf472`.
-- Pinned workflow SHA-256: `78b2a357e72440e9943d492009edee3315b3b7ba2f0cae9506d51fc0cd02c412`.
+- Pinned workflow Git blob: `1cb3ed7881961516b54fb5ab663890914440463a`.
+- Pinned workflow SHA-256: `b2f9e4919268b618e6d601c0e9280df8b376a9dec338e71483d3c4a551795bc6`.
 - Phase 3 target `main` requires event `pull_request`; probe targets require event `push`.
 - Any ambiguous, stale, failed, missing, mismatched, or unreadable evidence yields `SAFE_STOP` before branch writes.
 - No force push, generated merge commit, workflow mutation, tag creation, production promotion, or branch-protection weakening.
