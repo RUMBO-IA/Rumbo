@@ -23,7 +23,7 @@ Canonical stack:
 5. **Authority plane** — policy, preflight, approval, identity, scope, action-specific authorization.
 6. **Evidence plane** — receipts, effect readback, hash-bound artifacts, traces, tests, evals.
 7. **Continuity plane** — durable checkpoints, replay protection, idempotency, resume/recovery.
-8. **Promotion plane** — merge/deploy/production gates that are independent of model confidence.
+8. **Promotion plane** — merge/deploy/production gates that are separate from model confidence.
 
 Invariant:
 
@@ -58,7 +58,7 @@ RUMBO therefore adopts the following rule:
    - RUMBO-IA/Rumbo PR #191 implements an evidence-first daily operations agent using OpenAI Agents SDK over Responses API.
    - It separates READ and WRITE authority.
    - External write tools require approval.
-   - It uses deterministic idempotency keys, effect/authority receipts, and independent effect readback.
+   - It uses deterministic idempotency keys, effect/authority receipts, and separate effect readback.
    - Reported local integration suite: 14/14 PASS.
    - Reported public privacy regression suite: 21/21 PASS.
    - Reported remote checks on the recorded head: 7/7 SUCCESS.
@@ -132,11 +132,11 @@ Each specialist should have:
 - minimal tools;
 - explicit output schema;
 - explicit allowed effects;
-- independent test/eval contract.
+- separate test/eval contract.
 
 ### Tier 2 — Verifiers
 
-Verification must be structurally independent from generation where practical.
+Verification must be structurally separate from generation where practical.
 
 Examples:
 - test runner;
@@ -213,7 +213,7 @@ Use model-driven orchestration when:
 - outputs remain subject to deterministic validation.
 
 Parallel agents are allowed only when:
-- tasks are independent or join semantics are explicit;
+- tasks are separable or join semantics are explicit;
 - shared mutable state is avoided or synchronized;
 - the join step checks contradictory assumptions and duplicate work.
 
@@ -263,7 +263,7 @@ Boundary:
 Role:
 - authority, policy, evidence, continuity, replay protection, promotion, reconciliation.
 
-This is the layer that must remain vendor-neutral and independent of any single model, agent framework, UI, or connector.
+This is the layer that must remain vendor-neutral and decoupled from any single model, agent framework, UI, or connector.
 
 ## Required eval matrix
 
@@ -343,7 +343,7 @@ R2 may be proposed only after exact evidence demonstrates:
 - one manager + at least two bounded specialists;
 - one deterministic code-driven join;
 - one action requiring explicit approval;
-- one provider mutation with independent readback;
+- one provider mutation with separate readback;
 - duplicate prevention under an ambiguous post-commit failure;
 - recovered context cannot confer authority;
 - complete trace/receipt linkage across the workflow;
