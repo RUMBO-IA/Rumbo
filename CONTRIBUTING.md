@@ -22,6 +22,6 @@ Run the public privacy regression tests, commercial-coherence tests, security-he
 
 ## Promotion identity
 
-The privacy gate validates the exact HEAD commit identity and never grants a metadata bypass to GitHub-generated commits. Public changes must preserve the approved GitHub noreply author identity. Repository merge settings are intentionally rebase-only so validated branch metadata is preserved; squash and merge-commit modes are not permitted for this privacy-sensitive repository.
+The privacy gate validates the exact HEAD commit identity and never grants a metadata bypass to GitHub-generated commits. Public changes must preserve the approved GitHub noreply author and committer identity. GitHub server-side rebase integration can create a new commit object and rewrite committer metadata after exact-head checks, so it is not an approved promotion path for privacy-sensitive changes. Validate the exact candidate SHA first, require the protected `privacy` and `Vercel` checks on that SHA, then promote only by a non-forced fast-forward of `main` to that same commit object. Re-read `main` immediately before promotion, stop if it moved or if the update is not a fast-forward, and verify the exact SHA plus the `privacy` push gate after promotion. Squash and merge-commit modes remain prohibited.
 
 Undisclosed security issues belong in GitHub's private **Report a vulnerability** flow.
