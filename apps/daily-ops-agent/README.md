@@ -52,6 +52,6 @@ python -m unittest discover -s apps/daily-ops-agent -p "test*.py" -v
 - malformed/ambiguous writes: fail closed
 - prompt injection inside retrieved content: ignored
 - ambiguous write result: read back by idempotency key; never blind retry
-- successful provider return still requires independent readback before `effect_verified=True`
+- write receipts require a separate state check before claiming confirmation
 - pre-commit timeout remains `EFFECT_NOT_VERIFIED` with zero retry
 - receipts record intent, authority, execution, and verification
