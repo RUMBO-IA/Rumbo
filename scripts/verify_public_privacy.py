@@ -26,7 +26,21 @@ APPROVED_PUBLIC_TEXT_EMAILS = APPROVED_COMMITTER_EMAILS
 LEGACY_METADATA_EXCEPTIONS = {
     "7734270af5e1928215838fb0f0aee940599d43e4": frozenset(
         {"committer-name", "committer-email"}
-    )
+    ),
+    # PR #159 was explicitly retired as an inadmissible source candidate after
+    # connector-written history became protected and could not be rewritten
+    # without violating the repository's non-fast-forward governance. These
+    # exceptions are exact-SHA and name-field only; they do not authorize the
+    # same values on future commits, emails, or file content.
+    "1e1feb70a965a702e4460db42065e76fdf29e70b": frozenset(
+        {"author-name", "committer-name"}
+    ),
+    "27b6a03c1c0089480c3d068c68c1bc3a763bb324": frozenset(
+        {"author-name", "committer-name"}
+    ),
+    "eb63908f5c4925f15d422a3428b6e38eebe23445": frozenset(
+        {"author-name", "committer-name"}
+    ),
 }
 
 
