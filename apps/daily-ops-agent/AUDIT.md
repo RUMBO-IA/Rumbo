@@ -37,7 +37,7 @@ Implement a useful everyday RUMBO agent that reads email/calendar context, produ
 - Prompt-injection fixture: PRESENT
 - Live Gmail read plane: previously PROVEN in this chat
 - Live Calendar read plane: previously PROVEN in this chat
-- Unit/integration test execution: PASS — 13/13 on DESKTOP-QUGVQLB, Python 3.14.6, openai-agents 0.22.3, exit code 0
+- Unit/integration test execution: PASS — 14/14 on DESKTOP-QUGVQLB, Python 3.14.6, openai-agents 0.22.3, exit code 0
 - Ambiguous write recovery: PASS — post-commit timeout reconciles by idempotency readback with one effect; pre-commit timeout returns EFFECT_NOT_VERIFIED and does not retry
 - Effect verification: PASS in mock adapter — normal and ambiguous writes are independently read back before receipts claim effect_verified=True
 - SDK construction probe: PASS — Agent, Runner, SQLiteSession import/build without model inference; write tools report needs_approval=True

@@ -7,6 +7,7 @@ on:
       - 'apps/daily-ops-agent/**'
       - '.github/workflows/daily-ops-agent-ci.yml'
   push:
+    branches: [main]
     paths:
       - 'apps/daily-ops-agent/**'
       - '.github/workflows/daily-ops-agent-ci.yml'
