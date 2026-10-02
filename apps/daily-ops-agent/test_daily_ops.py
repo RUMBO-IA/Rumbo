@@ -32,7 +32,7 @@ class DailyOpsGovernanceTests(unittest.TestCase):
 
     def test_write_fails_closed_without_approval(self):
         with self.assertRaisesRegex(PermissionError, "WRITE_REQUIRES_EXPLICIT_APPROVAL"):
-            daily_ops.write_email_draft("client@example.com", "Re", "Draft", approved=False)
+            daily_ops.write_email_draft("mock-client", "Re", "Draft", approved=False)
         self.assertEqual(len(self.backend.drafts), 0)
 
     def test_calendar_write_fails_closed_without_approval(self):
@@ -43,8 +43,8 @@ class DailyOpsGovernanceTests(unittest.TestCase):
         self.assertEqual(len(self.backend.created_events), 0)
 
     def test_approved_draft_is_idempotent(self):
-        first = daily_ops.write_email_draft("client@example.com", "Re", "Draft", approved=True)
-        second = daily_ops.write_email_draft("client@example.com", "Re", "Draft", approved=True)
+        first = daily_ops.write_email_draft("mock-client", "Re", "Draft", approved=True)
+        second = daily_ops.write_email_draft("mock-client", "Re", "Draft", approved=True)
         self.assertEqual(first["draft"]["id"], second["draft"]["id"])
         self.assertEqual(len(self.backend.drafts), 1)
         self.assertEqual(first["receipt"]["idempotency_key"], second["receipt"]["idempotency_key"])
@@ -54,7 +54,7 @@ class DailyOpsGovernanceTests(unittest.TestCase):
             "Lunch",
             "2026-10-02T12:00:00-03:00",
             "2026-10-02T13:00:00-03:00",
-            ["alex@example.com"],
+            ["mock-attendee"],
         )
         first = daily_ops.write_calendar_event(*args, approved=True)
         second = daily_ops.write_calendar_event(*args, approved=True)
@@ -62,8 +62,8 @@ class DailyOpsGovernanceTests(unittest.TestCase):
         self.assertEqual(len(self.backend.created_events), 1)
 
     def test_idempotency_key_changes_when_payload_changes(self):
-        a = daily_ops.stable_idempotency_key("create_email_draft", {"to": "a@example.com", "subject": "A", "body": "x"})
-        b = daily_ops.stable_idempotency_key("create_email_draft", {"to": "a@example.com", "subject": "B", "body": "x"})
+        a = daily_ops.stable_idempotency_key("create_email_draft", {"to": "recipient-a", "subject": "A", "body": "x"})
+        b = daily_ops.stable_idempotency_key("create_email_draft", {"to": "recipient-a", "subject": "B", "body": "x"})
         self.assertNotEqual(a, b)
 
     def test_live_agent_requires_explicit_model(self):

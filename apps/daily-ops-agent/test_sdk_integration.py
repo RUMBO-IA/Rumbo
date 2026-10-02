@@ -50,7 +50,7 @@ class DailyOpsSdkIntegrationTests(unittest.IsolatedAsyncioTestCase):
     async def test_write_pauses_until_explicit_approval(self):
         model = ScriptedModel([
             [function_call("create_email_draft", {
-                "to": "client@example.com",
+                "to": "mock-client",
                 "subject": "Follow-up",
                 "body": "Thanks for the call.",
             }, call_id="call_write")],
