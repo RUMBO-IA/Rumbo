@@ -59,9 +59,10 @@ RUMBO therefore adopts the following rule:
    - It separates READ and WRITE authority.
    - External write tools require approval.
    - It uses deterministic idempotency keys, effect/authority receipts, and separate effect readback.
-   - Reported local integration suite: 14/14 PASS.
+   - Reported local integration suite: 24/24 PASS.
    - Reported public privacy regression suite: 21/21 PASS.
    - Reported remote checks on the recorded head: 7/7 SUCCESS.
+   - External MCP v2 stdio server/client wiring is implemented; tool discovery, fixture-backed read-loop execution, and write approval interruption are proven without provider credentials.
    - OpenAI API model inference during that implementation was recorded as zero calls.
 
 2. **Live ChatGPT connector read paths exist.**
@@ -81,7 +82,7 @@ RUMBO therefore adopts the following rule:
 
 1. **Agents SDK provider write path**
    - ChatGPT connector mutation/readback has evidence.
-   - The external Agents SDK Gmail/Calendar provider path remains not configured / not proven in PR #191.
+   - The external Agents SDK local MCP path is implemented and tested; app-owned Google OAuth and live provider execution remain not proven in PR #191.
 
 2. **Cross-surface orchestration**
    - RUMBO has multiple execution surfaces and continuity mechanisms, but this candidate does not claim a single runtime currently coordinates ChatGPT, Codex, Work/Dots, plugins/MCP, browser/computer-use, and remote execution under one live orchestration graph.
@@ -97,7 +98,7 @@ RUMBO therefore adopts the following rule:
 ### NOT PROVEN / must remain open
 
 - universal end-to-end orchestration across all RUMBO accounts and environments;
-- external Agents SDK Gmail/Calendar OAuth/MCP write path;
+- external Agents SDK live Google OAuth/provider read-write path;
 - a single shared memory namespace across ChatGPT, Codex, Work/Dots, local agents, plugins, and control-plane state;
 - production readiness of PR #191;
 - production deployment or merge of this canon;
