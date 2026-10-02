@@ -38,3 +38,19 @@ jobs:
         run: python -m pip install --disable-pip-version-check -r apps/daily-ops-agent/requirements.txt
       - name: Run daily ops agent tests
         run: python -m unittest discover -s apps/daily-ops-agent -p "test*.py" -v
+      - name: Enforce provider-evidence claim boundary
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          evidence = json.loads(Path("apps/daily-ops-agent/provider_evidence.json").read_text())
+          assert evidence["provider"] == "gmail"
+          assert evidence["effect"] == "create_draft"
+          assert evidence["message_sent"] is False
+          assert evidence["provider_write_success"] is True
+          assert evidence["provider_readback_confirmed"] is True
+          assert evidence["chatgpt_connector_path_proven"] is True
+          assert evidence["external_agents_sdk_provider_path_proven"] is False
+          assert evidence["production_proven"] is False
+          print("provider-evidence-claim-boundary: PASS")
+          PY

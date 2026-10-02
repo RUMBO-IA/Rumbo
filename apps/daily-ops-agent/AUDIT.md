@@ -35,7 +35,8 @@ Implement a useful everyday RUMBO agent that reads email/calendar context, produ
 - Approval gate present on SDK write tools: PROVEN by source
 - Deterministic idempotency: PROVEN by source/tests
 - Prompt-injection fixture: PRESENT
-- Live Gmail read plane: previously PROVEN in this chat
+- Live Gmail read plane: PROVEN in this chat
+- Live Gmail provider write/readback: PASS via ChatGPT connector — self-addressed draft created, confirmed by list_drafts + read_email, label DRAFT present, message not sent; identifiers/PII redacted from public evidence
 - Live Calendar read plane: previously PROVEN in this chat
 - Unit/integration test execution: PASS — 14/14 on DESKTOP-QUGVQLB, Python 3.14.6, openai-agents 0.22.3, exit code 0
 - Ambiguous write recovery: PASS — post-commit timeout reconciles by idempotency readback with one effect; pre-commit timeout returns EFFECT_NOT_VERIFIED and does not retry
@@ -51,5 +52,5 @@ Promotion gates:
 1. offline tests PASS — COMPLETE (13/13, 2026-10-02);
 2. approved OpenAI model is configured explicitly — OPEN;
 3. bounded live read-only model run — OPEN;
-4. one authorized provider test write followed by provider readback — OPEN;
+4. provider write followed by provider readback — COMPLETE for ChatGPT Gmail connector, OPEN for external Agents SDK provider path;
 5. ambiguous-failure recovery without duplicate effects — COMPLETE.
