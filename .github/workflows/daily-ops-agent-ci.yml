@@ -59,4 +59,16 @@ jobs:
           assert native["external_agents_sdk_provider_path_proven"] is False
           assert native["production_proven"] is False
           print("native-chatgpt-claim-boundary: PASS")
+          external = json.loads(Path("apps/daily-ops-agent/external_runtime_evidence.json").read_text())
+          assert external["mcp_server_implemented"] is True
+          assert external["mcp_stdio_discovery_proven"] is True
+          assert external["mcp_fixture_read_loop_proven"] is True
+          assert external["mcp_write_approval_interrupt_proven"] is True
+          assert external["mcp_write_provider_called_before_approval"] is False
+          assert external["external_google_oauth_provisioned"] is False
+          assert external["external_openai_model_run_proven"] is False
+          assert external["external_live_provider_read_proven"] is False
+          assert external["external_live_provider_write_proven"] is False
+          assert external["production_proven"] is False
+          print("external-runtime-claim-boundary: PASS")
           PY
