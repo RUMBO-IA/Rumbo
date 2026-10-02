@@ -66,6 +66,55 @@ class DailyOpsGovernanceTests(unittest.TestCase):
         b = daily_ops.stable_idempotency_key("create_email_draft", {"to": "recipient-a", "subject": "B", "body": "x"})
         self.assertNotEqual(a, b)
 
+    def test_ambiguous_draft_timeout_reconciles_without_duplicate(self):
+        class CommitThenTimeoutBackend(daily_ops.MockBackend):
+            def create_email_draft(self, to, subject, body, idempotency_key):
+                super().create_email_draft(to, subject, body, idempotency_key)
+                raise TimeoutError("provider response lost after commit")
+
+        backend = CommitThenTimeoutBackend()
+        daily_ops.configure_backend(backend)
+        result = daily_ops.write_email_draft("mock-client", "Re", "Draft", approved=True)
+
+        self.assertEqual(len(backend.drafts), 1)
+        self.assertEqual(result["draft"]["id"], "draft_1")
+        self.assertFalse(result["receipt"]["tool_success"])
+        self.assertTrue(result["receipt"]["effect_verified"])
+        self.assertEqual(result["receipt"]["note"], "AMBIGUOUS_RESULT_RECOVERED_BY_READBACK")
+
+    def test_ambiguous_draft_without_commit_does_not_retry(self):
+        class TimeoutBeforeCommitBackend(daily_ops.MockBackend):
+            def create_email_draft(self, to, subject, body, idempotency_key):
+                raise TimeoutError("provider unavailable before commit")
+
+        backend = TimeoutBeforeCommitBackend()
+        daily_ops.configure_backend(backend)
+        result = daily_ops.write_email_draft("mock-client", "Re", "Draft", approved=True)
+
+        self.assertEqual(len(backend.drafts), 0)
+        self.assertIsNone(result["draft"])
+        self.assertFalse(result["receipt"]["tool_success"])
+        self.assertFalse(result["receipt"]["effect_verified"])
+        self.assertEqual(result["receipt"]["note"], "EFFECT_NOT_VERIFIED_BY_READBACK")
+
+    def test_ambiguous_calendar_timeout_reconciles_without_duplicate(self):
+        class CommitThenTimeoutBackend(daily_ops.MockBackend):
+            def create_calendar_event(self, title, start, end, attendees, idempotency_key):
+                super().create_calendar_event(title, start, end, attendees, idempotency_key)
+                raise TimeoutError("provider response lost after commit")
+
+        backend = CommitThenTimeoutBackend()
+        daily_ops.configure_backend(backend)
+        result = daily_ops.write_calendar_event(
+            "Lunch", "2026-10-02T12:00:00-03:00", "2026-10-02T13:00:00-03:00", [], approved=True
+        )
+
+        self.assertEqual(len(backend.created_events), 1)
+        self.assertEqual(result["event"]["id"], "new_evt_1")
+        self.assertFalse(result["receipt"]["tool_success"])
+        self.assertTrue(result["receipt"]["effect_verified"])
+        self.assertEqual(result["receipt"]["note"], "AMBIGUOUS_RESULT_RECOVERED_BY_READBACK")
+
     def test_live_agent_requires_explicit_model(self):
         old = daily_ops.os.environ.pop("OPENAI_MODEL", None)
         try:

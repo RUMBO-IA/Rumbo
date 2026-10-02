@@ -74,7 +74,9 @@ class Backend(Protocol):
     def get_calendar_events(self, start: str, end: str, calendar_id: str = "primary") -> list[dict[str, Any]]: ...
     def search_email(self, query: str, max_results: int = 10) -> list[dict[str, Any]]: ...
     def create_email_draft(self, to: str, subject: str, body: str, idempotency_key: str) -> dict[str, Any]: ...
+    def get_email_draft_by_idempotency(self, idempotency_key: str) -> dict[str, Any] | None: ...
     def create_calendar_event(self, title: str, start: str, end: str, attendees: list[str], idempotency_key: str) -> dict[str, Any]: ...
+    def get_calendar_event_by_idempotency(self, idempotency_key: str) -> dict[str, Any] | None: ...
 
 
 class MockBackend:
@@ -105,12 +107,18 @@ class MockBackend:
         self.drafts[idempotency_key] = item
         return item
 
+    def get_email_draft_by_idempotency(self, idempotency_key: str) -> dict[str, Any] | None:
+        return self.drafts.get(idempotency_key)
+
     def create_calendar_event(self, title: str, start: str, end: str, attendees: list[str], idempotency_key: str) -> dict[str, Any]:
         if idempotency_key in self.created_events:
             return self.created_events[idempotency_key]
         item = {"id": f"new_evt_{len(self.created_events)+1}", "title": title, "start": start, "end": end, "attendees": list(attendees)}
         self.created_events[idempotency_key] = item
         return item
+
+    def get_calendar_event_by_idempotency(self, idempotency_key: str) -> dict[str, Any] | None:
+        return self.created_events.get(idempotency_key)
 
 
 BACKEND: Backend = MockBackend()
@@ -143,8 +151,21 @@ def write_email_draft(to: str, subject: str, body: str, *, approved: bool) -> di
         raise PermissionError("WRITE_REQUIRES_EXPLICIT_APPROVAL")
     payload = {"to": to, "subject": subject, "body": body}
     key = stable_idempotency_key("create_email_draft", payload)
-    item = BACKEND.create_email_draft(**payload, idempotency_key=key)
-    receipt = Receipt("write-draft", "create_email_draft", "WRITE", to, True, True, True, True, True, True, key)
+    tool_success = True
+    note = ""
+    try:
+        BACKEND.create_email_draft(**payload, idempotency_key=key)
+    except (TimeoutError, ConnectionError):
+        tool_success = False
+        note = "AMBIGUOUS_RESULT_RECOVERED_BY_READBACK"
+    item = BACKEND.get_email_draft_by_idempotency(key)
+    effect_verified = item is not None
+    if not effect_verified:
+        note = "EFFECT_NOT_VERIFIED_BY_READBACK"
+    receipt = Receipt(
+        "write-draft", "create_email_draft", "WRITE", to, True, True, True,
+        tool_success, effect_verified, effect_verified, key, note
+    )
     return {"draft": item, "receipt": asdict(receipt)}
 
 
@@ -153,8 +174,21 @@ def write_calendar_event(title: str, start: str, end: str, attendees: list[str],
         raise PermissionError("WRITE_REQUIRES_EXPLICIT_APPROVAL")
     payload = {"title": title, "start": start, "end": end, "attendees": list(attendees)}
     key = stable_idempotency_key("create_calendar_event", payload)
-    item = BACKEND.create_calendar_event(**payload, idempotency_key=key)
-    receipt = Receipt("write-event", "create_calendar_event", "WRITE", "primary", True, True, True, True, True, True, key)
+    tool_success = True
+    note = ""
+    try:
+        BACKEND.create_calendar_event(**payload, idempotency_key=key)
+    except (TimeoutError, ConnectionError):
+        tool_success = False
+        note = "AMBIGUOUS_RESULT_RECOVERED_BY_READBACK"
+    item = BACKEND.get_calendar_event_by_idempotency(key)
+    effect_verified = item is not None
+    if not effect_verified:
+        note = "EFFECT_NOT_VERIFIED_BY_READBACK"
+    receipt = Receipt(
+        "write-event", "create_calendar_event", "WRITE", "primary", True, True, True,
+        tool_success, effect_verified, effect_verified, key, note
+    )
     return {"event": item, "receipt": asdict(receipt)}
 
 

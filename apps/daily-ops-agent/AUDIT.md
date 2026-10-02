@@ -22,9 +22,11 @@ Implement a useful everyday RUMBO agent that reads email/calendar context, produ
 
 ## Files
 - `daily_ops.py`: runtime, instructions, mock backend, receipts, idempotency, approval-gated tools.
-- `test_daily_ops.py`: offline governance/adversarial tests.
+- `test_daily_ops.py`: offline governance/adversarial/readback tests.
+- `test_sdk_integration.py`: real Agents SDK orchestration and approval-interruption tests using ScriptedModel.
 - `README.md`: runbook and acceptance gates.
 - `requirements.txt`: Agents SDK pinned to current 0.22.x minor.
+- `.github/workflows/daily-ops-agent-ci.yml`: zero-spend dedicated CI gate.
 
 ## Verification state
 - GitHub branch isolation: PROVEN
@@ -35,7 +37,9 @@ Implement a useful everyday RUMBO agent that reads email/calendar context, produ
 - Prompt-injection fixture: PRESENT
 - Live Gmail read plane: previously PROVEN in this chat
 - Live Calendar read plane: previously PROVEN in this chat
-- Unit/integration test execution: PASS — 10/10 on DESKTOP-QUGVQLB, Python 3.14.6, openai-agents 0.22.3, exit code 0
+- Unit/integration test execution: PASS — 13/13 on DESKTOP-QUGVQLB, Python 3.14.6, openai-agents 0.22.3, exit code 0
+- Ambiguous write recovery: PASS — post-commit timeout reconciles by idempotency readback with one effect; pre-commit timeout returns EFFECT_NOT_VERIFIED and does not retry
+- Effect verification: PASS in mock adapter — normal and ambiguous writes are independently read back before receipts claim effect_verified=True
 - SDK construction probe: PASS — Agent, Runner, SQLiteSession import/build without model inference; write tools report needs_approval=True
 - Live OpenAI inference: NOT RUN (would require API model usage)
 - Live Gmail/Calendar mutation: NOT RUN
@@ -43,9 +47,9 @@ Implement a useful everyday RUMBO agent that reads email/calendar context, produ
 - Production status: NO_GO until a bounded live read-only model run and an authorized provider write/readback are verified
 
 ## Promotion gate
-Promote only after:
-1. offline tests PASS (completed 2026-10-02);
-2. approved OpenAI model is configured explicitly;
-3. a bounded live read-only run PASSes;
-4. one authorized test write is followed by provider readback;
-5. ambiguous-failure recovery is demonstrated without duplicate effects.
+Promotion gates:
+1. offline tests PASS — COMPLETE (13/13, 2026-10-02);
+2. approved OpenAI model is configured explicitly — OPEN;
+3. bounded live read-only model run — OPEN;
+4. one authorized provider test write followed by provider readback — OPEN;
+5. ambiguous-failure recovery without duplicate effects — COMPLETE.

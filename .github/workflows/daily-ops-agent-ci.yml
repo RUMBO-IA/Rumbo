@@ -1,0 +1,39 @@
+name: RUMBO Daily Ops Agent CI
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'apps/daily-ops-agent/**'
+      - '.github/workflows/daily-ops-agent-ci.yml'
+  push:
+    paths:
+      - 'apps/daily-ops-agent/**'
+      - '.github/workflows/daily-ops-agent-ci.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  daily-ops-agent:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: '3.14'
+      - name: Assert zero-spend test environment
+        run: |
+          python - <<'PY'
+          import os
+          assert not os.environ.get("OPENAI_API_KEY"), "OPENAI_API_KEY must not be present in zero-spend CI"
+          print("zero-spend-environment: PASS")
+          PY
+      - name: Install pinned agent dependency
+        run: python -m pip install --disable-pip-version-check -r apps/daily-ops-agent/requirements.txt
+      - name: Run daily ops agent tests
+        run: python -m unittest discover -s apps/daily-ops-agent -p "test*.py" -v
