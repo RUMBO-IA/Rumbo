@@ -40,6 +40,13 @@ LEGACY_METADATA_EXCEPTIONS = {
     "5b27fce34ac1884312bfd4c5293bd5fa8fd84b51": frozenset(
         {"committer-name"}
     ),
+    # PR #201 exact-head metadata was approved before promotion, but GitHub's
+    # server-side rebase API rewrote only the committer name on public main.
+    # This is an exact-SHA, exact-field quarantine; future promotion must
+    # preserve the already-validated commit object instead of generating one.
+    "11e7b8302440aa6c4220c7d284f315218c111dd0": frozenset(
+        {"committer-name"}
+    ),
 }
 
 
