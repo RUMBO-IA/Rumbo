@@ -53,4 +53,10 @@ jobs:
           assert evidence["external_agents_sdk_provider_path_proven"] is False
           assert evidence["production_proven"] is False
           print("provider-evidence-claim-boundary: PASS")
+          native = json.loads(Path("apps/daily-ops-agent/native_chatgpt_evidence.json").read_text())
+          assert native["writes_during_daily_brief"] == 0
+          assert native["native_chatgpt_read_workflow_proven"] is True
+          assert native["external_agents_sdk_provider_path_proven"] is False
+          assert native["production_proven"] is False
+          print("native-chatgpt-claim-boundary: PASS")
           PY
