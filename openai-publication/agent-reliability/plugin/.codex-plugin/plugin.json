@@ -19,7 +19,7 @@
   "skills": "./skills/",
   "interface": {
     "displayName": "RUMBO Agent Reliability",
-    "shortDescription": "Evidence-first coding-agent reliability workflows",
+    "shortDescription": "Evidence-first agent workflows",
     "longDescription": "Recover authoritative state, reconcile conflicting evidence, control agent loops, verify real effects, and audit final state before accepting coding-agent work.",
     "developerName": "RUMBO IA",
     "category": "Productivity",
@@ -35,8 +35,8 @@
       "Audit this agent run and report what is actually proven."
     ],
     "brandColor": "#111111",
-    "screenshots": [],
     "composerIcon": "./assets/icon.svg",
-    "logo": "./assets/logo.svg"
+    "logo": "./assets/logo.svg",
+    "supportURL": "https://rumbo-openai-support.val.run/"
   }
 }

@@ -1,6 +1,6 @@
 {
   "schema": "rumbo.openai-agent-reliability-publication-readiness/v1",
-  "observed_at_art": "2026-09-07T13:32:00-03:00",
+  "observed_at_art": "2026-09-13T05:37:51-03:00",
   "candidate": "RUMBO Agent Reliability",
   "package_slug": "rumbo-coding-agent-reliability",
   "source_commit": "3a7bff2a139cb6840ab6e23a2c19e315000e8b13",
@@ -8,9 +8,9 @@
   "skills": "5/5 SOURCE_BYTE_IDENTICAL",
   "public_url_http": {
     "https://rumbo.verso.fans/": 200,
-    "https://rumbo.verso.fans/openai-support": 200,
     "https://rumbo.verso.fans/openai-privacy": 200,
-    "https://rumbo.verso.fans/openai-terms": 200
+    "https://rumbo.verso.fans/openai-terms": 200,
+    "https://rumbo-openai-support.val.run/": 200
   },
   "account_observation": {
     "user_scoped_plugin_installed_enabled": true,
@@ -19,14 +19,85 @@
     "permissions_probe": "CONTRADICTORY_NOT_USED_AS_AUTHORITY"
   },
   "account_gates": {
-    "apps_management_write": "UNVERIFIED",
-    "publisher_identity_verified": "UNVERIFIED",
-    "same_publishing_organization": "UNVERIFIED"
+    "apps_management_write": "PASS_OWNER",
+    "publisher_identity_verified": "NOT_PROVEN_FRESH",
+    "individual_identity_last_authenticated_state": "IDENTITY_IN_REVIEW",
+    "fresh_identity_readback_this_execution": "NOT_AVAILABLE",
+    "business_identity_last_known_state": "IDENTITY_INCOMPLETE_NOT_USED",
+    "same_publishing_organization": "PASS_RUMBO_ORGANIZATION",
+    "publisher_identity_alignment": "BLOCKED_PENDING_VERIFIED_IDENTITY_AND_PUBLIC_DISCLOSURE"
   },
   "external_effects": {
     "portal_draft_write": false,
     "submitted_for_review": false,
     "published": false
   },
-  "state": "SUBMISSION_PACKET_READY_ACCOUNT_GATES_OPEN"
+  "state": "DRAFT_READY_SUBMISSION_IDENTITY_ALIGNMENT_PENDING",
+  "publisher_support_semantic": {
+    "state": "PASS",
+    "url": "https://rumbo-openai-support.val.run/",
+    "verification": "REMOTE_HTTP_200_AND_REQUIRED_MARKERS",
+    "observed_at_art": "2026-09-12T16:40:21-03:00"
+  },
+  "runtime_revalidation": {
+    "codex_cli": "0.153.4",
+    "isolated_local_marketplace_install": "PASS",
+    "installed_plugin_version": "0.1.6",
+    "native_skills_resolved": "5/5",
+    "model_response_required": false
+  },
+  "test_revalidation": {
+    "publication_and_support": "10/10 PASS",
+    "brand_contract": "27/27 PASS",
+    "content_contract": "42/42 PASS",
+    "combined": "79/79 PASS",
+    "publication_verifier": "PASS",
+    "brand_verifier": "PASS",
+    "content_verifier": "PASS",
+    "git_diff_check": "PASS"
+  },
+  "lineage_reconciliation": {
+    "public_source_commit": "3a7bff2a139cb6840ab6e23a2c19e315000e8b13",
+    "public_distribution_skills": 5,
+    "internal_operating_reference": "RUMBO-IA/rumbo-control-queue@ed0a39a0cacaa72946ed2e6a2e7af68456e3d372",
+    "internal_operating_skills": 7,
+    "relationship": "RELATED_DISTINCT_PUBLIC_PROJECTION",
+    "cross_package_byte_identity": "NOT_CLAIMED",
+    "supersession_required_before_replacing_public_skill_bytes": true
+  },
+  "reviewer_packet_revalidation": {
+    "schema": "rumbo.openai-agent-reliability-reviewer-cases/v2",
+    "positive_cases": 5,
+    "negative_cases": 3,
+    "positive_expected_result_shape": "5/5 PRESENT",
+    "positive_fixture_data": "5/5 PRESENT",
+    "negative_why_not_complete": "3/3 PRESENT",
+    "external_test_account_required": false,
+    "state": "PASS"
+  },
+  "main_reconciliation": {
+    "base_before": "9c4b59bd5f6c448c2cedfc5b1e529367831cfa53",
+    "current_main": "3ee060c260d48483613279b75a52270c320e1d9f",
+    "merge_conflicts": 0,
+    "package_skill_bytes_changed_by_main": false,
+    "state": "PASS"
+  },
+  "directory_contract_revalidation": {
+    "official_docs_observed": "2026-09-12",
+    "display_name_max_chars": 30,
+    "short_description_max_chars": 30,
+    "starter_prompt_max_chars": 128,
+    "skills_only_interface_screenshots_allowed": false,
+    "manifest_short_description_chars": 30,
+    "listing_short_description_chars": 30,
+    "public_legal_operator_disclosure": "PENDING_VERIFIED_IDENTITY_READBACK",
+    "metadata_remediation": "PASS",
+    "skills_only_zip_validation": "PASS",
+    "zip_sha256": "d251abfc82e1c424d340987cc9b699682e406a281ec045328af9714f0730a194",
+    "zip_size_bytes": 4974,
+    "zip_entries": 8,
+    "zip_uncompressed_bytes": 6908,
+    "zip_skill_count": 5,
+    "zip_structural_errors": 0
+  }
 }

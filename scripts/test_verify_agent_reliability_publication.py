@@ -59,20 +59,35 @@ class CandidateInventoryTests(unittest.TestCase):
         manifest = json.loads((PUB / "plugin" / ".codex-plugin" / "plugin.json").read_text(encoding="utf-8"))
         self.assertEqual(manifest["repository"], "https://github.com/RUMBO-IA/Rumbo")
         self.assertNotIn("email", manifest["author"])
-        self.assertEqual(manifest["interface"]["displayName"], "RUMBO Agent Reliability")
-        self.assertEqual(manifest["interface"]["privacyPolicyURL"], "https://rumbo.verso.fans/openai-privacy")
-        self.assertEqual(manifest["interface"]["termsOfServiceURL"], "https://rumbo.verso.fans/openai-terms")
+        interface = manifest["interface"]
+        self.assertEqual(interface["displayName"], "RUMBO Agent Reliability")
+        self.assertLessEqual(len(interface["displayName"]), 30)
+        self.assertEqual(interface["shortDescription"], "Evidence-first agent workflows")
+        self.assertLessEqual(len(interface["shortDescription"]), 30)
+        self.assertEqual(manifest["author"]["name"], interface["developerName"])
+        self.assertNotIn("screenshots", interface)
+        self.assertEqual(interface["supportURL"], "https://rumbo-openai-support.val.run/")
+        self.assertEqual(interface["privacyPolicyURL"], "https://rumbo.verso.fans/openai-privacy")
+        self.assertEqual(interface["termsOfServiceURL"], "https://rumbo.verso.fans/openai-terms")
+        for skill in SKILLS:
+            self.assertLessEqual(len(f"{manifest['name']}:{skill}"), 64)
 
 
 class ReviewerPacketTests(unittest.TestCase):
     def test_listing_has_required_reviewer_fields(self):
         listing = json.loads((PUB / "submission" / "listing.json").read_text(encoding="utf-8"))
         self.assertEqual(listing["display_name"], "RUMBO Agent Reliability")
-        self.assertGreaterEqual(len(listing["starter_prompts"]), 3)
+        self.assertLessEqual(len(listing["display_name"]), 30)
+        self.assertEqual(listing["short_description"], "Evidence-first agent workflows")
+        self.assertLessEqual(len(listing["short_description"]), 30)
+        self.assertEqual(len(listing["starter_prompts"]), 3)
+        for prompt in listing["starter_prompts"]:
+            self.assertLessEqual(len(prompt), 128)
+            self.assertNotIn("\n", prompt)
         self.assertEqual(listing["availability"]["state"], "UNSET_FAIL_CLOSED")
         self.assertEqual(listing["publisher_urls"]["privacy"], "https://rumbo.verso.fans/openai-privacy")
         self.assertEqual(listing["publisher_urls"]["terms"], "https://rumbo.verso.fans/openai-terms")
-        self.assertEqual(listing["publisher_urls"]["support"], "https://rumbo.verso.fans/openai-support")
+        self.assertEqual(listing["publisher_urls"]["support"], "https://rumbo-openai-support.val.run/")
 
     def test_reviewer_cases_meet_minimums_and_are_bounded(self):
         packet = json.loads((PUB / "submission" / "reviewer-cases.json").read_text(encoding="utf-8"))
@@ -83,6 +98,12 @@ class ReviewerPacketTests(unittest.TestCase):
         for case in packet["cases"]:
             self.assertIn(case["expected_skill"], SKILLS | {"NONE"})
             self.assertTrue(case["expected_behavior"])
+            self.assertEqual(case["test_account"], "NONE")
+            self.assertTrue(case["fixture_data"])
+        for case in positive:
+            self.assertTrue(case["expected_result_shape"])
+        for case in negative:
+            self.assertTrue(case["why_not_complete"])
 
 
 class FinalReadinessTests(unittest.TestCase):
@@ -91,8 +112,27 @@ class FinalReadinessTests(unittest.TestCase):
         self.assertEqual(final["local_package"], "PASS")
         self.assertEqual(set(final["public_url_http"].values()), {200})
         self.assertTrue(final["account_observation"]["user_scoped_plugin_installed_enabled"])
-        self.assertEqual(final["account_gates"]["apps_management_write"], "UNVERIFIED")
-        self.assertEqual(final["account_gates"]["publisher_identity_verified"], "UNVERIFIED")
+        self.assertEqual(final["account_gates"]["apps_management_write"], "PASS_OWNER")
+        self.assertEqual(final["account_gates"]["same_publishing_organization"], "PASS_RUMBO_ORGANIZATION")
+        self.assertEqual(final["account_gates"]["publisher_identity_verified"], "NOT_PROVEN_FRESH")
+        self.assertEqual(
+            final["account_gates"]["individual_identity_last_authenticated_state"],
+            "IDENTITY_IN_REVIEW",
+        )
+        self.assertEqual(final["account_gates"]["fresh_identity_readback_this_execution"], "NOT_AVAILABLE")
+        self.assertEqual(
+            final["account_gates"]["publisher_identity_alignment"],
+            "BLOCKED_PENDING_VERIFIED_IDENTITY_AND_PUBLIC_DISCLOSURE",
+        )
+        self.assertFalse(final["external_effects"]["portal_draft_write"])
         self.assertFalse(final["external_effects"]["submitted_for_review"])
         self.assertFalse(final["external_effects"]["published"])
-        self.assertEqual(final["state"], "SUBMISSION_PACKET_READY_ACCOUNT_GATES_OPEN")
+        contract = final["directory_contract_revalidation"]
+        self.assertEqual(contract["manifest_short_description_chars"], 30)
+        self.assertFalse(contract["skills_only_interface_screenshots_allowed"])
+        self.assertEqual(contract["metadata_remediation"], "PASS")
+        self.assertEqual(contract["skills_only_zip_validation"], "PASS")
+        self.assertEqual(contract["zip_skill_count"], 5)
+        self.assertEqual(contract["zip_structural_errors"], 0)
+        self.assertRegex(contract["zip_sha256"], r"^[0-9a-f]{64}$")
+        self.assertEqual(final["state"], "DRAFT_READY_SUBMISSION_IDENTITY_ALIGNMENT_PENDING")
