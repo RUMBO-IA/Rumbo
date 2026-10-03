@@ -1,9 +1,9 @@
-﻿{
+{
   "schema_version": 1,
   "registry_issue": "RUMBO-IA/Rumbo#72",
-  "owner_authorization_comment_id": 5630078910,
-  "application_sha": "34c625c65e047fdec06a5bef7064d2de6bed48ba",
-  "deployment_id": "dpl_8KbqvsKuua22xK4EQYZmtF3KXmNK",
+  "owner_authorization_comment_id": 5971885735,
+  "application_sha": "cd215a9b27df8a87bf17c29ebe5fb84b7d939af0",
+  "deployment_id": "dpl_GCjGycFo5nyMY1RNtxjmBsMCSpdw",
   "domain": "rumbo.verso.fans",
   "status": "AUTHORIZED",
   "invariant": "MAIN_ADVANCE != PRODUCTION_AUTHORITY"
