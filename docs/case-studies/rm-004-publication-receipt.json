@@ -1,0 +1,21 @@
+﻿{
+    "schema":  "rumbo-rm004-publication-receipt/v1",
+    "observed_at":  "2026-09-07T20:41:00-03:00",
+    "repository":  "RUMBO-IA/Rumbo",
+    "branch":  "docs/rm004-public-case-study-20260907",
+    "source_commit":  "c4d6835",
+    "path":  "docs/case-studies/rm-004-agent-evidence.md",
+    "github_url":  "https://github.com/RUMBO-IA/Rumbo/blob/docs/rm004-public-case-study-20260907/docs/case-studies/rm-004-agent-evidence.md",
+    "raw_url":  "https://raw.githubusercontent.com/RUMBO-IA/Rumbo/docs/rm004-public-case-study-20260907/docs/case-studies/rm-004-agent-evidence.md",
+    "local_sha256":  "df09a373020e0f61dc8dcfd9904e29429023b20983e1d53df1cdac65a7b9ee66",
+    "remote_sha256":  "df09a373020e0f61dc8dcfd9904e29429023b20983e1d53df1cdac65a7b9ee66",
+    "curl_exit":  0,
+    "exact_readback_match":  true,
+    "public_url_readback":  "PASS",
+    "branch_push":  "PASS",
+    "merged_to_main":  "NOT_EXECUTED",
+    "youtube_publication":  "NOT_EXECUTED",
+    "plugin_directory_publication":  "NOT_PROVEN",
+    "global_production":  "NO_GO",
+    "verdict":  "PUBLIC_CASE_STUDY_URL_AND_READBACK_PASS_BOUNDED"
+}
