@@ -11,9 +11,25 @@ class CommercialCoherenceTests(unittest.TestCase):
     def setUpClass(cls):
         cls.readme = (ROOT / "README.md").read_text(encoding="utf-8")
         cls.html = (ROOT / "index.html").read_text(encoding="utf-8")
+        cls.landing_en = (ROOT / "apps/landing-publica/index.html").read_text(encoding="utf-8")
+        cls.landing_es = (ROOT / "apps/landing-publica/index-es.html").read_text(encoding="utf-8")
 
     def test_current_public_surface_passes(self):
         self.assertEqual(verifier.check(self.readme, self.html), [])
+
+    def test_all_tracked_public_landings_are_commercially_coherent(self):
+        combined = self.html + "\n" + self.landing_en + "\n" + self.landing_es
+        self.assertEqual(verifier.check(self.readme, combined), [])
+
+    def test_stale_social_handle_is_rejected(self):
+        errors = verifier.check(self.readme, self.html + "\n@rumbo_ia")
+        self.assertIn("STALE_SOCIAL_HANDLE", errors)
+
+    def test_monthly_pricing_wording_is_rejected(self):
+        for wording in ("USD 149 a month", "USD 149 al mes"):
+            with self.subTest(wording=wording):
+                errors = verifier.check(self.readme, self.html + "\n" + wording)
+                self.assertIn("MONTHLY_PRICE", errors)
 
     def test_monthly_pricing_is_rejected(self):
         errors = verifier.check(self.readme, self.html + "\n<div>USD 149/mes</div>")
@@ -39,6 +55,66 @@ class CommercialCoherenceTests(unittest.TestCase):
         changed = self.html.replace('href="#contacto"', 'href="#producto"', 1)
         errors = verifier.check(self.readme, changed)
         self.assertIn("CONTACT_CTA_MISSING", errors)
+
+
+    def test_slash_mo_monthly_pricing_is_rejected(self):
+        self.assertIn("MONTHLY_PRICE", verifier.check(self.readme, self.html + "\nUSD 349/mo"))
+
+    def test_legacy_commercial_catalog_is_rejected(self):
+        for marker in ("RUMBO Capture", "RUMBO Recovery", "RUMBO Front Desk AI", "RUMBO Growth Engine", "Plan Growth completo"):
+            with self.subTest(marker=marker):
+                self.assertIn("LEGACY_COMMERCIAL_CATALOG", verifier.check(self.readme, self.html + "\n" + marker))
+
+    def test_unverified_tool_counts_are_rejected(self):
+        for wording in ("13 tools", "More than 14 tools", "14 herramientas", "Más de 14 herramientas"):
+            with self.subTest(wording=wording):
+                self.assertIn("UNVERIFIED_TOOL_COUNT", verifier.check(self.readme, self.html + "\n" + wording))
+
+    def test_fake_form_success_is_rejected(self):
+        for wording in ("Mensaje enviado", "Message sent"):
+            with self.subTest(wording=wording):
+                self.assertIn("FAKE_FORM_SUCCESS", verifier.check(self.readme, self.html + "\n" + wording))
+
+    def test_mislabeled_typeform_route_is_rejected(self):
+        sample = self.html + f'\n<a href="{verifier.TYPEFORM}" aria-label="WhatsApp directo">Email directo</a>'
+        self.assertIn("MISLABELED_TYPEFORM_ROUTE", verifier.check(self.readme, sample))
+
+    def test_generic_social_destinations_are_rejected(self):
+        for url in ("https://www.linkedin.com", "https://www.instagram.com"):
+            with self.subTest(url=url):
+                self.assertIn("GENERIC_SOCIAL_DESTINATION", verifier.check(self.readme, self.html + f'\n<a href="{url}">Social</a>'))
+
+
+    def test_adjectival_tool_count_is_rejected(self):
+        errors = verifier.check(self.readme, self.html + "\nMore than 14 specialized tools")
+        self.assertIn("UNVERIFIED_TOOL_COUNT", errors)
+
+    def test_duplicate_footer_typeform_item_is_rejected(self):
+        item = '<li><a href="' + verifier.TYPEFORM + '">Assessment form</a></li>'
+        errors = verifier.check(self.readme, self.html + "\n<footer><ul>" + item + item + "</ul></footer>")
+        self.assertIn("DUPLICATE_FOOTER_LINK", errors)
+
+    def test_typeform_whatsapp_visual_marker_is_rejected(self):
+        sample = self.html + '\n<a href="' + verifier.TYPEFORM + '"><svg fill="#25D366"></svg><span>wa</span></a>'
+        self.assertIn("MISLABELED_TYPEFORM_ROUTE", verifier.check(self.readme, sample))
+
+    def test_spanish_static_price_label_is_localized(self):
+        self.assertIn('id="calc-plan-price">— USD 149 pago único</span>', self.landing_es)
+        self.assertNotIn('id="calc-plan-price">— USD 149 one-time</span>', self.landing_es)
+
+    def test_surface_invariants_do_not_leak_between_files(self):
+        surfaces = {
+            "root.html": (self.html, verifier.ES_SURFACE_INVARIANTS),
+            "en.html": (self.landing_en.replace("Revenue Recovery Sprint", "BROKEN"), verifier.EN_SURFACE_INVARIANTS),
+        }
+        errors = verifier.check_surfaces(self.readme, surfaces)
+        self.assertTrue(any(e.startswith("en.html:INDEX_MISSING:") for e in errors))
+
+
+    def test_invariant_matching_uses_rendered_text(self):
+        marked = self.html.replace("Revenue Recovery Sprint", "Revenue <strong>Recovery</strong> Sprint")
+        errors = verifier.check(self.readme, marked, ("Revenue Recovery Sprint",))
+        self.assertNotIn("INDEX_MISSING:Revenue Recovery Sprint", errors)
 
 
 if __name__ == "__main__":
