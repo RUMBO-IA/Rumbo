@@ -1,0 +1,92 @@
+name: RUMBO Safe Merge V2 Current Main Rematerializer
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [main]
+    paths:
+      - ".github/workflows/safe-merge-v2-current-main-rematerialize.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  rematerialize:
+    if: >-
+      github.actor == 'fscfede-beep' &&
+      github.event.pull_request.head.repo.full_name == 'RUMBO-IA/Rumbo' &&
+      github.event.pull_request.head.ref == 'bootstrap/safe-merge-v2-current-main-20261004' &&
+      github.event.pull_request.base.sha == '7286596bd820a12180419f3f18c2020d1805ea4e'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: 7286596bd820a12180419f3f18c2020d1805ea4e
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Rematerialize exact audited Safe Merge v2 blobs
+        shell: bash
+        run: |
+          set -euo pipefail
+          old_base="68476a8e179d8db803bd3daeefa69a42a63fa098"
+          source_head="b083b6a837dd8aac99f26cb21c0855d8dcdbfb70"
+          source_branch="fix/safe-merge-operational-evidence-v2-clean-r2"
+          new_base="7286596bd820a12180419f3f18c2020d1805ea4e"
+          clean_branch="fix/safe-merge-operational-evidence-v2-current-main-clean"
+          temp_branch="bootstrap/safe-merge-v2-current-main-20261004"
+          paths=(
+            .github/workflows/safe-merge-authority-tests.yml
+            docs/superpowers/specs/2026-09-05-rumbo-safe-merge-authority-design.md
+            scripts/safe_merge_authority.py
+            scripts/safe_merge_evidence.py
+            scripts/test_safe_merge_authority.py
+          )
+
+          test "$(git rev-parse HEAD)" = "$new_base"
+          git fetch origin "refs/heads/$source_branch:refs/remotes/origin/$source_branch" --quiet
+          test "$(git rev-parse "refs/remotes/origin/$source_branch")" = "$source_head"
+          test "$(git rev-parse "$source_head^")" = "$old_base"
+
+          mapfile -t source_changed < <(git diff --name-only "$old_base" "$source_head" | sort)
+          test "${#source_changed[@]}" -eq "${#paths[@]}"
+          for i in "${!paths[@]}"; do test "${source_changed[$i]}" = "${paths[$i]}"; done
+
+          # Fail closed if current main independently changed any governed path.
+          for path in "${paths[@]}"; do
+            old_blob="$(git rev-parse --verify "$old_base:$path" 2>/dev/null || true)"
+            new_blob="$(git rev-parse --verify "$new_base:$path" 2>/dev/null || true)"
+            test "$old_blob" = "$new_blob"
+          done
+
+          if git ls-remote --exit-code --heads origin "refs/heads/$clean_branch" >/dev/null 2>&1; then
+            echo "FAIL_CLOSED_CLEAN_BRANCH_EXISTS" >&2
+            exit 3
+          fi
+
+          git switch -c "$clean_branch"
+          for path in "${paths[@]}"; do
+            mkdir -p "$(dirname "$path")"
+            git show "$source_head:$path" > "$path"
+          done
+          git add -- "${paths[@]}"
+
+          mapfile -t staged < <(git diff --cached --name-only | sort)
+          test "${#staged[@]}" -eq "${#paths[@]}"
+          for i in "${!paths[@]}"; do test "${staged[$i]}" = "${paths[$i]}"; done
+
+          for path in "${paths[@]}"; do
+            test "$(git hash-object "$path")" = "$(git rev-parse "$source_head:$path")"
+          done
+
+          git -c core.hooksPath=/dev/null               -c user.name="RUMBO Privacy Automation"               -c user.email="41898282+github-actions[bot]@users.noreply.github.com"               commit -m "fix(governance): rematerialize administration-read-independent Safe Merge"
+
+          clean_sha="$(git rev-parse HEAD)"
+          test "$(git rev-parse HEAD^)" = "$new_base"
+          test "$(git show -s --format='%an|%ae|%cn|%ce' HEAD)" = "RUMBO Privacy Automation|41898282+github-actions[bot]@users.noreply.github.com|RUMBO Privacy Automation|41898282+github-actions[bot]@users.noreply.github.com"
+
+          git push --set-upstream origin "$clean_branch"
+          test "$(git ls-remote origin "refs/heads/$clean_branch" | awk '{print $1}')" = "$clean_sha"
+          git push origin --delete "$temp_branch"
+          echo "SAFE_MERGE_V2_CURRENT_SHA=$clean_sha"
