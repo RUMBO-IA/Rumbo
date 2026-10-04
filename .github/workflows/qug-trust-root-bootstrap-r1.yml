@@ -62,13 +62,14 @@ jobs:
               -c user.name="RUMBO Privacy Automation" \
               -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
               commit -m "ci(authority): add protected-public QUG trust root R1"
-          git push --set-upstream origin "$clean"
-
-          if ! gh pr view "$clean" --json number >/dev/null 2>&1; then
-            gh pr create \
-              --base main \
-              --head "$clean" \
-              --draft \
-              --title "ci(authority): add clean protected-public QUG trust root R1" \
-              --body "Clean rematerialization of the trust-root workflow from #206 using approved github-actions[bot] identity. Exact base: 68476a8e179d8db803bd3daeefa69a42a63fa098. Changed path: only .github/workflows/qug-protected-trust-root-r1.yml. No main, production, DNS, billing, runner registration, or runner-group mutation. EXTERNAL_SPEND_USD=0; MERGE=NO_GO."
+          if git ls-remote --exit-code --heads origin "refs/heads/$clean" >/dev/null 2>&1; then
+            git fetch origin "$clean" --quiet
+            test "$(git rev-parse "origin/$clean^{tree}")" = "$(git rev-parse HEAD^{tree})"
+          else
+            git push --set-upstream origin "$clean"
           fi
+
+          # Remove only the connector-authored dirty bootstrap branch after
+          # the approved-identity clean branch is proven present.
+          git push origin --delete fix/qug-protected-trust-root-r1-20261003
+
