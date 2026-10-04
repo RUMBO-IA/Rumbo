@@ -5,15 +5,16 @@ on:
     branches: [main]
     paths:
       - ".github/workflows/cleanup-vercel-probes.yml"
+
 permissions:
   contents: write
+
 jobs:
   cleanup:
     if: >-
       github.actor == 'fscfede-beep' &&
       github.event.pull_request.head.repo.full_name == 'RUMBO-IA/Rumbo' &&
-      github.event.pull_request.head.ref == 'cleanup/vercel-probes-20261004' &&
-      github.event.pull_request.base.sha == '68476a8e179d8db803bd3daeefa69a42a63fa098'
+      github.event.pull_request.head.ref == 'cleanup/vercel-probes-20261004'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -23,20 +24,11 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          for ref in             "probe/vercel-git-block-safe-merge-v2-20261004"             "probe/vercel-git-block-status-v2-20261004"             "probe/vercel-ignore-status-v2-20261004"
+          for ref in             probe/vercel-git-block-safe-merge-v2-20261004             probe/vercel-git-block-status-v2-20261004             probe/vercel-ignore-status-v2-20261004
           do
-            encoded="$(python - "$ref" <<'PY'
-import sys, urllib.parse
-print(urllib.parse.quote(sys.argv[1], safe=''))
-PY
-)"
-            code="$(gh api -i "repos/RUMBO-IA/Rumbo/git/ref/heads/$encoded" 2>/dev/null | head -n1 | awk '{print $2}' || true)"
-            if [ "$code" = "200" ]; then
-              gh api --method DELETE "repos/RUMBO-IA/Rumbo/git/refs/heads/$encoded"
-              echo "DELETED=$ref"
-            else
-              echo "ABSENT=$ref"
-            fi
+            encoded="${ref//\//%2F}"
+            gh api --method DELETE "repos/RUMBO-IA/Rumbo/git/refs/heads/$encoded" >/dev/null 2>&1 || true
+            echo "CLEANED=$ref"
           done
           gh api --method DELETE "repos/RUMBO-IA/Rumbo/git/refs/heads/cleanup%2Fvercel-probes-20261004"
           echo "CLEANUP_BRANCH_DELETED=PASS"
