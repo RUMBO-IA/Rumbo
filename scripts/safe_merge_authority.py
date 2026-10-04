@@ -125,6 +125,7 @@ def evaluate(request: policy.MergeRequest, merge_policy: policy.MergePolicy, evi
         current_gate = "FAST_FORWARD_ONLY"
         if not evidence.ruleset_ok():
             return _stop(gates, current_gate, {"reason": "branch ruleset drift"}, target_sha=target_sha, live=live_id)
+        branch_safety_evidence: dict[str, Any] = {}
         if request.expected_base in merge_policy.phase3_targets:
             branch_safety = getattr(evidence, "branch_safety_ok", None)
             branch_ok = (
@@ -138,12 +139,25 @@ def evaluate(request: policy.MergeRequest, merge_policy: policy.MergePolicy, evi
                 if callable(branch_safety)
                 else evidence.branch_protection_ok(request.expected_base, required)
             )
+            details = getattr(evidence, "branch_safety_details", None)
+            if callable(details):
+                branch_safety_evidence = details()
             if not branch_ok:
-                return _stop(gates, current_gate, {"reason": "branch protection drift"}, target_sha=target_sha, live=live_id)
+                return _stop(
+                    gates,
+                    current_gate,
+                    {"reason": "branch protection drift", "branch_safety": branch_safety_evidence},
+                    target_sha=target_sha,
+                    live=live_id,
+                )
         fresh_target = evidence.target_sha(request.expected_base)
         if fresh_target != target_sha:
             return _stop(gates, current_gate, {"reason": "target changed before write", "fresh_target": fresh_target}, target_sha=target_sha, live=live_id)
-        gates.append(GateResult(current_gate, True, {"target_sha": target_sha, "ruleset": "active"}))
+        gates.append(GateResult(current_gate, True, {
+            "target_sha": target_sha,
+            "ruleset": "active",
+            "branch_safety": branch_safety_evidence,
+        }))
 
         if mode == "dry-run":
             return MergeOutcome("DRY_RUN_PASS", None, tuple(gates), target_sha, live_id)
@@ -179,8 +193,15 @@ def evaluate(request: policy.MergeRequest, merge_policy: policy.MergePolicy, evi
             if callable(branch_safety)
             else evidence.branch_protection_ok(request.expected_base, required)
         )
+        details = getattr(evidence, "branch_safety_details", None)
+        post_branch_safety = details() if callable(details) else {}
         if not branch_ok:
-            return _post_fail(gates, {"reason": "branch protection drift after write"}, target_sha=target_sha, live=live_id)
+            return _post_fail(
+                gates,
+                {"reason": "branch protection drift after write", "branch_safety": post_branch_safety},
+                target_sha=target_sha,
+                live=live_id,
+            )
 
         post_vercel = evidence.vercel_state()
         post_prod_ok = (
@@ -201,6 +222,7 @@ def evaluate(request: policy.MergeRequest, merge_policy: policy.MergePolicy, evi
             "target": post_target,
             "liveDeployment": live_id,
             "privacy_attestation": post_attestation,
+            "branch_safety": post_branch_safety,
         }))
         return MergeOutcome("MERGED_SAFE", None, tuple(gates), target_sha, live_id)
     except Exception as exc:
