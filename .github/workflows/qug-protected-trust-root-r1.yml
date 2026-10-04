@@ -5,7 +5,6 @@ on:
     branches: [main]
     paths:
       - "docs/control-authority-anchor-v1.json"
-      - ".github/workflows/qug-protected-trust-root-r1.yml"
   workflow_dispatch:
 
 permissions:
@@ -51,6 +50,13 @@ jobs:
           contexts=set(str(x) for x in ((((branch.get("protection") or {}).get("required_status_checks") or {}).get("contexts")) or []))
           for required in ("privacy","Vercel"):
               if required not in contexts: raise SystemExit("FAIL_REQUIRED_CONTEXT:"+required)
+          combined=get(f"https://api.github.com/repos/RUMBO-IA/Rumbo/commits/{public_sha}/status", token)
+          status_ok={str(x.get("context")) for x in (combined.get("statuses") or []) if x.get("state")=="success"}
+          checks=get(f"https://api.github.com/repos/RUMBO-IA/Rumbo/commits/{public_sha}/check-runs?per_page=100", token)
+          checks_ok={str(x.get("name")) for x in (checks.get("check_runs") or []) if x.get("status")=="completed" and x.get("conclusion")=="success"}
+          for required in ("privacy","Vercel"):
+              if required not in status_ok and required not in checks_ok:
+                  raise SystemExit("FAIL_EXACT_SHA_REQUIRED_CHECK:"+required)
           anchor=get(f"https://raw.githubusercontent.com/RUMBO-IA/Rumbo/{public_sha}/docs/control-authority-anchor-v1.json")
           if anchor.get("schema")!="rumbo.public-protected-authority-anchor/v1": raise SystemExit("FAIL_ANCHOR_SCHEMA")
           if (anchor.get("public_authority") or {}).get("repository")!="RUMBO-IA/Rumbo": raise SystemExit("FAIL_ANCHOR_PUBLIC_REPO")
