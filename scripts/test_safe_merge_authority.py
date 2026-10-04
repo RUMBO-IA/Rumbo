@@ -138,17 +138,40 @@ class EvidenceTests(unittest.TestCase):
         self.assertEqual(state["productionBranch"], "main")
         self.assertEqual(state["gitDeployments"], "disabled")
 
-    def test_fast_forward_push_uses_exact_expected_old_lease(self):
+    def test_fast_forward_uses_non_force_github_ref_update(self):
         fake = FakeRunner({
             ("git", "check-ref-format"): "",
             ("git", "fetch"): "",
             ("git", "rev-parse"): BASE,
-            ("git", "push"): "",
+            ("gh", "api", "--method", "PATCH"): "{}",
         })
         ev = evidence.RealEvidence(ROOT, fake, policy.DEFAULT_POLICY)
         ev.fast_forward("main", BASE, HEAD)
-        push = next(call for call in fake.calls if call[:2] == ("git", "push"))
-        self.assertIn(f"--force-with-lease=refs/heads/main:{BASE}", push)
+        patch_calls = [call for call in fake.calls if call[:4] == ("gh", "api", "--method", "PATCH")]
+        self.assertEqual(len(patch_calls), 1)
+        patch = patch_calls[0]
+        self.assertIn(f"repos/RUMBO-IA/Rumbo/git/refs/heads/main", patch)
+        self.assertIn("-f", patch)
+        self.assertIn(f"sha={HEAD}", patch)
+        self.assertIn("-F", patch)
+        self.assertIn("force=false", patch)
+        self.assertFalse(any(call[:2] == ("git", "push") for call in fake.calls))
+
+    def test_operational_branch_safety_requires_direct_invariants(self):
+        class OperationalEvidence(evidence.RealEvidence):
+            def branch_protection_ok(self, _target, _required):
+                raise evidence.EvidenceError("branch protection readback denied")
+            def branch_snapshot_ok(self, _target, _required):
+                return True
+            def linear_candidate_ok(self, _base_sha, _candidate):
+                return True
+            def review_threads_resolved(self, _pr_number):
+                return True
+
+        ev = OperationalEvidence(ROOT, FakeRunner({}), policy.DEFAULT_POLICY)
+        guard = getattr(ev, "branch_safety_ok", None)
+        observed = bool(guard and guard(40, "main", ("privacy", "Vercel"), BASE, HEAD))
+        self.assertTrue(observed)
 
     def _workflow_payload(self, *, blob=None, content=None):
         raw = content if content is not None else subprocess.check_output(["git", "show", f"HEAD:{policy.DEFAULT_POLICY.privacy_workflow_path}"], cwd=ROOT)
