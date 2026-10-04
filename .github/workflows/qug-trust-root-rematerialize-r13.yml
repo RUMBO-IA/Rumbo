@@ -63,7 +63,7 @@ jobs:
           grep -Fq 'include\.path|includeif\..*\.path' "$RUNNER_TEMP/qug-protected-trust-root-r1.yml"
           grep -Fq 'FAIL_PRIVATE_DANGEROUS_GIT_CONFIG_BEFORE_MATERIALIZATION' "$RUNNER_TEMP/qug-protected-trust-root-r1.yml"
           grep -Fq 'GIT_CONFIG_NOSYSTEM=1' "$RUNNER_TEMP/qug-protected-trust-root-r1.yml"
-          grep -Fq 'if: ${{ false }}' "$RUNNER_TEMP/qug-protected-trust-root-r1.yml"
+          grep -Fq 'DISABLED_PENDING_RUNNER_POLICY' "$RUNNER_TEMP/qug-protected-trust-root-r1.yml"
           grep -Fq 'test_r13_vercel_status_uses_creator_avatar' "$RUNNER_TEMP/test_control_authority_anchor.py"
           grep -Fq 'test_r13_ruleset_target_is_branch_in_both_authority_stages' "$RUNNER_TEMP/test_control_authority_anchor.py"
           grep -Fq 'test_r13_rejects_real_git_include_key_forms' "$RUNNER_TEMP/test_control_authority_anchor.py"
