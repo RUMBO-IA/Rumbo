@@ -77,7 +77,8 @@ jobs:
           mkdir -p "$(dirname "scripts/test_safe_merge_authority.py")"
           git show "$SOURCE_HEAD:scripts/test_safe_merge_authority.py" > "scripts/test_safe_merge_authority.py"
 
-          grep -Fq 'ref: ${{ github.event.pull_request.head.sha || github.sha }}' ".github/workflows/safe-merge-authority-tests.yml"
+          grep -Fq 'github.event.pull_request.head.sha' ".github/workflows/safe-merge-authority-tests.yml"
+          grep -Fq 'github.sha' ".github/workflows/safe-merge-authority-tests.yml"
           python -m unittest scripts.test_safe_merge_authority -v
 
           git add -- ".github/workflows/safe-merge-authority-tests.yml" "docs/superpowers/specs/2026-09-05-rumbo-safe-merge-authority-design.md" "scripts/safe_merge_authority.py" "scripts/safe_merge_evidence.py" "scripts/test_safe_merge_authority.py"
