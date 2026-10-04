@@ -401,6 +401,7 @@ class FakeEvidence:
     def ruleset_ok(self): return self.ruleset
     def branch_protection_ok(self, _target, _required): return self.branch_protection
     def branch_safety_ok(self, _pr_number, _target, _required, _base_sha, _candidate): return self.branch_safety
+    def branch_safety_details(self): return {"mode": "test", "ok": self.branch_safety}
     def fast_forward(self, target, expected_old, candidate):
         self.push_calls.append((target, expected_old, candidate))
         return evidence.CommandResult(("git", "push"), 0, "", "")
@@ -498,6 +499,12 @@ class AuthorityGateTests(unittest.TestCase):
         self.assertEqual(out.state, "DRY_RUN_PASS")
         self.assertIsNone(out.failed_gate)
         self.assertFalse(ev.push_calls)
+
+    def test_clean_dry_run_records_branch_safety_evidence(self):
+        ev = FakeEvidence(target_sequence=[BASE, BASE])
+        out = authority.evaluate(merge_request(), policy.DEFAULT_POLICY, ev)
+        g5 = next(g for g in out.gates if g.name == "FAST_FORWARD_ONLY")
+        self.assertEqual(g5.evidence.get("branch_safety"), {"mode": "test", "ok": True})
 
     def test_clean_dry_run_passes_without_write(self):
         ev = FakeEvidence(target_sequence=[BASE, BASE])
