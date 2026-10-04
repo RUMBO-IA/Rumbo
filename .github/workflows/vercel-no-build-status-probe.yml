@@ -1,0 +1,83 @@
+name: Vercel No-Build Status Probe
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [main]
+    paths:
+      - ".github/workflows/vercel-no-build-status-probe.yml"
+
+permissions:
+  contents: write
+  statuses: read
+
+jobs:
+  probe:
+    if: >-
+      github.actor == 'fscfede-beep' &&
+      github.event.pull_request.head.repo.full_name == 'RUMBO-IA/Rumbo' &&
+      github.event.pull_request.head.ref == 'bootstrap/vercel-no-build-status-probe-20261004' &&
+      github.event.pull_request.base.sha == '68476a8e179d8db803bd3daeefa69a42a63fa098'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: 68476a8e179d8db803bd3daeefa69a42a63fa098
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Create clean disabled-deployment probe and observe Vercel status
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          source_branch="bootstrap/vercel-no-build-status-probe-20261004"
+          probe_branch="probe/vercel-git-block-status-20261004"
+
+          cleanup() {
+            git push origin --delete "$probe_branch" >/dev/null 2>&1 || true
+            git push origin --delete "$source_branch" >/dev/null 2>&1 || true
+          }
+          trap cleanup EXIT
+
+          if git ls-remote --exit-code --heads origin "refs/heads/$probe_branch" >/dev/null 2>&1; then
+            echo "FAIL_CLOSED_PROBE_EXISTS" >&2
+            exit 3
+          fi
+
+          grep -Fq '"probe/vercel-git-block-*": false' vercel.json
+
+          git switch -c "$probe_branch"
+          mkdir -p docs/probes
+          cat > docs/probes/vercel-git-block-status-20261004.md <<'EOF'
+          # Vercel disabled-deployment status probe
+          
+          Disposable evidence branch used to observe the GitHub commit status emitted by
+          Vercel when repository configuration disables deployment for the branch.
+          EOF
+
+          git add docs/probes/vercel-git-block-status-20261004.md
+          git -c core.hooksPath=/dev/null               -c user.name="RUMBO Privacy Automation"               -c user.email="41898282+github-actions[bot]@users.noreply.github.com"               commit -m "test(vercel): observe disabled-deployment status"
+
+          probe_sha="$(git rev-parse HEAD)"
+          test "$(git show -s --format='%an|%ae|%cn|%ce' HEAD)" = "RUMBO Privacy Automation|41898282+github-actions[bot]@users.noreply.github.com|RUMBO Privacy Automation|41898282+github-actions[bot]@users.noreply.github.com"
+
+          git push --set-upstream origin "$probe_branch"
+
+          state=""
+          description=""
+          for attempt in $(seq 1 24); do
+            payload="$(gh api "repos/RUMBO-IA/Rumbo/commits/$probe_sha/status")"
+            state="$(python -c 'import json,sys; d=json.load(sys.stdin); xs=[x for x in d.get("statuses",[]) if x.get("context")=="Vercel"]; print(xs[0].get("state","") if xs else "")' <<<"$payload")"
+            description="$(python -c 'import json,sys; d=json.load(sys.stdin); xs=[x for x in d.get("statuses",[]) if x.get("context")=="Vercel"]; print(xs[0].get("description","") if xs else "")' <<<"$payload")"
+            if [ -n "$state" ]; then break; fi
+            sleep 5
+          done
+
+          echo "VERCEL_DISABLED_BRANCH_SHA=$probe_sha"
+          echo "VERCEL_DISABLED_BRANCH_STATUS=$state"
+          echo "VERCEL_DISABLED_BRANCH_DESCRIPTION=$description"
+
+          test -n "$state"
