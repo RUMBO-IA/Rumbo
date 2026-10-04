@@ -167,21 +167,20 @@ def evaluate(request: policy.MergeRequest, merge_policy: policy.MergePolicy, evi
         )
         if not evidence.ruleset_ok():
             return _post_fail(gates, {"reason": "ruleset drift after write"}, target_sha=target_sha, live=live_id)
-        if request.expected_base in merge_policy.phase3_targets:
-            branch_safety = getattr(evidence, "branch_safety_ok", None)
-            branch_ok = (
-                branch_safety(
-                    request.pr_number,
-                    request.expected_base,
-                    required,
-                    target_sha,
-                    request.expected_head_sha,
-                )
-                if callable(branch_safety)
-                else evidence.branch_protection_ok(request.expected_base, required)
+        branch_safety = getattr(evidence, "branch_safety_ok", None)
+        branch_ok = (
+            branch_safety(
+                request.pr_number,
+                request.expected_base,
+                required,
+                target_sha,
+                request.expected_head_sha,
             )
-            if not branch_ok:
-                return _post_fail(gates, {"reason": "branch protection drift after write"}, target_sha=target_sha, live=live_id)
+            if callable(branch_safety)
+            else evidence.branch_protection_ok(request.expected_base, required)
+        )
+        if not branch_ok:
+            return _post_fail(gates, {"reason": "branch protection drift after write"}, target_sha=target_sha, live=live_id)
 
         post_vercel = evidence.vercel_state()
         post_prod_ok = (
