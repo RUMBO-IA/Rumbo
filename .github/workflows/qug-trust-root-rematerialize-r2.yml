@@ -1,0 +1,93 @@
+name: RUMBO QUG Trust Root Rematerialize R2
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [main]
+    paths:
+      - ".github/workflows/qug-trust-root-rematerialize-r2.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  rematerialize:
+    if: >-
+      github.event.pull_request.head.repo.full_name == 'RUMBO-IA/Rumbo' &&
+      github.event.pull_request.head.ref == 'bootstrap/qug-trust-root-rematerialize-r2-20261004'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout exact public base
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: 68476a8e179d8db803bd3daeefa69a42a63fa098
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Verify source and create clean trust-root branch
+        env:
+          SOURCE_HEAD: 6bdb248317633b82959e2c1d00950969fb7766dd
+          SOURCE_BRANCH: fix/qug-protected-trust-root-clean-r1-20261003
+          CLEAN_BRANCH: fix/qug-protected-trust-root-clean-r2-20261004
+          BASE_SHA: 68476a8e179d8db803bd3daeefa69a42a63fa098
+          BOOTSTRAP_HEAD: ${{ github.event.pull_request.head.sha }}
+          BOOTSTRAP_BRANCH: ${{ github.event.pull_request.head.ref }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          target=".github/workflows/qug-protected-trust-root-r1.yml"
+
+          test "$(git rev-parse HEAD)" = "$BASE_SHA"
+          [[ "$SOURCE_HEAD" =~ ^[0-9a-f]{40}$ ]]
+          [[ "$BOOTSTRAP_HEAD" =~ ^[0-9a-f]{40}$ ]]
+          test "$BOOTSTRAP_BRANCH" = "bootstrap/qug-trust-root-rematerialize-r2-20261004"
+
+          source_remote="$(git ls-remote origin "refs/heads/$SOURCE_BRANCH" | awk '{print $1}')"
+          test "$source_remote" = "$SOURCE_HEAD"
+
+          bootstrap_remote="$(git ls-remote origin "refs/heads/$BOOTSTRAP_BRANCH" | awk '{print $1}')"
+          test "$bootstrap_remote" = "$BOOTSTRAP_HEAD"
+
+          git fetch origin "$SOURCE_HEAD" --quiet
+          mapfile -t source_changed < <(git diff --name-only "$BASE_SHA" "$SOURCE_HEAD")
+          test "${#source_changed[@]}" -eq 1
+          test "${source_changed[0]}" = "$target"
+
+          git show "$SOURCE_HEAD:$target" > "$RUNNER_TEMP/qug-protected-trust-root-r1.yml"
+          test -s "$RUNNER_TEMP/qug-protected-trust-root-r1.yml"
+
+          if git ls-remote --exit-code --heads origin "refs/heads/$CLEAN_BRANCH" >/dev/null 2>&1; then
+            echo "FAIL_CLOSED_CLEAN_BRANCH_ALREADY_EXISTS" >&2
+            exit 3
+          fi
+
+          git switch --detach "$BASE_SHA"
+          git switch -c "$CLEAN_BRANCH"
+          mkdir -p .github/workflows
+          cp "$RUNNER_TEMP/qug-protected-trust-root-r1.yml" "$target"
+          git add -- "$target"
+          test "$(git diff --cached --name-only)" = "$target"
+
+          git -c core.hooksPath=/dev/null \
+              -c user.name="RUMBO Privacy Automation" \
+              -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+              commit -m "ci(authority): rematerialize protected-public QUG trust root R2"
+
+          clean_sha="$(git rev-parse HEAD)"
+          git push --set-upstream origin "$CLEAN_BRANCH"
+
+          remote_clean="$(git ls-remote origin "refs/heads/$CLEAN_BRANCH" | awk '{print $1}')"
+          test "$remote_clean" = "$clean_sha"
+          git fetch origin "$remote_clean" --quiet
+          test "$(git show "$remote_clean:$target" | git hash-object --stdin)" = "$(git hash-object "$target")"
+
+          # Delete only the two connector-authored dirty refs after the clean bot-authored
+          # branch is proven present. Exact-head checks prevent deleting a moved ref.
+          test "$(git ls-remote origin "refs/heads/$SOURCE_BRANCH" | awk '{print $1}')" = "$SOURCE_HEAD"
+          git push origin --delete "$SOURCE_BRANCH"
+
+          test "$(git ls-remote origin "refs/heads/$BOOTSTRAP_BRANCH" | awk '{print $1}')" = "$BOOTSTRAP_HEAD"
+          git push origin --delete "$BOOTSTRAP_BRANCH"
+
+          echo "CLEAN_SHA=$clean_sha"
