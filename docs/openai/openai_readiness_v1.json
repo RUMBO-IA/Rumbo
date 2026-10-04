@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "as_of": "2026-10-04",
+  "product": "RUMBO IA",
+  "default_public_claim_policy": "fail_closed",
+  "claims": [
+    {"id":"openai_partner_network_member","state":"NOT_PROVEN","public_label_allowed":false,"evidence_required":"OpenAI approval/member record"},
+    {"id":"openai_marketplace_partner","state":"NOT_PROVEN","public_label_allowed":false,"evidence_required":"OpenAI Marketplace approval/listing"},
+    {"id":"openai_marketplace_product_eligible","state":"NOT_PROVEN","public_label_allowed":false,"evidence_required":"product-specific eligibility confirmation"},
+    {"id":"siwc_identity","state":"REQUIRES_OPENAI_APPROVAL","public_label_allowed":false,"evidence_required":"commercial SIWC client ID and successful verified flow"},
+    {"id":"siwc_plan_usage","state":"REQUIRES_OPENAI_APPROVAL","public_label_allowed":false,"evidence_required":"OpenAI approval plus verified eligible request"},
+    {"id":"direct_rumbo_chatgpt_wallet_charge","state":"NOT_PROVEN","public_label_allowed":false,"evidence_required":"official OpenAI API/program enabling third-party service debit"}
+  ],
+  "ledger_separation": [
+    "rumbo_fees",
+    "openai_api_usage",
+    "siwc_plan_usage",
+    "siwc_credits_usage",
+    "marketplace_commitment_attribution"
+  ],
+  "invariants": [
+    "SUBMITTED!=APPROVED",
+    "APPROVED!=LISTED",
+    "LISTED!=ELIGIBLE_PRODUCT",
+    "AUTHENTICATED!=AUTHORIZED",
+    "PROTOCOL_SUCCESS!=EFFECT_VERIFIED",
+    "CHATGPT_PLAN_USAGE!=RUMBO_SUBSCRIPTION_PAYMENT",
+    "CHATGPT_CREDITS!=CHATGPT_WALLET_BALANCE",
+    "CHATGPT_WALLET!=OPENAI_API_BALANCE"
+  ]
+}
