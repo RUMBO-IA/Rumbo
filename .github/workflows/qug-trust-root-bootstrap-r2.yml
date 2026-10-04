@@ -14,7 +14,7 @@ permissions:
 jobs:
   rematerialize-clean:
     if: >-
-      github.event.pull_request.number == 0 &&
+      github.event.pull_request.number == 210 &&
       github.actor == 'fscfede-beep' &&
       github.event.pull_request.head.repo.full_name == 'RUMBO-IA/Rumbo' &&
       github.event.pull_request.head.ref == 'fix/qug-protected-trust-root-bootstrap-r2-20261004' &&
