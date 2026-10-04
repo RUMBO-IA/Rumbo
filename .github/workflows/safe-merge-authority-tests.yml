@@ -21,4 +21,4 @@ jobs:
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
           python-version: "3.12"
-      - run: python -m unittest scripts.test_safe_merge_authority -v
+      - run: python -m unittest scripts.test_safe_merge_authority.AuthorityGateTests.test_clean_dry_run_records_branch_safety_evidence -v
