@@ -21,10 +21,4 @@ jobs:
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
           python-version: "3.12"
-      - run: >-
-          python -m unittest
-          scripts.test_safe_merge_authority.AuthorityGateTests.test_operational_branch_safety_can_replace_unreadable_admin_readback
-          scripts.test_safe_merge_authority.EvidenceTests.test_operational_branch_safety_requires_direct_invariants
-          scripts.test_safe_merge_authority.EvidenceTests.test_fast_forward_uses_non_force_github_ref_update
-          scripts.test_safe_merge_authority.FastForwardTests.test_main_rechecks_operational_branch_safety_after_write
-          -v
+      - run: python -m unittest scripts.test_safe_merge_authority -v
