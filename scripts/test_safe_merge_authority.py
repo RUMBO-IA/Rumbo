@@ -310,6 +310,38 @@ class EvidenceTests(unittest.TestCase):
     def test_commit_metadata_ok_does_not_require_local_deny_hashes(self):
         self.assertTrue(evidence.RealEvidence(ROOT, FakeRunner({}), policy.DEFAULT_POLICY).commit_metadata_ok("HEAD"))
 
+    def test_operational_branch_safety_fails_closed_on_each_direct_invariant(self):
+        class OperationalEvidence(evidence.RealEvidence):
+            snapshot = True
+            linear = True
+            threads = True
+            def branch_protection_ok(self, _target, _required):
+                raise evidence.EvidenceError("branch protection readback denied")
+            def branch_snapshot_ok(self, _target, _required):
+                return self.snapshot
+            def linear_candidate_ok(self, _base_sha, _candidate):
+                return self.linear
+            def review_threads_resolved(self, _pr_number):
+                return self.threads
+
+        for attribute in ("snapshot", "linear", "threads"):
+            ev = OperationalEvidence(ROOT, FakeRunner({}), policy.DEFAULT_POLICY)
+            setattr(ev, attribute, False)
+            self.assertFalse(
+                ev.branch_safety_ok(40, "main", ("privacy", "Vercel"), BASE, HEAD),
+                attribute,
+            )
+
+    def test_operational_branch_safety_does_not_mask_non_permission_errors(self):
+        class BrokenEvidence(evidence.RealEvidence):
+            def branch_protection_ok(self, _target, _required):
+                raise evidence.EvidenceError("network failure")
+
+        ev = BrokenEvidence(ROOT, FakeRunner({}), policy.DEFAULT_POLICY)
+        with self.assertRaisesRegex(evidence.EvidenceError, "network failure"):
+            ev.branch_safety_ok(40, "main", ("privacy", "Vercel"), BASE, HEAD)
+
+
 
 BASE = "1" * 40
 HEAD = "2" * 40
