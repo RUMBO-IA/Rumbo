@@ -89,6 +89,7 @@ class RealEvidence:
         self.root = Path(root)
         self.runner = runner or SubprocessRunner(self.root)
         self.policy = merge_policy
+        self._branch_safety_details: dict[str, Any] = {}
 
     def _json(self, args) -> Any:
         return parse_json_result(self.runner.run(tuple(args)))
@@ -468,15 +469,36 @@ class RealEvidence:
         candidate: str,
     ) -> bool:
         try:
-            return self.branch_protection_ok(target, required)
+            strict_ok = self.branch_protection_ok(target, required)
         except EvidenceError as exc:
             if str(exc) != "branch protection readback denied":
                 raise
-        return (
-            self.branch_snapshot_ok(target, required)
-            and self.linear_candidate_ok(base_sha, candidate)
-            and self.review_threads_resolved(pr_number)
-        )
+        else:
+            self._branch_safety_details = {
+                "mode": "classic_branch_protection",
+                "ok": strict_ok,
+                "required_checks": list(required),
+            }
+            return strict_ok
+
+        snapshot_ok = self.branch_snapshot_ok(target, required)
+        linear_ok = self.linear_candidate_ok(base_sha, candidate)
+        threads_ok = self.review_threads_resolved(pr_number)
+        fallback_ok = snapshot_ok and linear_ok and threads_ok
+        self._branch_safety_details = {
+            "mode": "operational_fallback",
+            "ok": fallback_ok,
+            "admin_readback": "denied",
+            "branch_snapshot_protected_and_checks": snapshot_ok,
+            "linear_candidate_without_merges": linear_ok,
+            "review_threads_resolved": threads_ok,
+            "ref_update_force": False,
+            "required_checks": list(required),
+        }
+        return fallback_ok
+
+    def branch_safety_details(self) -> dict[str, Any]:
+        return dict(self._branch_safety_details)
 
     def fast_forward(self, target: str, expected_old: str, candidate: str) -> CommandResult:
         authorized = target in self.policy.phase3_targets or target.startswith(self.policy.probe_prefix)
