@@ -5,6 +5,8 @@ on:
     branches: [main]
     paths:
       - "docs/control-authority-anchor-v1.json"
+      # Bootstrap the trust root on its first protected-main promotion too.
+      - ".github/workflows/qug-protected-trust-root-r1.yml"
   workflow_dispatch:
 
 permissions:
