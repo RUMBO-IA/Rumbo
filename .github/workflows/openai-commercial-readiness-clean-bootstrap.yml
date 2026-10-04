@@ -1,0 +1,94 @@
+name: RUMBO Commercial Readiness Clean Rematerializer
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [main]
+    paths:
+      - ".github/workflows/openai-commercial-readiness-clean-bootstrap.yml"
+      - "docs/openai/COMMERCIAL_PLATFORM_V1.md"
+      - "docs/openai/openai_readiness_v1.json"
+      - "platform/schema/commercial_control_plane_v1.sql"
+
+permissions:
+  contents: write
+
+jobs:
+  rematerialize:
+    if: >-
+      github.actor == 'fscfede-beep' &&
+      github.event.pull_request.head.repo.full_name == 'RUMBO-IA/Rumbo' &&
+      github.event.pull_request.head.ref == 'bootstrap/openai-commercial-readiness-clean-20261004' &&
+      github.event.pull_request.base.sha == '68476a8e179d8db803bd3daeefa69a42a63fa098'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout exact public base
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: 68476a8e179d8db803bd3daeefa69a42a63fa098
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Preserve exact commercial candidate and remove dirty refs
+        env:
+          SOURCE_HEAD: ${{ github.event.pull_request.head.sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          temp_branch="bootstrap/openai-commercial-readiness-clean-20261004"
+          dirty_branch="feat/openai-commercial-readiness-v1"
+          dirty_head="359333eaa50116809ab91b09a92bb6796673b6b0"
+          clean_branch="feat/openai-commercial-readiness-v1-clean"
+
+          [[ "$SOURCE_HEAD" =~ ^[0-9a-f]{40}$ ]]
+          test "$(git ls-remote origin "refs/heads/$temp_branch" | awk '{print $1}')" = "$SOURCE_HEAD"
+          test "$(git ls-remote origin "refs/heads/$dirty_branch" | awk '{print $1}')" = "$dirty_head"
+
+          git fetch origin "$SOURCE_HEAD" "$dirty_head" --quiet
+          mapfile -t dirty_changed < <(git diff --name-only "68476a8e179d8db803bd3daeefa69a42a63fa098" "$dirty_head" | sort)
+          expected=(
+            "docs/openai/COMMERCIAL_PLATFORM_V1.md"
+            "docs/openai/openai_readiness_v1.json"
+            "platform/schema/commercial_control_plane_v1.sql"
+          )
+          test "${#dirty_changed[@]}" -eq 3
+          for i in "${!expected[@]}"; do test "${dirty_changed[$i]}" = "${expected[$i]}"; done
+
+          mapfile -t staged_source < <(git diff --name-only "68476a8e179d8db803bd3daeefa69a42a63fa098" "$SOURCE_HEAD" | grep -v '^.github/workflows/openai-commercial-readiness-clean-bootstrap.yml$' | sort)
+          test "${#staged_source[@]}" -eq 3
+          for i in "${!expected[@]}"; do test "${staged_source[$i]}" = "${expected[$i]}"; done
+
+          for path in "${expected[@]}"; do
+            test "$(git show "$SOURCE_HEAD:$path" | git hash-object --stdin)" = "$(git show "$dirty_head:$path" | git hash-object --stdin)"
+          done
+
+          if git ls-remote --exit-code --heads origin "refs/heads/$clean_branch" >/dev/null 2>&1; then
+            echo "FAIL_CLOSED_CLEAN_COMMERCIAL_BRANCH_EXISTS" >&2
+            exit 3
+          fi
+
+          git switch --detach "68476a8e179d8db803bd3daeefa69a42a63fa098"
+          git switch -c "$clean_branch"
+          for path in "${expected[@]}"; do
+            mkdir -p "$(dirname "$path")"
+            git show "$dirty_head:$path" > "$path"
+          done
+          git add -- "${expected[@]}"
+          mapfile -t staged < <(git diff --cached --name-only | sort)
+          test "${#staged[@]}" -eq 3
+          for i in "${!expected[@]}"; do test "${staged[$i]}" = "${expected[$i]}"; done
+
+          git -c core.hooksPath=/dev/null               -c user.name="RUMBO Privacy Automation"               -c user.email="41898282+github-actions[bot]@users.noreply.github.com"               commit -m "feat(platform): rematerialize OpenAI commercial readiness candidate"
+
+          clean_sha="$(git rev-parse HEAD)"
+          git push --set-upstream origin "$clean_branch"
+          test "$(git ls-remote origin "refs/heads/$clean_branch" | awk '{print $1}')" = "$clean_sha"
+
+          for path in "${expected[@]}"; do
+            test "$(git show "$clean_sha:$path" | git hash-object --stdin)" = "$(git show "$dirty_head:$path" | git hash-object --stdin)"
+          done
+
+          git push origin --delete "$dirty_branch"
+          git push origin --delete "$temp_branch"
+          echo "CLEAN_COMMERCIAL_SHA=$clean_sha"
