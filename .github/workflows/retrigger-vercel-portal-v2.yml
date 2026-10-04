@@ -1,0 +1,55 @@
+name: Retrigger Vercel Portal V2
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [main]
+    paths:
+      - ".github/workflows/retrigger-vercel-portal-v2.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  retrigger:
+    if: >-
+      github.actor == 'fscfede-beep' &&
+      github.event.pull_request.head.repo.full_name == 'RUMBO-IA/Rumbo' &&
+      github.event.pull_request.head.ref == 'bootstrap/retrigger-vercel-portal-v2-20261004' &&
+      github.event.pull_request.base.sha == '78b313ac31516896f6451ba4e64508a1c210ae6d'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: 1237e954c4089235005fc67a489a90b0d0aa16f3
+          fetch-depth: 0
+          persist-credentials: true
+      - name: Create clean empty commit and retrigger Git integration
+        shell: bash
+        run: |
+          set -euo pipefail
+          target_branch="feat/customer-portal-v2-clean"
+          expected="1237e954c4089235005fc67a489a90b0d0aa16f3"
+          temp_branch="bootstrap/retrigger-vercel-portal-v2-20261004"
+
+          remote_before="$(git ls-remote origin "refs/heads/$target_branch" | awk '{print $1}')"
+          test "$remote_before" = "$expected"
+          test "$(git rev-parse HEAD)" = "$expected"
+
+          git switch -c retrigger-local
+          git -c core.hooksPath=/dev/null               -c user.name="RUMBO Privacy Automation"               -c user.email="41898282+github-actions[bot]@users.noreply.github.com"               commit --allow-empty -m "chore(ci): retrigger Vercel after preview tracking restore"
+
+          next="$(git rev-parse HEAD)"
+          test "$(git rev-parse HEAD^)" = "$expected"
+          test "$(git rev-parse HEAD^{tree})" = "$(git rev-parse "$expected^{tree}")"
+          test "$(git show -s --format='%an|%ae|%cn|%ce' HEAD)" = "RUMBO Privacy Automation|41898282+github-actions[bot]@users.noreply.github.com|RUMBO Privacy Automation|41898282+github-actions[bot]@users.noreply.github.com"
+
+          remote_boundary="$(git ls-remote origin "refs/heads/$target_branch" | awk '{print $1}')"
+          test "$remote_boundary" = "$expected"
+
+          git push origin "HEAD:refs/heads/$target_branch"
+          test "$(git ls-remote origin "refs/heads/$target_branch" | awk '{print $1}')" = "$next"
+
+          git push origin --delete "$temp_branch"
+          echo "PORTAL_RETRIGGER_SHA=$next"
