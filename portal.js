@@ -127,13 +127,10 @@ async function handleSignup() {
   }
   showStatus('Creating account…');
   try {
-    const data = await authRequest('/signup', {
+    const redirectTo = new URL('login.html', location.href).href;
+    const data = await authRequest(`/signup?redirect_to=${encodeURIComponent(redirectTo)}`, {
       method: 'POST',
-      body: JSON.stringify({
-        email,
-        password,
-        options: { emailRedirectTo: new URL('login.html', location.href).href }
-      })
+      body: JSON.stringify({ email, password })
     });
     if (data.access_token) {
       saveSession(data);
@@ -311,7 +308,11 @@ async function loadPartners() {
 }
 
 function init() {
-  acceptOAuthHash();
+  const acceptedOAuth = acceptOAuthHash();
+  if (document.body.dataset.page === 'login' && acceptedOAuth) {
+    location.href = 'dashboard.html';
+    return;
+  }
   qs('#login-form')?.addEventListener('submit', handleLogin);
   qs('#signup-button')?.addEventListener('click', handleSignup);
   qs('#google-button')?.addEventListener('click', handleGoogle);
