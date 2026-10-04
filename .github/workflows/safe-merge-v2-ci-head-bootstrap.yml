@@ -1,0 +1,93 @@
+name: Safe Merge V2 CI Head Repair Rematerializer
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [main]
+    paths:
+      - ".github/workflows/safe-merge-v2-ci-head-bootstrap.yml"
+      - ".github/workflows/safe-merge-authority-tests.yml"
+      - "docs/superpowers/specs/2026-09-05-rumbo-safe-merge-authority-design.md"
+      - "scripts/safe_merge_authority.py"
+      - "scripts/safe_merge_evidence.py"
+      - "scripts/test_safe_merge_authority.py"
+
+permissions:
+  contents: write
+  pull-requests: read
+
+jobs:
+  rematerialize:
+    if: >-
+      github.actor == 'fscfede-beep' &&
+      github.event.pull_request.head.repo.full_name == 'RUMBO-IA/Rumbo' &&
+      github.event.pull_request.head.ref == 'bootstrap/safe-merge-v2-ci-head-20261004' &&
+      github.event.pull_request.base.sha == '68476a8e179d8db803bd3daeefa69a42a63fa098'
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: 68476a8e179d8db803bd3daeefa69a42a63fa098
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: "3.12"
+      - name: Verify exact scope and rematerialize
+        env:
+          SOURCE_HEAD: ${{ github.event.pull_request.head.sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          source_branch="bootstrap/safe-merge-v2-ci-head-20261004"
+          old_clean="fix/safe-merge-operational-evidence-v2-clean"
+          target_branch="fix/safe-merge-operational-evidence-v2-clean-r2"
+          base="68476a8e179d8db803bd3daeefa69a42a63fa098"
+
+          test "$(git ls-remote origin "refs/heads/$source_branch" | awk '{print $1}')" = "$SOURCE_HEAD"
+          if git ls-remote --exit-code --heads origin "refs/heads/$target_branch" >/dev/null 2>&1; then
+            echo "FAIL_CLOSED_TARGET_EXISTS" >&2
+            exit 3
+          fi
+          git fetch origin "$SOURCE_HEAD" --quiet
+
+          mapfile -t changed < <(git diff --name-only "$base" "$SOURCE_HEAD" | sort)
+          expected=(
+            ".github/workflows/safe-merge-authority-tests.yml"
+            ".github/workflows/safe-merge-v2-ci-head-bootstrap.yml"
+            "docs/superpowers/specs/2026-09-05-rumbo-safe-merge-authority-design.md"
+            "scripts/safe_merge_authority.py"
+            "scripts/safe_merge_evidence.py"
+            "scripts/test_safe_merge_authority.py"
+          )
+          test "${#changed[@]}" -eq "${#expected[@]}"
+          for i in "${!expected[@]}"; do test "${changed[$i]}" = "${expected[$i]}"; done
+
+          git switch --detach "$base"
+          git switch -c "$target_branch"
+          mkdir -p "$(dirname ".github/workflows/safe-merge-authority-tests.yml")"
+          git show "$SOURCE_HEAD:.github/workflows/safe-merge-authority-tests.yml" > ".github/workflows/safe-merge-authority-tests.yml"
+          mkdir -p "$(dirname "docs/superpowers/specs/2026-09-05-rumbo-safe-merge-authority-design.md")"
+          git show "$SOURCE_HEAD:docs/superpowers/specs/2026-09-05-rumbo-safe-merge-authority-design.md" > "docs/superpowers/specs/2026-09-05-rumbo-safe-merge-authority-design.md"
+          mkdir -p "$(dirname "scripts/safe_merge_authority.py")"
+          git show "$SOURCE_HEAD:scripts/safe_merge_authority.py" > "scripts/safe_merge_authority.py"
+          mkdir -p "$(dirname "scripts/safe_merge_evidence.py")"
+          git show "$SOURCE_HEAD:scripts/safe_merge_evidence.py" > "scripts/safe_merge_evidence.py"
+          mkdir -p "$(dirname "scripts/test_safe_merge_authority.py")"
+          git show "$SOURCE_HEAD:scripts/test_safe_merge_authority.py" > "scripts/test_safe_merge_authority.py"
+
+          grep -Fq 'ref: ${{ github.event.pull_request.head.sha || github.sha }}' ".github/workflows/safe-merge-authority-tests.yml"
+          python -m unittest scripts.test_safe_merge_authority -v
+
+          git add -- ".github/workflows/safe-merge-authority-tests.yml" "docs/superpowers/specs/2026-09-05-rumbo-safe-merge-authority-design.md" "scripts/safe_merge_authority.py" "scripts/safe_merge_evidence.py" "scripts/test_safe_merge_authority.py"
+          git -c core.hooksPath=/dev/null               -c user.name="RUMBO Privacy Automation"               -c user.email="41898282+github-actions[bot]@users.noreply.github.com"               commit -m "fix(governance): bind safe-merge tests to exact PR head"
+
+          clean_sha="$(git rev-parse HEAD)"
+          test "$(git show -s --format='%an|%ae|%cn|%ce' HEAD)" = "RUMBO Privacy Automation|41898282+github-actions[bot]@users.noreply.github.com|RUMBO Privacy Automation|41898282+github-actions[bot]@users.noreply.github.com"
+          git push --set-upstream origin "$target_branch"
+          test "$(git ls-remote origin "refs/heads/$target_branch" | awk '{print $1}')" = "$clean_sha"
+
+          git push origin --delete "$old_clean"
+          git push origin --delete "$source_branch"
+          echo "CLEAN_SAFE_MERGE_V2_R2_SHA=$clean_sha"
