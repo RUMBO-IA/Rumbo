@@ -1,0 +1,104 @@
+name: RUMBO QUG Trust Root Rematerialize R8
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [main]
+    paths:
+      - ".github/workflows/qug-trust-root-rematerialize-r7.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  rematerialize:
+    if: >-
+      github.actor == 'fscfede-beep' &&
+      github.event.pull_request.head.repo.full_name == 'RUMBO-IA/Rumbo' &&
+      github.event.pull_request.head.ref == 'bootstrap/qug-protected-trust-root-r8-20261004' &&
+      github.event.pull_request.base.sha == '68476a8e179d8db803bd3daeefa69a42a63fa098'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout exact public base
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: 68476a8e179d8db803bd3daeefa69a42a63fa098
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Verify exact source and create clean R8
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="68476a8e179d8db803bd3daeefa69a42a63fa098"
+          source_branch="source/qug-protected-trust-root-r8-20261004"
+          source_sha="1a58f3ece13acce9fd6583db1298232608d85f11"
+          bootstrap_branch="bootstrap/qug-protected-trust-root-r8-20261004"
+          bootstrap_sha="${{ github.event.pull_request.head.sha }}"
+          clean_branch="fix/qug-protected-trust-root-clean-r8-20261004"
+          workflow=".github/workflows/qug-protected-trust-root-r1.yml"
+          tests="scripts/test_control_authority_anchor.py"
+          bootstrap_file=".github/workflows/qug-trust-root-rematerialize-r7.yml"
+
+          [[ "$bootstrap_sha" =~ ^[0-9a-f]{40}$ ]]
+          test "$(git ls-remote origin "refs/heads/$bootstrap_branch" | awk '{print $1}')" = "$bootstrap_sha"
+          test "$(git ls-remote origin "refs/heads/$source_branch" | awk '{print $1}')" = "$source_sha"
+          test "$(git ls-remote origin refs/heads/main | awk '{print $1}')" = "$base"
+          git fetch origin "$source_sha" "$bootstrap_sha" --quiet
+
+          mapfile -t source_changed < <(git diff --name-only "$base" "$source_sha" | sort)
+          test "${#source_changed[@]}" -eq 2
+          test "${source_changed[0]}" = "$workflow"
+          test "${source_changed[1]}" = "$tests"
+          mapfile -t bootstrap_changed < <(git diff --name-only "$base" "$bootstrap_sha" | sort)
+          test "${#bootstrap_changed[@]}" -eq 1
+          test "${bootstrap_changed[0]}" = "$bootstrap_file"
+
+          git show "$source_sha:$workflow" > "$RUNNER_TEMP/qug-protected-trust-root-r1.yml"
+          git show "$source_sha:$tests" > "$RUNNER_TEMP/test_control_authority_anchor.py"
+          grep -Fq 'EXPECTED_PRIVACY_WORKFLOW_SHA256' "$RUNNER_TEMP/qug-protected-trust-root-r1.yml"
+          grep -Fq 'FAIL_RULESET_SCOPE_BEFORE_CARRIER' "$RUNNER_TEMP/qug-protected-trust-root-r1.yml"
+          grep -Fq 'FAIL_PRIVACY_WORKFLOW_PRE_CARRIER' "$RUNNER_TEMP/qug-protected-trust-root-r1.yml"
+          grep -Fq 'FAIL_PRIVACY_CHECK_PRE_CARRIER' "$RUNNER_TEMP/qug-protected-trust-root-r1.yml"
+          grep -Fq 'FAIL_VERCEL_STATUS_PRE_CARRIER' "$RUNNER_TEMP/qug-protected-trust-root-r1.yml"
+          grep -Fq 'cancel-in-progress: false' "$RUNNER_TEMP/qug-protected-trust-root-r1.yml"
+          grep -Fq 'FAIL_PRIVATE_DANGEROUS_GIT_CONFIG' "$RUNNER_TEMP/qug-protected-trust-root-r1.yml"
+          grep -Fq 'git -c core.hooksPath="$hooks" -C "$repo" worktree add' "$RUNNER_TEMP/qug-protected-trust-root-r1.yml"
+          grep -Fq 'test_qug_trust_root_precarrier_revalidates_full_ruleset' "$RUNNER_TEMP/test_control_authority_anchor.py"
+          grep -Fq 'test_qug_trust_root_precarrier_revalidates_exact_required_results' "$RUNNER_TEMP/test_control_authority_anchor.py"
+          grep -Fq 'test_qug_trust_root_serializes_persistent_effect_without_cancellation' "$RUNNER_TEMP/test_control_authority_anchor.py"
+          grep -Fq 'test_qug_trust_root_rejects_dangerous_local_git_config_and_neutralizes_hooks' "$RUNNER_TEMP/test_control_authority_anchor.py"
+
+          if git ls-remote --exit-code --heads origin "refs/heads/$clean_branch" >/dev/null 2>&1; then
+            echo "FAIL_CLOSED_CLEAN_R8_ALREADY_EXISTS" >&2
+            exit 3
+          fi
+
+          git switch --detach "$base"
+          git switch -c "$clean_branch"
+          mkdir -p .github/workflows scripts
+          cp "$RUNNER_TEMP/qug-protected-trust-root-r1.yml" "$workflow"
+          cp "$RUNNER_TEMP/test_control_authority_anchor.py" "$tests"
+          git add -- "$workflow" "$tests"
+          mapfile -t staged < <(git diff --cached --name-only | sort)
+          test "${#staged[@]}" -eq 2
+          test "${staged[0]}" = "$workflow"
+          test "${staged[1]}" = "$tests"
+          git -c core.hooksPath=/dev/null \
+              -c user.name="RUMBO Privacy Automation" \
+              -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+              commit -m "fix(authority): close QUG pre-effect authority races R8"
+          clean_sha="$(git rev-parse HEAD)"
+          test "$(git rev-parse HEAD^)" = "$base"
+          mapfile -t clean_changed < <(git diff --name-only "$base" "$clean_sha" | sort)
+          test "${#clean_changed[@]}" -eq 2
+          test "${clean_changed[0]}" = "$workflow"
+          test "${clean_changed[1]}" = "$tests"
+          git push --set-upstream origin "$clean_branch"
+          test "$(git ls-remote origin "refs/heads/$clean_branch" | awk '{print $1}')" = "$clean_sha"
+
+          test "$(git ls-remote origin "refs/heads/$source_branch" | awk '{print $1}')" = "$source_sha"
+          test "$(git ls-remote origin "refs/heads/$bootstrap_branch" | awk '{print $1}')" = "$bootstrap_sha"
+          git push origin --delete "$source_branch" "$bootstrap_branch"
+          echo "CLEAN_R8_SHA=$clean_sha"
