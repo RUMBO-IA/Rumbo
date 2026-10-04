@@ -385,7 +385,13 @@ class RealEvidence:
         if target not in self.policy.phase3_targets:
             return True
         owner, repo = self.policy.repository.split("/", 1)
-        data = self._json(("gh", "api", f"repos/{owner}/{repo}/branches/{target}/protection"))
+        result = self.runner.run(("gh", "api", f"repos/{owner}/{repo}/branches/{target}/protection"))
+        if result.returncode != 0:
+            stderr = (result.stderr or "").lower()
+            if "resource not accessible by integration" in stderr and "403" in stderr:
+                raise EvidenceError("branch protection readback denied")
+            raise EvidenceError(f"command failed ({result.returncode}): {' '.join(result.args)}")
+        data = parse_json_result(result)
         status = data.get("required_status_checks") or {}
         contexts = set(status.get("contexts") or [])
         contexts.update(item.get("context") for item in status.get("checks") or [] if item.get("context"))
@@ -397,6 +403,81 @@ class RealEvidence:
             and bool((data.get("required_conversation_resolution") or {}).get("enabled"))
         )
 
+    def branch_snapshot_ok(self, target: str, required: tuple[str, ...]) -> bool:
+        owner, repo = self.policy.repository.split("/", 1)
+        data = self._json(("gh", "api", f"repos/{owner}/{repo}/branches/{target}"))
+        if data.get("protected") is not True:
+            return False
+        status = ((data.get("protection") or {}).get("required_status_checks") or {})
+        contexts = set(status.get("contexts") or [])
+        contexts.update(item.get("context") for item in status.get("checks") or [] if item.get("context"))
+        return set(required) <= contexts
+
+    def linear_candidate_ok(self, base_sha: str, candidate: str) -> bool:
+        if not self.is_ancestor(base_sha, candidate):
+            return False
+        result = self.runner.run(("git", "rev-list", "--merges", f"{base_sha}..{candidate}"))
+        if result.returncode != 0:
+            raise EvidenceError("could not inspect candidate merge history")
+        return not result.stdout.strip()
+
+    def review_threads_resolved(self, pr_number: int) -> bool:
+        owner, repo = self.policy.repository.split("/", 1)
+        query = (
+            "query($owner:String!,$repo:String!,$number:Int!,$after:String){"
+            "repository(owner:$owner,name:$repo){pullRequest(number:$number){"
+            "reviewThreads(first:100,after:$after){nodes{isResolved}"
+            "pageInfo{hasNextPage endCursor}}}}}"
+        )
+        after = None
+        while True:
+            args = [
+                "gh", "api", "graphql",
+                "-f", f"query={query}",
+                "-f", f"owner={owner}",
+                "-f", f"repo={repo}",
+                "-F", f"number={pr_number}",
+            ]
+            if after is not None:
+                args.extend(("-f", f"after={after}"))
+            data = self._json(tuple(args))
+            pull = ((data.get("data") or {}).get("repository") or {}).get("pullRequest")
+            if not isinstance(pull, dict):
+                return False
+            threads = pull.get("reviewThreads")
+            if not isinstance(threads, dict):
+                return False
+            nodes = threads.get("nodes")
+            if not isinstance(nodes, list):
+                return False
+            if any(not isinstance(node, dict) or node.get("isResolved") is not True for node in nodes):
+                return False
+            page = threads.get("pageInfo") or {}
+            if not page.get("hasNextPage"):
+                return True
+            after = page.get("endCursor")
+            if not isinstance(after, str) or not after:
+                return False
+
+    def branch_safety_ok(
+        self,
+        pr_number: int,
+        target: str,
+        required: tuple[str, ...],
+        base_sha: str,
+        candidate: str,
+    ) -> bool:
+        try:
+            return self.branch_protection_ok(target, required)
+        except EvidenceError as exc:
+            if str(exc) != "branch protection readback denied":
+                raise
+        return (
+            self.branch_snapshot_ok(target, required)
+            and self.linear_candidate_ok(base_sha, candidate)
+            and self.review_threads_resolved(pr_number)
+        )
+
     def fast_forward(self, target: str, expected_old: str, candidate: str) -> CommandResult:
         authorized = target in self.policy.phase3_targets or target.startswith(self.policy.probe_prefix)
         if not authorized:
@@ -406,10 +487,13 @@ class RealEvidence:
             raise EvidenceError("target is not a valid branch ref")
         if self.target_sha(target) != expected_old:
             raise EvidenceError("target changed at write boundary")
+        owner, repo = self.policy.repository.split("/", 1)
         result = self.runner.run((
-            "git", "push", f"--force-with-lease=refs/heads/{target}:{expected_old}",
-            "origin", f"{candidate}:refs/heads/{target}",
+            "gh", "api", "--method", "PATCH",
+            f"repos/{owner}/{repo}/git/refs/heads/{target}",
+            "-f", f"sha={candidate}",
+            "-F", "force=false",
         ))
         if result.returncode != 0:
-            raise EvidenceError("fast-forward push failed")
+            raise EvidenceError("fast-forward ref update failed")
         return result
