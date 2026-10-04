@@ -138,7 +138,7 @@ class EvidenceTests(unittest.TestCase):
         self.assertEqual(state["productionBranch"], "main")
         self.assertEqual(state["gitDeployments"], "disabled")
 
-    def test_fast_forward_push_uses_exact_expected_old_lease(self):
+    def test_fast_forward_push_is_plain_non_force_update(self):
         fake = FakeRunner({
             ("git", "check-ref-format"): "",
             ("git", "fetch"): "",
@@ -148,7 +148,8 @@ class EvidenceTests(unittest.TestCase):
         ev = evidence.RealEvidence(ROOT, fake, policy.DEFAULT_POLICY)
         ev.fast_forward("main", BASE, HEAD)
         push = next(call for call in fake.calls if call[:2] == ("git", "push"))
-        self.assertIn(f"--force-with-lease=refs/heads/main:{BASE}", push)
+        self.assertEqual(push, ("git", "push", "origin", f"{HEAD}:refs/heads/main"))
+        self.assertFalse(any("force" in part for part in push))
 
     def _workflow_payload(self, *, blob=None, content=None):
         raw = content if content is not None else subprocess.check_output(["git", "show", f"HEAD:{policy.DEFAULT_POLICY.privacy_workflow_path}"], cwd=ROOT)
@@ -284,7 +285,149 @@ class EvidenceTests(unittest.TestCase):
             evidence.RealEvidence(ROOT, fake, policy.DEFAULT_POLICY).privacy_attestation(40, "a" * 40, "main", "feature/head")
 
     def test_commit_metadata_ok_does_not_require_local_deny_hashes(self):
-        self.assertTrue(evidence.RealEvidence(ROOT, FakeRunner({}), policy.DEFAULT_POLICY).commit_metadata_ok("HEAD"))
+        self.assertTrue(evidence.RealEvidence(ROOT, FakeRunner({}), policy.DEFAULT_POLICY).commit_metadata_ok("HEAD"))\n\n    def test_branch_protection_permission_fallback_accepts_equivalent_exact_operation_evidence(self):
+        protection_403 = evidence.CommandResult(
+            ("gh", "api", "repos/RUMBO-IA/Rumbo/branches/main/protection"),
+            1, "", "gh: Resource not accessible by integration (HTTP 403)"
+        )
+        branch = json.dumps({
+            "protected": True,
+            "protection": {
+                "enabled": True,
+                "required_status_checks": {
+                    "enforcement_level": "everyone",
+                    "contexts": ["privacy", "Vercel"],
+                    "checks": []
+                }
+            }
+        })
+        ruleset = json.dumps({
+            "enforcement": "active",
+            "conditions": {"ref_name": {"include": ["~ALL"]}},
+            "bypass_actors": [],
+            "rules": [
+                {"type": "commit_author_email_pattern"},
+                {"type": "committer_email_pattern"},
+                {"type": "non_fast_forward"}
+            ]
+        })
+        threads = json.dumps({
+            "data": {"repository": {"pullRequest": {"reviewThreads": {
+                "nodes": [], "pageInfo": {"hasNextPage": False}
+            }}}}
+        })
+        fake = FakeRunner({
+            ("gh", "api", "repos/RUMBO-IA/Rumbo/branches/main/protection"): protection_403,
+            ("gh", "api", "repos/RUMBO-IA/Rumbo/branches/main"): branch,
+            ("gh", "api", "repos/RUMBO-IA/Rumbo/rulesets/22317339"): ruleset,
+            ("git", "merge-base", "--is-ancestor"): evidence.CommandResult(("git",), 0, "", ""),
+            ("git", "rev-list", "--min-parents=2"): "",
+            ("gh", "api", "graphql"): threads,
+        })
+        ev = evidence.RealEvidence(ROOT, fake, policy.DEFAULT_POLICY)
+        self.assertTrue(ev.branch_protection_assurance_ok(
+            "main", ("privacy", "Vercel"), base_sha=BASE, candidate=HEAD, pr_number=40
+        ))
+
+    def test_branch_protection_permission_fallback_rejects_non_linear_candidate(self):
+        protection_403 = evidence.CommandResult(
+            ("gh", "api", "repos/RUMBO-IA/Rumbo/branches/main/protection"),
+            1, "", "gh: Resource not accessible by integration (HTTP 403)"
+        )
+        branch = json.dumps({
+            "protected": True,
+            "protection": {
+                "enabled": True,
+                "required_status_checks": {
+                    "enforcement_level": "everyone",
+                    "contexts": ["privacy", "Vercel"]
+                }
+            }
+        })
+        ruleset = json.dumps({
+            "enforcement": "active",
+            "conditions": {"ref_name": {"include": ["~ALL"]}},
+            "bypass_actors": [],
+            "rules": [
+                {"type": "commit_author_email_pattern"},
+                {"type": "committer_email_pattern"},
+                {"type": "non_fast_forward"}
+            ]
+        })
+        threads = json.dumps({
+            "data": {"repository": {"pullRequest": {"reviewThreads": {
+                "nodes": [], "pageInfo": {"hasNextPage": False}
+            }}}}
+        })
+        fake = FakeRunner({
+            ("gh", "api", "repos/RUMBO-IA/Rumbo/branches/main/protection"): protection_403,
+            ("gh", "api", "repos/RUMBO-IA/Rumbo/branches/main"): branch,
+            ("gh", "api", "repos/RUMBO-IA/Rumbo/rulesets/22317339"): ruleset,
+            ("git", "merge-base", "--is-ancestor"): evidence.CommandResult(("git",), 0, "", ""),
+            ("git", "rev-list", "--min-parents=2"): "deadbeef\n",
+            ("gh", "api", "graphql"): threads,
+        })
+        ev = evidence.RealEvidence(ROOT, fake, policy.DEFAULT_POLICY)
+        self.assertFalse(ev.branch_protection_assurance_ok(
+            "main", ("privacy", "Vercel"), base_sha=BASE, candidate=HEAD, pr_number=40
+        ))
+
+    def test_branch_protection_permission_fallback_rejects_unresolved_review_thread(self):
+        protection_403 = evidence.CommandResult(
+            ("gh", "api", "repos/RUMBO-IA/Rumbo/branches/main/protection"),
+            1, "", "gh: Resource not accessible by integration (HTTP 403)"
+        )
+        branch = json.dumps({
+            "protected": True,
+            "protection": {
+                "enabled": True,
+                "required_status_checks": {
+                    "enforcement_level": "everyone",
+                    "contexts": ["privacy", "Vercel"]
+                }
+            }
+        })
+        ruleset = json.dumps({
+            "enforcement": "active",
+            "conditions": {"ref_name": {"include": ["~ALL"]}},
+            "bypass_actors": [],
+            "rules": [
+                {"type": "commit_author_email_pattern"},
+                {"type": "committer_email_pattern"},
+                {"type": "non_fast_forward"}
+            ]
+        })
+        threads = json.dumps({
+            "data": {"repository": {"pullRequest": {"reviewThreads": {
+                "nodes": [{"isResolved": False}], "pageInfo": {"hasNextPage": False}
+            }}}}
+        })
+        fake = FakeRunner({
+            ("gh", "api", "repos/RUMBO-IA/Rumbo/branches/main/protection"): protection_403,
+            ("gh", "api", "repos/RUMBO-IA/Rumbo/branches/main"): branch,
+            ("gh", "api", "repos/RUMBO-IA/Rumbo/rulesets/22317339"): ruleset,
+            ("git", "merge-base", "--is-ancestor"): evidence.CommandResult(("git",), 0, "", ""),
+            ("git", "rev-list", "--min-parents=2"): "",
+            ("gh", "api", "graphql"): threads,
+        })
+        ev = evidence.RealEvidence(ROOT, fake, policy.DEFAULT_POLICY)
+        self.assertFalse(ev.branch_protection_assurance_ok(
+            "main", ("privacy", "Vercel"), base_sha=BASE, candidate=HEAD, pr_number=40
+        ))
+
+    def test_branch_protection_non_permission_error_fails_closed(self):
+        protection_500 = evidence.CommandResult(
+            ("gh", "api", "repos/RUMBO-IA/Rumbo/branches/main/protection"),
+            1, "", "gh: server failure (HTTP 500)"
+        )
+        fake = FakeRunner({
+            ("gh", "api", "repos/RUMBO-IA/Rumbo/branches/main/protection"): protection_500,
+        })
+        ev = evidence.RealEvidence(ROOT, fake, policy.DEFAULT_POLICY)
+        with self.assertRaises(evidence.EvidenceError):
+            ev.branch_protection_assurance_ok(
+                "main", ("privacy", "Vercel"), base_sha=BASE, candidate=HEAD, pr_number=40
+            )
 
 
 BASE = "1" * 40
@@ -343,6 +486,8 @@ class FakeEvidence:
     def vercel_state(self): return dict(self.vercel)
     def ruleset_ok(self): return self.ruleset
     def branch_protection_ok(self, _target, _required): return self.branch_protection
+    def branch_protection_assurance_ok(self, _target, _required, *, base_sha, candidate, pr_number):
+        return self.branch_protection
     def fast_forward(self, target, expected_old, candidate):
         self.push_calls.append((target, expected_old, candidate))
         return evidence.CommandResult(("git", "push"), 0, "", "")
