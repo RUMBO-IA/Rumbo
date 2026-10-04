@@ -5,7 +5,7 @@ on:
     types: [opened, synchronize, reopened]
     branches: [main]
     paths:
-      - ".github/workflows/qug-trust-root-rematerialize-r7.yml"
+      - ".github/workflows/qug-trust-root-rematerialize-r8.yml"
 
 permissions:
   contents: write
@@ -39,7 +39,7 @@ jobs:
           clean_branch="fix/qug-protected-trust-root-clean-r8b-20261004"
           workflow=".github/workflows/qug-protected-trust-root-r1.yml"
           tests="scripts/test_control_authority_anchor.py"
-          bootstrap_file=".github/workflows/qug-trust-root-rematerialize-r7.yml"
+          bootstrap_file=".github/workflows/qug-trust-root-rematerialize-r8.yml"
 
           [[ "$bootstrap_sha" =~ ^[0-9a-f]{40}$ ]]
           test "$(git ls-remote origin "refs/heads/$bootstrap_branch" | awk '{print $1}')" = "$bootstrap_sha"
