@@ -1,0 +1,85 @@
+name: RUMBO Customer Portal V2 Rematerializer
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [main]
+    paths:
+      - ".github/workflows/customer-portal-v2-rematerialize.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  rematerialize:
+    if: >-
+      github.actor == 'fscfede-beep' &&
+      github.event.pull_request.head.repo.full_name == 'RUMBO-IA/Rumbo' &&
+      github.event.pull_request.head.ref == 'bootstrap/customer-portal-v2-rematerialize-20261004' &&
+      github.event.pull_request.base.sha == '78b313ac31516896f6451ba4e64508a1c210ae6d'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: 78b313ac31516896f6451ba4e64508a1c210ae6d
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Rematerialize exact audited portal blobs
+        shell: bash
+        run: |
+          set -euo pipefail
+          old_base="68476a8e179d8db803bd3daeefa69a42a63fa098"
+          old_head="7338e7a2a1a8b108a9c9f58deda9e4aa9b7ebc51"
+          new_base="78b313ac31516896f6451ba4e64508a1c210ae6d"
+          clean_branch="feat/customer-portal-v2-clean"
+          temp_branch="bootstrap/customer-portal-v2-rematerialize-20261004"
+          paths=(dashboard.html login.html partners.html portal.css portal.js support.html vercel.json)
+
+          test "$(git rev-parse HEAD)" = "$new_base"
+          git fetch origin "$old_base" "$old_head" --quiet
+
+          test "$(git rev-parse "$old_head^")" = "$old_base"
+          mapfile -t old_changed < <(git diff --name-only "$old_base" "$old_head" | sort)
+          test "${#old_changed[@]}" -eq "${#paths[@]}"
+          for i in "${!paths[@]}"; do test "${old_changed[$i]}" = "${paths[$i]}"; done
+
+          # New main must not have independently changed any portal path since the old base.
+          for path in "${paths[@]}"; do
+            old_blob="$(git rev-parse "$old_base:$path" 2>/dev/null || true)"
+            new_blob="$(git rev-parse "$new_base:$path" 2>/dev/null || true)"
+            test "$old_blob" = "$new_blob"
+          done
+
+          if git ls-remote --exit-code --heads origin "refs/heads/$clean_branch" >/dev/null 2>&1; then
+            echo "FAIL_CLOSED_CLEAN_BRANCH_EXISTS" >&2
+            exit 3
+          fi
+
+          git switch -c "$clean_branch"
+          for path in "${paths[@]}"; do
+            git show "$old_head:$path" > "$path"
+          done
+          git add -- "${paths[@]}"
+
+          mapfile -t staged < <(git diff --cached --name-only | sort)
+          test "${#staged[@]}" -eq "${#paths[@]}"
+          for i in "${!paths[@]}"; do test "${staged[$i]}" = "${paths[$i]}"; done
+
+          # Exact blob equivalence with the already-reviewed portal candidate.
+          for path in "${paths[@]}"; do
+            test "$(git hash-object "$path")" = "$(git rev-parse "$old_head:$path")"
+          done
+
+          git -c core.hooksPath=/dev/null               -c user.name="RUMBO Privacy Automation"               -c user.email="41898282+github-actions[bot]@users.noreply.github.com"               commit -m "feat(web): rematerialize customer portal on commercial readiness main"
+
+          clean_sha="$(git rev-parse HEAD)"
+          test "$(git rev-parse HEAD^)" = "$new_base"
+          test "$(git show -s --format='%an|%ae|%cn|%ce' HEAD)" = "RUMBO Privacy Automation|41898282+github-actions[bot]@users.noreply.github.com|RUMBO Privacy Automation|41898282+github-actions[bot]@users.noreply.github.com"
+
+          git push --set-upstream origin "$clean_branch"
+          test "$(git ls-remote origin "refs/heads/$clean_branch" | awk '{print $1}')" = "$clean_sha"
+
+          git push origin --delete "$temp_branch"
+          echo "CLEAN_PORTAL_V2_SHA=$clean_sha"
