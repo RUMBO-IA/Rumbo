@@ -143,6 +143,7 @@ class EvidenceTests(unittest.TestCase):
             ("git", "check-ref-format"): "",
             ("git", "fetch"): "",
             ("git", "rev-parse"): BASE,
+            ("git", "push"): "",
             ("gh", "api", "--method", "PATCH"): "{}",
         })
         ev = evidence.RealEvidence(ROOT, fake, policy.DEFAULT_POLICY)
