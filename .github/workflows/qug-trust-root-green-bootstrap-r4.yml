@@ -28,7 +28,7 @@ jobs:
         run: |
           set -euo pipefail
           temp="bootstrap/qug-trust-root-green-r4-20261004"
-          clean="fix/qug-protected-trust-root-clean-r4-20261004"
+          clean="fix/qug-protected-trust-root-clean-r4b-20261004"
           test "$(git ls-remote origin "refs/heads/$temp" | awk '{print $1}')" = "$SOURCE_HEAD"
           git fetch origin "$SOURCE_HEAD" --quiet
           mapfile -t changed < <(git diff --name-only "68476a8e179d8db803bd3daeefa69a42a63fa098" "$SOURCE_HEAD" | sort)
