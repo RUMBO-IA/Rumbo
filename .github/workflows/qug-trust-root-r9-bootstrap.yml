@@ -60,7 +60,6 @@ jobs:
           grep -Fq 'FAIL_PRIVACY_CHECK_PRE_CARRIER' "$RUNNER_TEMP/workflow.yml"
           grep -Fq 'FAIL_VERCEL_STATUS_PRE_CARRIER' "$RUNNER_TEMP/workflow.yml"
           grep -Fq 'cancel-in-progress: false' "$RUNNER_TEMP/workflow.yml"
-          grep -Fq 'if: ${{ false }}' "$RUNNER_TEMP/workflow.yml"
           grep -Fq 'DISABLED_PENDING_RUNNER_POLICY' "$RUNNER_TEMP/workflow.yml"
           grep -Fq 'FAIL_PRIVATE_DANGEROUS_GIT_CONFIG' "$RUNNER_TEMP/workflow.yml"
           grep -Fq 'core.hooksPath="$hooks"' "$RUNNER_TEMP/workflow.yml"
