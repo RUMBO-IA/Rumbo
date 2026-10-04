@@ -138,17 +138,41 @@ class EvidenceTests(unittest.TestCase):
         self.assertEqual(state["productionBranch"], "main")
         self.assertEqual(state["gitDeployments"], "disabled")
 
-    def test_fast_forward_push_uses_exact_expected_old_lease(self):
+    def test_fast_forward_uses_non_force_github_ref_update(self):
         fake = FakeRunner({
             ("git", "check-ref-format"): "",
             ("git", "fetch"): "",
             ("git", "rev-parse"): BASE,
             ("git", "push"): "",
+            ("gh", "api", "--method", "PATCH"): "{}",
         })
         ev = evidence.RealEvidence(ROOT, fake, policy.DEFAULT_POLICY)
         ev.fast_forward("main", BASE, HEAD)
-        push = next(call for call in fake.calls if call[:2] == ("git", "push"))
-        self.assertIn(f"--force-with-lease=refs/heads/main:{BASE}", push)
+        patch_calls = [call for call in fake.calls if call[:4] == ("gh", "api", "--method", "PATCH")]
+        self.assertEqual(len(patch_calls), 1)
+        patch = patch_calls[0]
+        self.assertIn(f"repos/RUMBO-IA/Rumbo/git/refs/heads/main", patch)
+        self.assertIn("-f", patch)
+        self.assertIn(f"sha={HEAD}", patch)
+        self.assertIn("-F", patch)
+        self.assertIn("force=false", patch)
+        self.assertFalse(any(call[:2] == ("git", "push") for call in fake.calls))
+
+    def test_operational_branch_safety_requires_direct_invariants(self):
+        class OperationalEvidence(evidence.RealEvidence):
+            def branch_protection_ok(self, _target, _required):
+                raise evidence.EvidenceError("branch protection readback denied")
+            def branch_snapshot_ok(self, _target, _required):
+                return True
+            def linear_candidate_ok(self, _base_sha, _candidate):
+                return True
+            def review_threads_resolved(self, _pr_number):
+                return True
+
+        ev = OperationalEvidence(ROOT, FakeRunner({}), policy.DEFAULT_POLICY)
+        guard = getattr(ev, "branch_safety_ok", None)
+        observed = bool(guard and guard(40, "main", ("privacy", "Vercel"), BASE, HEAD))
+        self.assertTrue(observed)
 
     def _workflow_payload(self, *, blob=None, content=None):
         raw = content if content is not None else subprocess.check_output(["git", "show", f"HEAD:{policy.DEFAULT_POLICY.privacy_workflow_path}"], cwd=ROOT)
@@ -286,6 +310,38 @@ class EvidenceTests(unittest.TestCase):
     def test_commit_metadata_ok_does_not_require_local_deny_hashes(self):
         self.assertTrue(evidence.RealEvidence(ROOT, FakeRunner({}), policy.DEFAULT_POLICY).commit_metadata_ok("HEAD"))
 
+    def test_operational_branch_safety_fails_closed_on_each_direct_invariant(self):
+        class OperationalEvidence(evidence.RealEvidence):
+            snapshot = True
+            linear = True
+            threads = True
+            def branch_protection_ok(self, _target, _required):
+                raise evidence.EvidenceError("branch protection readback denied")
+            def branch_snapshot_ok(self, _target, _required):
+                return self.snapshot
+            def linear_candidate_ok(self, _base_sha, _candidate):
+                return self.linear
+            def review_threads_resolved(self, _pr_number):
+                return self.threads
+
+        for attribute in ("snapshot", "linear", "threads"):
+            ev = OperationalEvidence(ROOT, FakeRunner({}), policy.DEFAULT_POLICY)
+            setattr(ev, attribute, False)
+            self.assertFalse(
+                ev.branch_safety_ok(40, "main", ("privacy", "Vercel"), BASE, HEAD),
+                attribute,
+            )
+
+    def test_operational_branch_safety_does_not_mask_non_permission_errors(self):
+        class BrokenEvidence(evidence.RealEvidence):
+            def branch_protection_ok(self, _target, _required):
+                raise evidence.EvidenceError("network failure")
+
+        ev = BrokenEvidence(ROOT, FakeRunner({}), policy.DEFAULT_POLICY)
+        with self.assertRaisesRegex(evidence.EvidenceError, "network failure"):
+            ev.branch_safety_ok(40, "main", ("privacy", "Vercel"), BASE, HEAD)
+
+
 
 BASE = "1" * 40
 HEAD = "2" * 40
@@ -298,7 +354,7 @@ def merge_request(head=HEAD, base="main", repository="RUMBO-IA/Rumbo"):
 class FakeEvidence:
     def __init__(self, *, head=HEAD, base="main", repo="RUMBO-IA/Rumbo", head_branch="feature/head", checks=None,
                  metadata=True, attestation_sequence=None, post_attestation_sequence=None, ancestor=True, vercel=None, target_sequence=None,
-                 ruleset=True, branch_protection=True, repo_deployment_blocked=True):
+                 ruleset=True, branch_protection=True, branch_safety=None, repo_deployment_blocked=True):
         self.head, self.base, self.repo, self.head_branch = head, base, repo, head_branch
         self.check_states = checks if checks is not None else {"privacy": "SUCCESS", "Vercel": "SUCCESS"}
         self.metadata, self.ancestor, self.ruleset = metadata, ancestor, ruleset
@@ -309,6 +365,7 @@ class FakeEvidence:
         self.post_attestation_calls = 0
         self.repo_deployment_blocked = repo_deployment_blocked
         self.branch_protection = branch_protection
+        self.branch_safety = branch_protection if branch_safety is None else branch_safety
         self.vercel = vercel or {"autoAssignCustomDomains": False, "commandForIgnoringBuildStep": None,
                                  "productionBranch": "main", "gitDeployments": "disabled",
                                  "liveDeployment": "dpl_live", "liveTarget": "production"}
@@ -343,6 +400,8 @@ class FakeEvidence:
     def vercel_state(self): return dict(self.vercel)
     def ruleset_ok(self): return self.ruleset
     def branch_protection_ok(self, _target, _required): return self.branch_protection
+    def branch_safety_ok(self, _pr_number, _target, _required, _base_sha, _candidate): return self.branch_safety
+    def branch_safety_details(self): return {"mode": "test", "ok": self.branch_safety}
     def fast_forward(self, target, expected_old, candidate):
         self.push_calls.append((target, expected_old, candidate))
         return evidence.CommandResult(("git", "push"), 0, "", "")
@@ -430,6 +489,23 @@ class AuthorityGateTests(unittest.TestCase):
         self.assertEqual((out.state, out.failed_gate), ("SAFE_STOP", "FAST_FORWARD_ONLY"))
         self.assertFalse(ev.push_calls)
 
+    def test_operational_branch_safety_can_replace_unreadable_admin_readback(self):
+        ev = FakeEvidence(
+            target_sequence=[BASE, BASE],
+            branch_protection=False,
+            branch_safety=True,
+        )
+        out = authority.evaluate(merge_request(), policy.DEFAULT_POLICY, ev)
+        self.assertEqual(out.state, "DRY_RUN_PASS")
+        self.assertIsNone(out.failed_gate)
+        self.assertFalse(ev.push_calls)
+
+    def test_clean_dry_run_records_branch_safety_evidence(self):
+        ev = FakeEvidence(target_sequence=[BASE, BASE])
+        out = authority.evaluate(merge_request(), policy.DEFAULT_POLICY, ev)
+        g5 = next(g for g in out.gates if g.name == "FAST_FORWARD_ONLY")
+        self.assertEqual(g5.evidence.get("branch_safety"), {"mode": "test", "ok": True})
+
     def test_clean_dry_run_passes_without_write(self):
         ev = FakeEvidence(target_sequence=[BASE, BASE])
         out = authority.evaluate(merge_request(), policy.DEFAULT_POLICY, ev)
@@ -467,6 +543,17 @@ class FastForwardTests(unittest.TestCase):
         out = authority.evaluate(merge_request(), policy.DEFAULT_POLICY, ev, mode="main")
         self.assertEqual(out.state, "MERGED_SAFE")
         self.assertEqual(ev.post_attestation_calls, 1)
+        self.assertEqual(ev.push_calls, [("main", BASE, HEAD)])
+
+    def test_main_rechecks_operational_branch_safety_after_write(self):
+        ev = FakeEvidence(
+            target_sequence=[BASE, BASE, HEAD],
+            branch_protection=False,
+            branch_safety=True,
+        )
+        out = authority.evaluate(merge_request(), policy.DEFAULT_POLICY, ev, mode="main")
+        self.assertEqual(out.state, "MERGED_SAFE")
+        self.assertIsNone(out.failed_gate)
         self.assertEqual(ev.push_calls, [("main", BASE, HEAD)])
 
     def test_main_post_write_accepts_transient_push_privacy_pending_when_exact_attestation_stays_successful(self):
