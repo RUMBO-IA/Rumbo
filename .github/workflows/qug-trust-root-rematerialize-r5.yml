@@ -1,0 +1,89 @@
+name: RUMBO QUG Trust Root Rematerialize R5
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [main]
+    paths:
+      - ".github/workflows/qug-trust-root-rematerialize-r5.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  rematerialize:
+    if: >-
+      github.actor == 'fscfede-beep' &&
+      github.event.pull_request.head.repo.full_name == 'RUMBO-IA/Rumbo' &&
+      github.event.pull_request.head.ref == 'bootstrap/qug-protected-trust-root-r5-20261004' &&
+      github.event.pull_request.base.sha == '68476a8e179d8db803bd3daeefa69a42a63fa098'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout exact public base
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: 68476a8e179d8db803bd3daeefa69a42a63fa098
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Verify exact source and create clean R5
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="68476a8e179d8db803bd3daeefa69a42a63fa098"
+          source_branch="source/qug-protected-trust-root-r5-20261004"
+          source_sha="d4cf40f5d8df67a17265abca08b5b1ee88b3ccbb"
+          bootstrap_branch="bootstrap/qug-protected-trust-root-r5-20261004"
+          bootstrap_sha="${{ github.event.pull_request.head.sha }}"
+          clean_branch="fix/qug-protected-trust-root-clean-r5-20261004"
+          target=".github/workflows/qug-protected-trust-root-r1.yml"
+          bootstrap_file=".github/workflows/qug-trust-root-rematerialize-r5.yml"
+
+          [[ "$bootstrap_sha" =~ ^[0-9a-f]{40}$ ]]
+          test "$(git ls-remote origin "refs/heads/$bootstrap_branch" | awk '{print $1}')" = "$bootstrap_sha"
+          test "$(git ls-remote origin "refs/heads/$source_branch" | awk '{print $1}')" = "$source_sha"
+          test "$(git ls-remote origin refs/heads/main | awk '{print $1}')" = "$base"
+          git fetch origin "$source_sha" "$bootstrap_sha" --quiet
+
+          mapfile -t source_changed < <(git diff --name-only "$base" "$source_sha" | sort)
+          test "${#source_changed[@]}" -eq 1
+          test "${source_changed[0]}" = "$target"
+          mapfile -t bootstrap_changed < <(git diff --name-only "$base" "$bootstrap_sha" | sort)
+          test "${#bootstrap_changed[@]}" -eq 1
+          test "${bootstrap_changed[0]}" = "$bootstrap_file"
+
+          git show "$source_sha:$target" > "$RUNNER_TEMP/qug-protected-trust-root-r1.yml"
+          test -s "$RUNNER_TEMP/qug-protected-trust-root-r1.yml"
+          grep -Fq "RULESET_ID=22317339" "$RUNNER_TEMP/qug-protected-trust-root-r1.yml"
+          grep -Fq "PRIVACY_WORKFLOW_ID=347174988" "$RUNNER_TEMP/qug-protected-trust-root-r1.yml"
+          grep -Fq "GIT_NO_REPLACE_OBJECTS=1" "$RUNNER_TEMP/qug-protected-trust-root-r1.yml"
+          grep -Fq -- "--no-includes" "$RUNNER_TEMP/qug-protected-trust-root-r1.yml"
+          grep -Fq "core.hooksPath=" "$RUNNER_TEMP/qug-protected-trust-root-r1.yml"
+          grep -Fq "cancel-in-progress: true" "$RUNNER_TEMP/qug-protected-trust-root-r1.yml"
+
+          if git ls-remote --exit-code --heads origin "refs/heads/$clean_branch" >/dev/null 2>&1; then
+            echo "FAIL_CLOSED_CLEAN_R5_ALREADY_EXISTS" >&2
+            exit 3
+          fi
+
+          git switch --detach "$base"
+          git switch -c "$clean_branch"
+          mkdir -p .github/workflows
+          cp "$RUNNER_TEMP/qug-protected-trust-root-r1.yml" "$target"
+          git add -- "$target"
+          test "$(git diff --cached --name-only)" = "$target"
+          git -c core.hooksPath=/dev/null \
+              -c user.name="RUMBO Privacy Automation" \
+              -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+              commit -m "ci(authority): harden QUG Git materialization R5"
+          clean_sha="$(git rev-parse HEAD)"
+          test "$(git rev-parse HEAD^)" = "$base"
+          test "$(git diff --name-only "$base" "$clean_sha")" = "$target"
+          git push --set-upstream origin "$clean_branch"
+          test "$(git ls-remote origin "refs/heads/$clean_branch" | awk '{print $1}')" = "$clean_sha"
+
+          test "$(git ls-remote origin "refs/heads/$source_branch" | awk '{print $1}')" = "$source_sha"
+          test "$(git ls-remote origin "refs/heads/$bootstrap_branch" | awk '{print $1}')" = "$bootstrap_sha"
+          git push origin --delete "$source_branch" "$bootstrap_branch"
+          echo "CLEAN_R5_SHA=$clean_sha"
