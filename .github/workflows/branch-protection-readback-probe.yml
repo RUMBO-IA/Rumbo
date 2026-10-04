@@ -2,64 +2,29 @@ name: Branch Protection Readback Probe
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened]
+    types: [synchronize, reopened]
     branches: [main]
     paths:
       - ".github/workflows/branch-protection-readback-probe.yml"
 
 permissions:
-  contents: read
+  contents: write
   pull-requests: read
-  actions: read
-  checks: read
-  statuses: read
 
 jobs:
-  probe:
+  cleanup:
     if: >-
       github.actor == 'fscfede-beep' &&
       github.event.pull_request.head.repo.full_name == 'RUMBO-IA/Rumbo' &&
-      github.event.pull_request.head.ref == 'probe/branch-protection-readback-20261004' &&
-      github.event.pull_request.base.sha == '68476a8e179d8db803bd3daeefa69a42a63fa098'
+      github.event.pull_request.head.ref == 'probe/branch-protection-readback-20261004'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Probe branch protection endpoint with GITHUB_TOKEN
+      - name: Delete ephemeral probe branch
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -euo pipefail
-          out="$(mktemp)"
-          code=0
-          gh api repos/RUMBO-IA/Rumbo/branches/main/protection >"$out" 2>"$RUNNER_TEMP/err" || code=$?
-          if [ "$code" -ne 0 ]; then
-            echo "BRANCH_PROTECTION_READBACK=FAIL"
-            cat "$RUNNER_TEMP/err"
-            exit "$code"
-          fi
-          python - "$out" <<'PY'
-          import json,sys
-          d=json.load(open(sys.argv[1],encoding="utf-8"))
-          required=set((d.get("required_status_checks") or {}).get("contexts") or [])
-          required.update(x.get("context") for x in (d.get("required_status_checks") or {}).get("checks") or [] if x.get("context"))
-          checks={
-            "enforce_admins": bool((d.get("enforce_admins") or {}).get("enabled")),
-            "required_linear_history": bool((d.get("required_linear_history") or {}).get("enabled")),
-            "allow_force_pushes": bool((d.get("allow_force_pushes") or {}).get("enabled")),
-            "required_conversation_resolution": bool((d.get("required_conversation_resolution") or {}).get("enabled")),
-            "privacy_required": "privacy" in required,
-            "vercel_required": "Vercel" in required,
-          }
-          print("BRANCH_PROTECTION_READBACK=PASS")
-          for k,v in checks.items(): print(f"{k}={str(v).lower()}")
-          if checks != {
-            "enforce_admins": True,
-            "required_linear_history": True,
-            "allow_force_pushes": False,
-            "required_conversation_resolution": True,
-            "privacy_required": True,
-            "vercel_required": True,
-          }:
-            raise SystemExit("branch protection predicates mismatch")
-          PY
+          gh api --method DELETE repos/RUMBO-IA/Rumbo/git/refs/heads/probe/branch-protection-readback-20261004
+          echo "PROBE_BRANCH_DELETED=PASS"
