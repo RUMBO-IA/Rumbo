@@ -1,0 +1,98 @@
+name: RUMBO QUG Trust Root R11 Clean Rematerializer
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [main]
+    paths:
+      - ".github/workflows/qug-protected-trust-root-r1.yml"
+      - "scripts/test_control_authority_anchor.py"
+      - ".github/workflows/qug-trust-root-r11-bootstrap.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  rematerialize:
+    if: >-
+      github.actor == 'fscfede-beep' &&
+      github.event.pull_request.head.repo.full_name == 'RUMBO-IA/Rumbo' &&
+      github.event.pull_request.head.ref == 'bootstrap/qug-trust-root-r11-review-fixes-20261004' &&
+      github.event.pull_request.base.sha == '68476a8e179d8db803bd3daeefa69a42a63fa098'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout exact public base
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: 68476a8e179d8db803bd3daeefa69a42a63fa098
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Verify review fixes and rematerialize R11
+        env:
+          SOURCE_HEAD: ${{ github.event.pull_request.head.sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          temp_branch="bootstrap/qug-trust-root-r11-review-fixes-20261004"
+          clean_branch="fix/qug-protected-trust-root-clean-r11-20261004"
+          wf=".github/workflows/qug-protected-trust-root-r1.yml"
+          tst="scripts/test_control_authority_anchor.py"
+
+          [[ "$SOURCE_HEAD" =~ ^[0-9a-f]{40}$ ]]
+          test "$(git ls-remote origin "refs/heads/$temp_branch" | awk '{print $1}')" = "$SOURCE_HEAD"
+          git fetch origin "$SOURCE_HEAD" --quiet
+
+          mapfile -t changed < <(git diff --name-only "68476a8e179d8db803bd3daeefa69a42a63fa098" "$SOURCE_HEAD" | sort)
+          expected=(
+            ".github/workflows/qug-protected-trust-root-r1.yml"
+            ".github/workflows/qug-trust-root-r11-bootstrap.yml"
+            "scripts/test_control_authority_anchor.py"
+          )
+          test "${#changed[@]}" -eq 3
+          for i in "${!expected[@]}"; do test "${changed[$i]}" = "${expected[$i]}"; done
+
+          git show "$SOURCE_HEAD:$wf" > "$RUNNER_TEMP/workflow.yml"
+          git show "$SOURCE_HEAD:$tst" > "$RUNNER_TEMP/test.py"
+
+          grep -Fq 'FAIL_RULESET_EXCLUSIONS_PRESENT' "$RUNNER_TEMP/workflow.yml"
+          grep -Fq 'FAIL_RULESET_EXCLUSIONS_BEFORE_CARRIER' "$RUNNER_TEMP/workflow.yml"
+          grep -Fq 'FAIL_RULESET_BYPASS_VISIBILITY' "$RUNNER_TEMP/workflow.yml"
+          grep -Fq 'FAIL_RULESET_BYPASS_VISIBILITY_BEFORE_CARRIER' "$RUNNER_TEMP/workflow.yml"
+          grep -Fq 'FAIL_PRIVATE_ORIGIN_URL' "$RUNNER_TEMP/workflow.yml"
+          grep -Fq 'protocol.ext.allow=never' "$RUNNER_TEMP/workflow.yml"
+          grep -Fq 'DISABLED_PENDING_RUNNER_POLICY' "$RUNNER_TEMP/workflow.yml"
+          grep -Fq 'test_ruleset_ref_exclusions_fail_closed_in_both_authority_stages' "$RUNNER_TEMP/test.py"
+          grep -Fq 'test_ruleset_bypass_visibility_is_required_not_assumed' "$RUNNER_TEMP/test.py"
+          grep -Fq 'test_private_fetch_uses_exact_https_origin_and_protocol_lockdown' "$RUNNER_TEMP/test.py"
+
+          if git ls-remote --exit-code --heads origin "refs/heads/$clean_branch" >/dev/null 2>&1; then
+            echo "FAIL_CLOSED_R11_ALREADY_EXISTS" >&2
+            exit 3
+          fi
+
+          git switch --detach "68476a8e179d8db803bd3daeefa69a42a63fa098"
+          git switch -c "$clean_branch"
+          mkdir -p .github/workflows scripts
+          cp "$RUNNER_TEMP/workflow.yml" "$wf"
+          cp "$RUNNER_TEMP/test.py" "$tst"
+          git add -- "$wf" "$tst"
+          mapfile -t staged < <(git diff --cached --name-only | sort)
+          test "${#staged[@]}" -eq 2
+          test "${staged[0]}" = "$wf"
+          test "${staged[1]}" = "$tst"
+
+          git -c core.hooksPath=/dev/null \
+              -c user.name="RUMBO Privacy Automation" \
+              -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+              commit -m "fix(authority): close independent review P1 findings R11"
+
+          clean_sha="$(git rev-parse HEAD)"
+          test "$(git rev-parse HEAD^)" = "68476a8e179d8db803bd3daeefa69a42a63fa098"
+          git push --set-upstream origin "$clean_branch"
+          test "$(git ls-remote origin "refs/heads/$clean_branch" | awk '{print $1}')" = "$clean_sha"
+
+          test "$(git ls-remote origin "refs/heads/$temp_branch" | awk '{print $1}')" = "$SOURCE_HEAD"
+          git push origin --delete "$temp_branch"
+          echo "CLEAN_R11_SHA=$clean_sha"
