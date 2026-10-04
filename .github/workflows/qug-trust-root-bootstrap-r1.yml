@@ -1,0 +1,74 @@
+name: RUMBO QUG Trust Root Clean Bootstrap R1
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [main]
+    paths:
+      - ".github/workflows/qug-protected-trust-root-r1.yml"
+      - ".github/workflows/qug-trust-root-bootstrap-r1.yml"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  rematerialize-clean:
+    if: >-
+      github.event.pull_request.number == 206 &&
+      github.event.pull_request.head.repo.full_name == 'RUMBO-IA/Rumbo' &&
+      github.event.pull_request.head.ref == 'fix/qug-protected-trust-root-r1-20261003'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout exact public base
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: 68476a8e179d8db803bd3daeefa69a42a63fa098
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Verify exact PR lineage and materialize one clean file
+        env:
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$BASE_SHA" = "68476a8e179d8db803bd3daeefa69a42a63fa098"
+          [[ "$HEAD_SHA" =~ ^[0-9a-f]{40}$ ]]
+          git fetch origin "$HEAD_SHA" --quiet
+          mapfile -t changed < <(git diff --name-only "$BASE_SHA" "$HEAD_SHA" | sort)
+          expected=(
+            ".github/workflows/qug-protected-trust-root-r1.yml"
+            ".github/workflows/qug-trust-root-bootstrap-r1.yml"
+          )
+          test "${#changed[@]}" -eq "${#expected[@]}"
+          for i in "${!expected[@]}"; do test "${changed[$i]}" = "${expected[$i]}"; done
+
+          target=".github/workflows/qug-protected-trust-root-r1.yml"
+          git show "$HEAD_SHA:$target" > "$RUNNER_TEMP/qug-protected-trust-root-r1.yml"
+          test -s "$RUNNER_TEMP/qug-protected-trust-root-r1.yml"
+
+          clean="fix/qug-protected-trust-root-clean-r1-20261003"
+          git switch --detach "$BASE_SHA"
+          git switch -c "$clean"
+          mkdir -p .github/workflows
+          cp "$RUNNER_TEMP/qug-protected-trust-root-r1.yml" "$target"
+          git add -- "$target"
+          test "$(git diff --cached --name-only)" = "$target"
+          git -c core.hooksPath=/dev/null \
+              -c user.name="RUMBO Privacy Automation" \
+              -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+              commit -m "ci(authority): add protected-public QUG trust root R1"
+          git push --set-upstream origin "$clean"
+
+          if ! gh pr view "$clean" --json number >/dev/null 2>&1; then
+            gh pr create \
+              --base main \
+              --head "$clean" \
+              --draft \
+              --title "ci(authority): add clean protected-public QUG trust root R1" \
+              --body "Clean rematerialization of the trust-root workflow from #206 using approved github-actions[bot] identity. Exact base: 68476a8e179d8db803bd3daeefa69a42a63fa098. Changed path: only .github/workflows/qug-protected-trust-root-r1.yml. No main, production, DNS, billing, runner registration, or runner-group mutation. EXTERNAL_SPEND_USD=0; MERGE=NO_GO."
+          fi
