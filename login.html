@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="RUMBO IA customer account sign in and registration.">
+  <title>Account — RUMBO IA</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="portal.css">
+  <script src="portal.js" defer></script>
+</head>
+<body data-page="login">
+<header class="nav"><a class="brand" href="index.html">RUMBO <span>IA</span></a><nav><a href="partners.html">Partners</a><a href="support.html">Support</a></nav></header>
+<main class="portal-shell">
+  <div class="section-heading"><span>Customer account</span><h1>Sign in to RUMBO IA</h1><p class="lead">Use email and password, or continue with Google when the Google OAuth provider is enabled for this environment.</p></div>
+  <div class="portal-grid">
+    <section class="portal-card">
+      <h2>Email</h2>
+      <form id="login-form" class="portal-form">
+        <label>Email<input id="email" type="email" autocomplete="email" required></label>
+        <label>Password<input id="password" type="password" autocomplete="current-password" minlength="8" required></label>
+        <div class="portal-actions"><button class="button" type="submit">Sign in</button><button class="button ghost" id="signup-button" type="button">Create account</button></div>
+      </form>
+    </section>
+    <section class="portal-card">
+      <h2>Google</h2>
+      <p>Google identity is handled by the configured identity provider. RUMBO authorization remains workspace-scoped after authentication.</p>
+      <button class="button ghost" id="google-button" type="button">Continue with Google</button>
+      <p class="portal-note">Sign in with ChatGPT is not shown until RUMBO has verified commercial SIWC approval and credentials.</p>
+    </section>
+  </div>
+  <div class="portal-status" data-status aria-live="polite">Ready.</div>
+</main>
+<footer><div>© 2026 RUMBO IA · Argentina</div><div><a href="privacy.html">Privacy</a><a href="terms.html">Terms</a></div></footer>
+</body>
+</html>
