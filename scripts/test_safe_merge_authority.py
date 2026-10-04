@@ -298,7 +298,7 @@ def merge_request(head=HEAD, base="main", repository="RUMBO-IA/Rumbo"):
 class FakeEvidence:
     def __init__(self, *, head=HEAD, base="main", repo="RUMBO-IA/Rumbo", head_branch="feature/head", checks=None,
                  metadata=True, attestation_sequence=None, post_attestation_sequence=None, ancestor=True, vercel=None, target_sequence=None,
-                 ruleset=True, branch_protection=True, repo_deployment_blocked=True):
+                 ruleset=True, branch_protection=True, branch_safety=None, repo_deployment_blocked=True):
         self.head, self.base, self.repo, self.head_branch = head, base, repo, head_branch
         self.check_states = checks if checks is not None else {"privacy": "SUCCESS", "Vercel": "SUCCESS"}
         self.metadata, self.ancestor, self.ruleset = metadata, ancestor, ruleset
@@ -309,6 +309,7 @@ class FakeEvidence:
         self.post_attestation_calls = 0
         self.repo_deployment_blocked = repo_deployment_blocked
         self.branch_protection = branch_protection
+        self.branch_safety = branch_protection if branch_safety is None else branch_safety
         self.vercel = vercel or {"autoAssignCustomDomains": False, "commandForIgnoringBuildStep": None,
                                  "productionBranch": "main", "gitDeployments": "disabled",
                                  "liveDeployment": "dpl_live", "liveTarget": "production"}
@@ -343,6 +344,7 @@ class FakeEvidence:
     def vercel_state(self): return dict(self.vercel)
     def ruleset_ok(self): return self.ruleset
     def branch_protection_ok(self, _target, _required): return self.branch_protection
+    def branch_safety_ok(self, _pr_number, _target, _required, _base_sha, _candidate): return self.branch_safety
     def fast_forward(self, target, expected_old, candidate):
         self.push_calls.append((target, expected_old, candidate))
         return evidence.CommandResult(("git", "push"), 0, "", "")
@@ -428,6 +430,17 @@ class AuthorityGateTests(unittest.TestCase):
         ev = FakeEvidence(target_sequence=[BASE, BASE], branch_protection=False)
         out = authority.evaluate(merge_request(), policy.DEFAULT_POLICY, ev, mode="main")
         self.assertEqual((out.state, out.failed_gate), ("SAFE_STOP", "FAST_FORWARD_ONLY"))
+        self.assertFalse(ev.push_calls)
+
+    def test_operational_branch_safety_can_replace_unreadable_admin_readback(self):
+        ev = FakeEvidence(
+            target_sequence=[BASE, BASE],
+            branch_protection=False,
+            branch_safety=True,
+        )
+        out = authority.evaluate(merge_request(), policy.DEFAULT_POLICY, ev)
+        self.assertEqual(out.state, "DRY_RUN_PASS")
+        self.assertIsNone(out.failed_gate)
         self.assertFalse(ev.push_calls)
 
     def test_clean_dry_run_passes_without_write(self):
