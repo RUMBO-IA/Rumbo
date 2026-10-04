@@ -1,0 +1,49 @@
+name: Ruleset Visibility Probe R11
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [main]
+    paths:
+      - ".github/workflows/ruleset-visibility-probe-r11.yml"
+
+permissions:
+  contents: write
+  pull-requests: read
+
+jobs:
+  probe:
+    if: >-
+      github.actor == 'fscfede-beep' &&
+      github.event.pull_request.head.repo.full_name == 'RUMBO-IA/Rumbo' &&
+      github.event.pull_request.head.ref == 'probe/ruleset-visibility-r11-20261004' &&
+      github.event.pull_request.base.sha == '68476a8e179d8db803bd3daeefa69a42a63fa098'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Read ruleset through Actions token
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api repos/RUMBO-IA/Rumbo/rulesets/22317339 > "$RUNNER_TEMP/ruleset.json"
+          python - "$RUNNER_TEMP/ruleset.json" <<'PY'
+          import json,sys
+          d=json.load(open(sys.argv[1],encoding="utf-8"))
+          print("RULESET_KEYS="+",".join(sorted(d)))
+          print("BYPASS_FIELD_PRESENT="+str("bypass_actors" in d).lower())
+          print("BYPASS_ACTORS="+json.dumps(d.get("bypass_actors"),sort_keys=True))
+          print("CURRENT_USER_CAN_BYPASS_PRESENT="+str("current_user_can_bypass" in d).lower())
+          print("CURRENT_USER_CAN_BYPASS="+json.dumps(d.get("current_user_can_bypass")))
+          print("EXCLUDES="+json.dumps((((d.get("conditions") or {}).get("ref_name") or {}).get("exclude")),sort_keys=True))
+          PY
+
+      - name: Delete probe branch
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api --method DELETE repos/RUMBO-IA/Rumbo/git/refs/heads/probe/ruleset-visibility-r11-20261004
