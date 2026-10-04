@@ -1,0 +1,124 @@
+name: RUMBO QUG Protected Trust Root R1
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "docs/control-authority-anchor-v1.json"
+      - ".github/workflows/qug-protected-trust-root-r1.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rumbo-qug-protected-trust-root
+  cancel-in-progress: false
+
+jobs:
+  authorize:
+    name: Validate protected public authority
+    runs-on: ubuntu-latest
+    outputs:
+      canonical_sha: ${{ steps.authority.outputs.canonical_sha }}
+      canonical_tree_sha: ${{ steps.authority.outputs.canonical_tree_sha }}
+      public_sha: ${{ steps.authority.outputs.public_sha }}
+    steps:
+      - name: Validate exact public anchor and required contexts
+        id: authority
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EXPECTED_PUBLIC_SHA: ${{ github.sha }}
+        shell: python
+        run: |
+          import json, os, re, urllib.request
+          SHA = re.compile(r"^[0-9a-f]{40}$")
+          def get(url, token=None):
+              headers={"Accept":"application/vnd.github+json","User-Agent":"RUMBO-public-trust-root-r1"}
+              if token: headers["Authorization"]="Bearer "+token
+              with urllib.request.urlopen(urllib.request.Request(url,headers=headers), timeout=20) as r:
+                  return json.load(r)
+          def norm(v, code):
+              v=str(v or "").strip().lower()
+              if not SHA.fullmatch(v): raise SystemExit(code+":"+v)
+              return v
+          token=os.environ["GH_TOKEN"]
+          expected=norm(os.environ["EXPECTED_PUBLIC_SHA"],"FAIL_PUBLIC_EVENT_SHA")
+          branch=get("https://api.github.com/repos/RUMBO-IA/Rumbo/branches/main", token)
+          if branch.get("protected") is not True: raise SystemExit("FAIL_PUBLIC_MAIN_UNPROTECTED")
+          public_sha=norm((branch.get("commit") or {}).get("sha"),"FAIL_PUBLIC_MAIN_SHA")
+          if public_sha != expected: raise SystemExit("FAIL_PUBLIC_MAIN_EVENT_DRIFT")
+          contexts=set(str(x) for x in ((((branch.get("protection") or {}).get("required_status_checks") or {}).get("contexts")) or []))
+          for required in ("privacy","Vercel"):
+              if required not in contexts: raise SystemExit("FAIL_REQUIRED_CONTEXT:"+required)
+          anchor=get(f"https://raw.githubusercontent.com/RUMBO-IA/Rumbo/{public_sha}/docs/control-authority-anchor-v1.json")
+          if anchor.get("schema")!="rumbo.public-protected-authority-anchor/v1": raise SystemExit("FAIL_ANCHOR_SCHEMA")
+          if (anchor.get("public_authority") or {}).get("repository")!="RUMBO-IA/Rumbo": raise SystemExit("FAIL_ANCHOR_PUBLIC_REPO")
+          subject=anchor.get("subject") or {}
+          if subject.get("repository")!="RUMBO-IA/rumbo-control-queue": raise SystemExit("FAIL_ANCHOR_PRIVATE_REPO")
+          canonical_sha=norm(subject.get("authorized_main_sha"),"FAIL_ANCHOR_SHA")
+          canonical_tree=norm(subject.get("authorized_tree_sha"),"FAIL_ANCHOR_TREE")
+          readback=get("https://api.github.com/repos/RUMBO-IA/Rumbo/branches/main", token)
+          if norm((readback.get("commit") or {}).get("sha"),"FAIL_PUBLIC_READBACK_SHA") != public_sha:
+              raise SystemExit("FAIL_PUBLIC_MAIN_RACE")
+          with open(os.environ["GITHUB_OUTPUT"],"a",encoding="utf-8") as f:
+              f.write(f"canonical_sha={canonical_sha}\n")
+              f.write(f"canonical_tree_sha={canonical_tree}\n")
+              f.write(f"public_sha={public_sha}\n")
+
+  apply-desktop-authority:
+    name: Apply exact anchored Desktop authority on QUG
+    needs: authorize
+    runs-on: [self-hosted, Linux, X64, rumbo-ci-linux]
+    timeout-minutes: 20
+    env:
+      CANONICAL_SHA: ${{ needs.authorize.outputs.canonical_sha }}
+      CANONICAL_TREE_SHA: ${{ needs.authorize.outputs.canonical_tree_sha }}
+      PUBLIC_AUTHORITY_SHA: ${{ needs.authorize.outputs.public_sha }}
+    steps:
+      - name: Require exact QUGVQLB carrier
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$RUNNER_OS" = "Linux"
+          test "$RUNNER_NAME" = "DESKTOP-QUGVQLB"
+          test "$(hostname)" = "DESKTOP-QUGVQLB"
+          test -x /mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe
+
+      - name: Verify anchored private commit and tree before execution
+        shell: bash
+        run: |
+          set -euo pipefail
+          repo=/mnt/c/Users/Usuario/rumbo_dev/rumbo-control-queue
+          test -d "$repo/.git"
+          git -C "$repo" fetch origin main --quiet
+          git -C "$repo" cat-file -e "$CANONICAL_SHA^{commit}"
+          test "$(git -C "$repo" show -s --format=%T "$CANONICAL_SHA")" = "$CANONICAL_TREE_SHA"
+          test "$(git -C "$repo" ls-remote origin refs/heads/main | awk '{print $1}')" = "$CANONICAL_SHA"
+          echo "RUMBO_PUBLIC_TRUST_ROOT_PRIVATE_BINDING=PASS"
+
+      - name: Execute exact anchored carrier through Windows interop
+        shell: bash
+        run: |
+          set -euo pipefail
+          repo=/mnt/c/Users/Usuario/rumbo_dev/rumbo-control-queue
+          wt="$RUNNER_TEMP/rumbo-public-trust-root-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
+          rm -rf "$wt"
+          git -C "$repo" worktree add --detach "$wt" "$CANONICAL_SHA"
+          trap 'git -C "$repo" worktree remove --force "$wt" >/dev/null 2>&1 || true' EXIT
+          script_win="$(wslpath -w "$wt/operations/desktop-commander-zero-spend-r2/APPLY_DESKTOP_AUTHORITY_WSL_R2.ps1")"
+          ps=/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe
+          "$ps" -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "
+            \$ErrorActionPreference='Stop';
+            \$env:GITHUB_REPOSITORY='RUMBO-IA/rumbo-control-queue';
+            \$env:GITHUB_REF='refs/heads/main';
+            \$env:GITHUB_SHA='$CANONICAL_SHA';
+            \$env:GITHUB_EVENT_NAME='workflow_dispatch';
+            \$env:RUMBO_DURABLE_ACTIVATION='1';
+            \$env:RUMBO_AUTHORITY_REF='refs/heads/main';
+            \$env:RUMBO_SOURCE_MAIN_SHA='$CANONICAL_SHA';
+            \$env:RUMBO_DURABLE_ACTIVATION_SHA='$CANONICAL_SHA';
+            \$env:RUMBO_CANONICAL_SHA='$CANONICAL_SHA';
+            \$env:RUMBO_PUBLIC_AUTHORITY_SHA='$PUBLIC_AUTHORITY_SHA';
+            & '$script_win' -AuthorityMode canonical -CanonicalSha '$CANONICAL_SHA' -SourceRepo 'C:\\Users\\Usuario\\rumbo_dev\\rumbo-control-queue'
+          "
