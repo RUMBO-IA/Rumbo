@@ -1,0 +1,27 @@
+name: Safe Merge V2 regression
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "scripts/safe_merge_evidence.py"
+      - "scripts/safe_merge_authority.py"
+      - "scripts/test_safe_merge_authority.py"
+      - ".github/workflows/safe-merge-v2-regression.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  safe-merge-v2:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: '3.12'
+      - run: python -m unittest scripts.test_safe_merge_authority -v
