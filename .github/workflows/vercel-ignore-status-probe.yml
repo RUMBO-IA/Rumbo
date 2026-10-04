@@ -1,0 +1,34 @@
+name: Vercel ignored-build status probe rematerializer
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [main]
+    paths:
+      - ".github/workflows/vercel-ignore-status-probe.yml"
+permissions:
+  contents: write
+jobs:
+  rematerialize:
+    if: >-
+      github.actor == 'fscfede-beep' &&
+      github.event.pull_request.head.repo.full_name == 'RUMBO-IA/Rumbo' &&
+      github.event.pull_request.head.ref == 'bootstrap/vercel-ignore-status-probe-20261004'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: b083b6a837dd8aac99f26cb21c0855d8dcdbfb70
+          fetch-depth: 0
+          persist-credentials: true
+      - name: Create same-tree probe commit
+        shell: bash
+        run: |
+          set -euo pipefail
+          git switch --detach b083b6a837dd8aac99f26cb21c0855d8dcdbfb70
+          git switch -c probe/vercel-ignore-status-v2-20261004
+          git -c user.name="RUMBO Privacy Automation"               -c user.email="41898282+github-actions[bot]@users.noreply.github.com"               commit --allow-empty -m "probe(vercel): ignored-build status semantics"
+          test "$(git rev-parse HEAD^{tree})" = "$(git rev-parse b083b6a837dd8aac99f26cb21c0855d8dcdbfb70^{tree})"
+          git push --set-upstream origin probe/vercel-ignore-status-v2-20261004
+          git push origin --delete bootstrap/vercel-ignore-status-probe-20261004
+          echo "PROBE_SHA=$(git rev-parse HEAD)"
