@@ -1,0 +1,64 @@
+name: Safe Merge V2 clean rematerializer
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [main]
+    paths:
+      - ".github/workflows/safe-merge-v2-bootstrap.yml"
+      - ".github/workflows/safe-merge-v2-regression.yml"
+      - "scripts/safe_merge_evidence.py"
+      - "scripts/safe_merge_authority.py"
+      - "scripts/test_safe_merge_authority.py"
+
+permissions:
+  contents: write
+
+jobs:
+  rematerialize:
+    if: >-
+      github.actor == 'fscfede-beep' &&
+      github.event.pull_request.head.repo.full_name == 'RUMBO-IA/Rumbo' &&
+      github.event.pull_request.head.ref == 'bootstrap/safe-merge-v2-20261004' &&
+      github.event.pull_request.base.sha == '68476a8e179d8db803bd3daeefa69a42a63fa098'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: 68476a8e179d8db803bd3daeefa69a42a63fa098
+          fetch-depth: 0
+          persist-credentials: true
+      - name: Rematerialize exact patch with approved metadata
+        env:
+          SOURCE_HEAD: ${{ github.event.pull_request.head.sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          temp_branch="bootstrap/safe-merge-v2-20261004"
+          clean_branch="fix/safe-merge-v2-clean"
+          base="68476a8e179d8db803bd3daeefa69a42a63fa098"
+          bootstrap=".github/workflows/safe-merge-v2-bootstrap.yml"
+          expected=(".github/workflows/safe-merge-v2-regression.yml" "scripts/safe_merge_authority.py" "scripts/safe_merge_evidence.py" "scripts/test_safe_merge_authority.py")
+          test "$(git ls-remote origin "refs/heads/$temp_branch" | awk '{print $1}')" = "$SOURCE_HEAD"
+          if git ls-remote --exit-code --heads origin "refs/heads/$clean_branch" >/dev/null 2>&1; then
+            echo "FAIL_CLOSED_CLEAN_BRANCH_EXISTS" >&2
+            exit 3
+          fi
+          git fetch origin "$SOURCE_HEAD" --quiet
+          mapfile -t changed < <(git diff --name-only "$base" "$SOURCE_HEAD" | grep -v "^$bootstrap$" | sort)
+          test "${#changed[@]}" -eq "${#expected[@]}"
+          for i in "${!expected[@]}"; do test "${changed[$i]}" = "${expected[$i]}"; done
+          git switch --detach "$base"
+          git switch -c "$clean_branch"
+          for path in "${expected[@]}"; do
+            mkdir -p "$(dirname "$path")"
+            git show "$SOURCE_HEAD:$path" > "$path"
+          done
+          git add -- "${expected[@]}"
+          git -c core.hooksPath=/dev/null               -c user.name="RUMBO Privacy Automation"               -c user.email="41898282+github-actions[bot]@users.noreply.github.com"               commit -m "fix(governance): add permission-equivalent safe merge assurance"
+          clean_sha="$(git rev-parse HEAD)"
+          test "$(git show -s --format='%an|%ae|%cn|%ce' HEAD)" = "RUMBO Privacy Automation|41898282+github-actions[bot]@users.noreply.github.com|RUMBO Privacy Automation|41898282+github-actions[bot]@users.noreply.github.com"
+          git push --set-upstream origin "$clean_branch"
+          git push origin --delete "$temp_branch"
+          echo "CLEAN_SAFE_MERGE_V2_SHA=$clean_sha"
