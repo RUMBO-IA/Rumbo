@@ -21,7 +21,7 @@ The public repository keeps consequential behavior behind explicit verification 
 
 ## Release posture
 
-This repository distinguishes the mutable Git `main` branch from production traffic. The current `main` head is intentionally not hardcoded here; GitHub is the source of truth for the branch head. The owner-authorized production binding for `rumbo.verso.fans` is application commit `cd215a9b27df8a87bf17c29ebe5fb84b7d939af0` through Vercel deployment `dpl_GCjGycFo5nyMY1RNtxjmBsMCSpdw`, as authorized by canonical registry issue #72 comment `5971885735`. Live provider effect remains subject to exact promotion and readback.
+This repository distinguishes the mutable Git `main` branch from production traffic. The current `main` head is intentionally not hardcoded here; GitHub is the source of truth for the branch head. The owner-authorized production binding for `rumbo.verso.fans` is application commit `7286596bd820a12180419f3f18c2020d1805ea4e` through Vercel deployment `dpl_13zESeCcMWJqp1bJjsyJvtuTz6TG`, as authorized by canonical registry issue #72 comment `5984301321`. Live provider effect remains subject to exact promotion and readback.
 
 Changes to `main` do not automatically promote production: Git deployments for `main` are disabled, and production promotion is explicit and subject to the Safe Merge Authority gates.
 
