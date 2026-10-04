@@ -7,6 +7,7 @@ import unittest
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 ANCHOR = ROOT / "docs" / "control-authority-anchor-v1.json"
 VERIFIER = ROOT / "scripts" / "verify_control_authority_anchor.py"
+TRUST_ROOT_WORKFLOW = ROOT / ".github" / "workflows" / "qug-protected-trust-root-r1.yml"
 
 spec = importlib.util.spec_from_file_location("verify_control_authority_anchor", VERIFIER)
 guard = importlib.util.module_from_spec(spec)
@@ -165,6 +166,74 @@ class ControlAuthorityAnchorTests(unittest.TestCase):
         finally:
             guard.gh_json = original
 
+    def trust_root_workflow(self):
+        return TRUST_ROOT_WORKFLOW.read_text(encoding="utf-8")
+
+    def test_qug_trust_root_binds_exact_check_producers(self):
+        workflow = self.trust_root_workflow()
+        self.assertIn("EXPECTED_PRIVACY_WORKFLOW_ID = 347174988", workflow)
+        self.assertIn('EXPECTED_PRIVACY_WORKFLOW_PATH = ".github/workflows/privacy-gate.yml"', workflow)
+        self.assertIn('EXPECTED_PRIVACY_WORKFLOW_BLOB = "1cb3ed7881961516b54fb5ab663890914440463a"', workflow)
+        self.assertIn('EXPECTED_PRIVACY_WORKFLOW_SHA256 = "b2f9e4919268b618e6d601c0e9280df8b376a9dec338e71483d3c4a551795bc6"', workflow)
+        self.assertIn("EXPECTED_PRIVACY_APP_ID = 15368", workflow)
+        self.assertIn("EXPECTED_VERCEL_APP_ID = 8329", workflow)
+        self.assertIn("EXPECTED_VERCEL_CREATOR_ID = 35613825", workflow)
+        self.assertIn('EXPECTED_VERCEL_CREATOR_LOGIN = "vercel[bot]"', workflow)
+
+    def test_qug_trust_root_enforces_governing_ruleset(self):
+        workflow = self.trust_root_workflow()
+        self.assertIn("EXPECTED_RULESET_ID = 22317339", workflow)
+        self.assertIn("ruleset enforcement!=active", workflow)
+        self.assertIn("ruleset bypass_actors present", workflow)
+        self.assertIn("ruleset missing non_fast_forward", workflow)
+
+    def test_qug_trust_root_revalidates_public_head_before_carrier(self):
+        workflow = self.trust_root_workflow()
+        self.assertIn("Revalidate public authority immediately before carrier", workflow)
+        self.assertIn("FAIL_PUBLIC_HEAD_SUPERSEDED_BEFORE_CARRIER", workflow)
+        self.assertIn("FAIL_ANCHOR_DRIFT_BEFORE_CARRIER", workflow)
+
+    def test_qug_trust_root_allows_private_main_drift(self):
+        workflow = self.trust_root_workflow()
+        self.assertNotIn("ls-remote origin refs/heads/main", workflow)
+        self.assertIn("fetch origin main --quiet", workflow)
+        self.assertIn('cat-file -e "$CANONICAL_SHA^{commit}"', workflow)
+
+    def test_qug_trust_root_disables_git_replace_objects(self):
+        workflow = self.trust_root_workflow()
+        self.assertIn("GIT_NO_REPLACE_OBJECTS=1", workflow)
+        self.assertIn("refs/replace", workflow)
+        self.assertIn("FAIL_PRIVATE_REPLACE_REFS_PRESENT", workflow)
+
+
+    def test_qug_trust_root_precarrier_revalidates_full_ruleset(self):
+        workflow = self.trust_root_workflow()
+        marker = "Revalidate public authority immediately before carrier"
+        self.assertIn(marker, workflow)
+        pre_carrier = workflow[workflow.index(marker):]
+        self.assertIn('current_user_can_bypass") not in (None,"never")', pre_carrier)
+        self.assertIn("FAIL_RULESET_BYPASS_CAPABILITY_BEFORE_CARRIER", pre_carrier)
+        self.assertIn('if "~ALL" not in includes:', pre_carrier)
+        self.assertIn("FAIL_RULESET_SCOPE_BEFORE_CARRIER", pre_carrier)
+
+
+    def test_qug_trust_root_rejects_dangerous_local_git_config_and_neutralizes_hooks(self):
+        workflow = self.trust_root_workflow()
+        self.assertIn("config --local --no-includes --name-only --list", workflow)
+        self.assertIn("FAIL_PRIVATE_DANGEROUS_GIT_CONFIG", workflow)
+        self.assertIn('hooks="$RUNNER_TEMP/rumbo-public-trust-root-empty-hooks-', workflow)
+        self.assertIn('git -c core.hooksPath="$hooks" -C "$repo" worktree add', workflow)
+        self.assertIn('git -c core.hooksPath="$hooks" -C "$repo" worktree remove', workflow)
+
+
+
+
+    def test_persistent_qug_carrier_is_inert_until_runner_group_policy_is_proven(self):
+        text = (ROOT / ".github" / "workflows" / "qug-protected-trust-root-r1.yml").read_text(encoding="utf-8")
+        self.assertIn("apply-desktop-authority:", text)
+        self.assertIn("if: ${{ false }}", text)
+        self.assertIn("DISABLED_PENDING_RUNNER_POLICY", text)
+        self.assertIn("runs-on: [self-hosted, Linux, X64, rumbo-ci-linux]", text)
 
 if __name__ == "__main__":
     unittest.main()
