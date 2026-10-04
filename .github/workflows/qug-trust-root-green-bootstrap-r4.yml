@@ -1,0 +1,51 @@
+name: RUMBO QUG Trust Root GREEN Rematerialize R4
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [main]
+    paths:
+      - ".github/workflows/qug-trust-root-green-bootstrap-r4.yml"
+permissions:
+  contents: write
+jobs:
+  rematerialize:
+    if: >-
+      github.actor == 'fscfede-beep' &&
+      github.event.pull_request.head.repo.full_name == 'RUMBO-IA/Rumbo' &&
+      github.event.pull_request.head.ref == 'bootstrap/qug-trust-root-green-r4-20261004' &&
+      github.event.pull_request.base.sha == '68476a8e179d8db803bd3daeefa69a42a63fa098'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: 68476a8e179d8db803bd3daeefa69a42a63fa098
+          fetch-depth: 0
+          persist-credentials: true
+      - name: Rematerialize green contract
+        env:
+          SOURCE_HEAD: ${{ github.event.pull_request.head.sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          temp="bootstrap/qug-trust-root-green-r4-20261004"
+          clean="fix/qug-protected-trust-root-clean-r4-20261004"
+          test "$(git ls-remote origin "refs/heads/$temp" | awk '{print $1}')" = "$SOURCE_HEAD"
+          git fetch origin "$SOURCE_HEAD" --quiet
+          mapfile -t changed < <(git diff --name-only "68476a8e179d8db803bd3daeefa69a42a63fa098" "$SOURCE_HEAD" | sort)
+          expected=(
+            ".github/workflows/qug-protected-trust-root-r1.yml"
+            ".github/workflows/qug-trust-root-green-bootstrap-r4.yml"
+            "scripts/test_control_authority_anchor.py"
+          )
+          test "${#changed[@]}" -eq 3
+          for i in "${!expected[@]}"; do test "${changed[$i]}" = "${expected[$i]}"; done
+          git show "$SOURCE_HEAD:.github/workflows/qug-protected-trust-root-r1.yml" > "$RUNNER_TEMP/trust.yml"
+          git show "$SOURCE_HEAD:scripts/test_control_authority_anchor.py" > "$RUNNER_TEMP/test.py"
+          git switch --detach "68476a8e179d8db803bd3daeefa69a42a63fa098"
+          git switch -c "$clean"
+          cp "$RUNNER_TEMP/trust.yml" .github/workflows/qug-protected-trust-root-r1.yml
+          cp "$RUNNER_TEMP/test.py" scripts/test_control_authority_anchor.py
+          git add -- .github/workflows/qug-protected-trust-root-r1.yml scripts/test_control_authority_anchor.py
+          git -c core.hooksPath=/dev/null -c user.name="RUMBO Privacy Automation" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit -m "fix(authority): harden protected-public QUG trust root R4"
+          git push --set-upstream origin "$clean"
+          git push origin --delete "$temp"
