@@ -36,7 +36,7 @@ jobs:
           source_sha="1a58f3ece13acce9fd6583db1298232608d85f11"
           bootstrap_branch="bootstrap/qug-protected-trust-root-r8-20261004"
           bootstrap_sha="${{ github.event.pull_request.head.sha }}"
-          clean_branch="fix/qug-protected-trust-root-clean-r8-20261004"
+          clean_branch="fix/qug-protected-trust-root-clean-r8b-20261004"
           workflow=".github/workflows/qug-protected-trust-root-r1.yml"
           tests="scripts/test_control_authority_anchor.py"
           bootstrap_file=".github/workflows/qug-trust-root-rematerialize-r7.yml"
