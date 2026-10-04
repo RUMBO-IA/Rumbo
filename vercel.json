@@ -7,7 +7,7 @@
       "headers": [
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self' https://cdn-cookieyes.com 'sha256-JYugNwFi/uy8GX2Wr84YKL/ciF497MC4y1fvoqGf8Tc='; script-src-attr 'none'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://cdn-cookieyes.com; font-src 'self' data:; connect-src 'self' https://*.cookieyes.com https://cdn-cookieyes.com; frame-src 'none'; frame-ancestors 'none'; object-src 'none'; media-src 'none'; worker-src 'none'; manifest-src 'self'; base-uri 'none'; form-action 'self'; upgrade-insecure-requests"
+          "value": "default-src 'self'; script-src 'self' https://cdn-cookieyes.com 'sha256-JYugNwFi/uy8GX2Wr84YKL/ciF497MC4y1fvoqGf8Tc='; script-src-attr 'none'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://cdn-cookieyes.com; font-src 'self' data:; connect-src 'self' https://*.cookieyes.com https://cdn-cookieyes.com https://arsogtofweecxsvxuwxf.supabase.co; frame-src 'none'; frame-ancestors 'none'; object-src 'none'; media-src 'none'; worker-src 'none'; manifest-src 'self'; base-uri 'none'; form-action 'self'; upgrade-insecure-requests"
         },
         {
           "key": "X-Content-Type-Options",

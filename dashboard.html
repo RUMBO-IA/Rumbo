@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="RUMBO IA customer usage, MCP calls and execution receipts.">
+  <title>Dashboard — RUMBO IA</title>
+  <link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="portal.css">
+  <script src="portal.js" defer></script>
+</head>
+<body data-page="dashboard">
+<header class="nav"><a class="brand" href="index.html">RUMBO <span>IA</span></a><nav><a href="support.html">Support</a><a href="partners.html">Partners</a><button class="button small ghost" type="button" data-logout>Sign out</button></nav></header>
+<main class="portal-shell">
+  <div class="section-heading"><span>Control plane</span><h1>Customer dashboard</h1><p>Signed in as <strong data-user-email>—</strong></p></div>
+  <div class="portal-kv"><div><strong>Workspace</strong><span data-workspace-name>—</span></div><div><strong>Plan</strong><span data-workspace-plan>—</span></div><div><strong>Role</strong><span data-workspace-role>—</span></div></div>
+  <div class="portal-status" data-status aria-live="polite">Loading…</div>
+  <section class="portal-card"><h2>MCP calls</h2><div id="call-list" class="portal-list"></div></section>
+  <section class="portal-card"><h2>Billable usage</h2><p class="portal-note">RUMBO fees are shown separately from OpenAI API, ChatGPT plan usage, credits or Marketplace commitment attribution.</p><div id="usage-list" class="portal-list"></div></section>
+  <section class="portal-card"><h2>Execution receipts</h2><div id="receipt-list" class="portal-list"></div></section>
+</main>
+<footer><div>RUMBO IA · evidence-first customer surface</div><div><a href="privacy.html">Privacy</a><a href="terms.html">Terms</a></div></footer>
+</body></html>
