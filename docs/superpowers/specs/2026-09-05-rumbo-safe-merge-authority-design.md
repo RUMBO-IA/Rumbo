@@ -172,3 +172,33 @@ For every Phase 3 target, the candidate commit must therefore contain `vercel.js
 The repository keeps `main=false` and a disposable `probe/vercel-git-block-* = false` rule so the no-deployment behavior can be tested without touching `main`.
 
 Post-write privacy verification must not require GitHub Actions `pull_requests[]` to remain populated. GitHub can clear that association after an exact-SHA fast-forward marks the PR merged. The pre-write attestation remains strict and PR-bound; post-write verification re-fetches the exact pre-write `run_id` and requires unchanged workflow identity, event, head SHA, head branch, attempt, creation time, completed status, and successful conclusion.
+
+
+## Administration-read-independent branch safety
+
+Phase-3 protection verification remains fail-closed when the classic branch-protection
+endpoint is readable. If and only if GitHub returns the specific
+`Resource not accessible by integration (HTTP 403)` response for that readback,
+the authority may use operationally equivalent evidence for the exact update.
+
+The fallback requires all of the following:
+
+1. the ordinary branch endpoint still reports the target as protected and exposes
+   every required status context;
+2. the candidate is a descendant of the exact pre-write target and the introduced
+   segment contains no merge commits;
+3. every pull-request review thread is resolved, including pagination;
+4. the repository ruleset remains active, applies to all branches, has no bypass
+   actors, and includes `non_fast_forward`;
+5. the ref write is performed through the GitHub refs API with `force=false`;
+6. the normal exact-head required-check, privacy-attestation, TOCTOU, metadata,
+   and Vercel production-no-go gates remain unchanged.
+
+Any readable classic protection state that fails its original predicates is a hard
+failure; it must never fall through to operational evidence. Any non-permission API
+failure is also a hard failure.
+
+Receipts identify the verification mode as either
+`classic_branch_protection` or `operational_fallback` and record the individual
+fallback predicates. The fallback therefore removes a dependency on Administration
+read permission without granting, inferring, or bypassing Administration authority.
