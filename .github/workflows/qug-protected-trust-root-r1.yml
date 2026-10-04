@@ -1,0 +1,249 @@
+name: RUMBO QUG Protected Trust Root R1
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "docs/control-authority-anchor-v1.json"
+      # Bootstrap the trust root on its first protected-main promotion too.
+      - ".github/workflows/qug-protected-trust-root-r1.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  checks: read
+  statuses: read
+  actions: read
+
+concurrency:
+  group: rumbo-qug-protected-trust-root
+  cancel-in-progress: true
+
+jobs:
+  authorize:
+    name: Validate protected public authority
+    runs-on: ubuntu-latest
+    outputs:
+      canonical_sha: ${{ steps.authority.outputs.canonical_sha }}
+      canonical_tree_sha: ${{ steps.authority.outputs.canonical_tree_sha }}
+      public_sha: ${{ steps.authority.outputs.public_sha }}
+    steps:
+      - name: Validate exact public anchor and required contexts
+        id: authority
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EXPECTED_PUBLIC_SHA: ${{ github.sha }}
+        shell: python
+        run: |
+          import json, os, re, time, urllib.parse, urllib.request
+          SHA = re.compile(r"^[0-9a-f]{40}$")
+          PUBLIC_REPO="RUMBO-IA/Rumbo"
+          PRIVATE_REPO="RUMBO-IA/rumbo-control-queue"
+          RULESET_ID=22317339
+          PRIVACY_WORKFLOW_ID=347174988
+          PRIVACY_WORKFLOW_BLOB="1cb3ed7881961516b54fb5ab663890914440463a"
+          PRIVACY_APP_ID=15368
+          VERCEL_APP_ID=8329
+          TERMINAL={"failure","error","cancelled","timed_out","action_required","stale","startup_failure"}
+          def get(url, token=None):
+              headers={"Accept":"application/vnd.github+json","User-Agent":"RUMBO-public-trust-root-r4"}
+              if token: headers["Authorization"]="Bearer "+token
+              with urllib.request.urlopen(urllib.request.Request(url,headers=headers), timeout=20) as r:
+                  return json.load(r)
+          def norm(v, code):
+              v=str(v or "").strip().lower()
+              if not SHA.fullmatch(v): raise SystemExit(code+":"+v)
+              return v
+          def required_apps(branch):
+              required=((branch.get("protection") or {}).get("required_status_checks") or {})
+              contexts=set(str(x) for x in (required.get("contexts") or []))
+              for name in ("privacy","Vercel"):
+                  if name not in contexts: raise SystemExit("FAIL_REQUIRED_CONTEXT:"+name)
+              checks={str(x.get("context")):x.get("app_id") for x in (required.get("checks") or []) if isinstance(x,dict)}
+              expected={"privacy":PRIVACY_APP_ID,"Vercel":VERCEL_APP_ID}
+              for name,app_id in expected.items():
+                  if checks.get(name) != app_id: raise SystemExit(f"FAIL_REQUIRED_APP:{name}:{checks.get(name)}:{app_id}")
+          def verify_ruleset(token):
+              rs=get(f"https://api.github.com/repos/{PUBLIC_REPO}/rulesets/{RULESET_ID}", token)
+              if rs.get("enforcement")!="active": raise SystemExit("FAIL_RULESET_NOT_ACTIVE")
+              if rs.get("bypass_actors"): raise SystemExit("FAIL_RULESET_BYPASS")
+              if rs.get("current_user_can_bypass") not in (None,"never"): raise SystemExit("FAIL_RULESET_CURRENT_USER_BYPASS")
+              includes=set((((rs.get("conditions") or {}).get("ref_name") or {}).get("include")) or [])
+              if "~ALL" not in includes: raise SystemExit("FAIL_RULESET_SCOPE")
+              types={x.get("type") for x in (rs.get("rules") or []) if isinstance(x,dict)}
+              if "non_fast_forward" not in types: raise SystemExit("FAIL_RULESET_NON_FAST_FORWARD")
+          def verify_anchor(public_sha):
+              a=get(f"https://raw.githubusercontent.com/{PUBLIC_REPO}/{public_sha}/docs/control-authority-anchor-v1.json")
+              if a.get("schema")!="rumbo.public-protected-authority-anchor/v1": raise SystemExit("FAIL_ANCHOR_SCHEMA")
+              pa=a.get("public_authority") or {}
+              if pa.get("repository")!=PUBLIC_REPO or pa.get("branch")!="main": raise SystemExit("FAIL_ANCHOR_PUBLIC_AUTHORITY")
+              if pa.get("ruleset_id")!=RULESET_ID: raise SystemExit("FAIL_ANCHOR_RULESET_ID")
+              rr=(pa.get("required_readback") or {}).get("required_status_checks") or []
+              if set(rr)!={"privacy","Vercel"}: raise SystemExit("FAIL_ANCHOR_REQUIRED_CHECKS")
+              subject=a.get("subject") or {}
+              if subject.get("repository")!=PRIVATE_REPO: raise SystemExit("FAIL_ANCHOR_PRIVATE_REPO")
+              semantics=a.get("selection_semantics") or {}
+              if semantics.get("private_commit_is_immutable") is not True or semantics.get("private_main_may_drift_without_changing_canon") is not True:
+                  raise SystemExit("FAIL_ANCHOR_SELECTION_SEMANTICS")
+              policy=a.get("policy") or {}
+              if policy.get("private_main_alone_is_not_promotion_authority") is not True: raise SystemExit("FAIL_ANCHOR_POLICY")
+              return norm(subject.get("authorized_main_sha"),"FAIL_ANCHOR_SHA"), norm(subject.get("authorized_tree_sha"),"FAIL_ANCHOR_TREE")
+          def verify_privacy_blob(public_sha, token):
+              ref=urllib.parse.quote(public_sha, safe="")
+              meta=get(f"https://api.github.com/repos/{PUBLIC_REPO}/contents/.github/workflows/privacy-gate.yml?ref={ref}", token)
+              if meta.get("sha")!=PRIVACY_WORKFLOW_BLOB: raise SystemExit("FAIL_PRIVACY_WORKFLOW_BLOB")
+          def exact_privacy(public_sha, token):
+              url=f"https://api.github.com/repos/{PUBLIC_REPO}/actions/workflows/{PRIVACY_WORKFLOW_ID}/runs?branch=main&event=push&per_page=100"
+              payload=get(url, token)
+              runs=[x for x in (payload.get("workflow_runs") or []) if isinstance(x,dict) and x.get("workflow_id")==PRIVACY_WORKFLOW_ID and x.get("event")=="push" and x.get("head_branch")=="main" and str(x.get("head_sha") or "").lower()==public_sha and str(x.get("path") or "") in {".github/workflows/privacy-gate.yml",".github/workflows/privacy-gate.yml@main"}]
+              if not runs: return None
+              return max(runs,key=lambda x:(int(x.get("run_number") or 0),int(x.get("id") or 0)))
+          def latest_vercel(public_sha, token):
+              payload=get(f"https://api.github.com/repos/{PUBLIC_REPO}/commits/{public_sha}/status", token)
+              rows=[x for x in (payload.get("statuses") or []) if isinstance(x,dict) and x.get("context")=="Vercel"]
+              if not rows: return None
+              return max(rows,key=lambda x:int(x.get("id") or 0))
+          token=os.environ["GH_TOKEN"]
+          expected=norm(os.environ["EXPECTED_PUBLIC_SHA"],"FAIL_PUBLIC_EVENT_SHA")
+          branch=get(f"https://api.github.com/repos/{PUBLIC_REPO}/branches/main", token)
+          if branch.get("protected") is not True: raise SystemExit("FAIL_PUBLIC_MAIN_UNPROTECTED")
+          public_sha=norm((branch.get("commit") or {}).get("sha"),"FAIL_PUBLIC_MAIN_SHA")
+          if public_sha!=expected: raise SystemExit("FAIL_PUBLIC_MAIN_EVENT_DRIFT")
+          required_apps(branch)
+          verify_ruleset(token)
+          verify_privacy_blob(public_sha, token)
+          canonical_sha,canonical_tree=verify_anchor(public_sha)
+          deadline=time.monotonic()+300
+          while True:
+              pr=exact_privacy(public_sha, token)
+              vs=latest_vercel(public_sha, token)
+              privacy_ok=False
+              vercel_ok=False
+              if pr is not None:
+                  if pr.get("status")=="completed" and pr.get("conclusion")=="success": privacy_ok=True
+                  elif pr.get("status")=="completed" and pr.get("conclusion") in TERMINAL: raise SystemExit("FAIL_PRIVACY_TERMINAL:"+str(pr.get("conclusion")))
+              if vs is not None:
+                  avatar=str(vs.get("avatar_url") or "")
+                  target=str(vs.get("target_url") or "")
+                  if f"/in/{VERCEL_APP_ID}" not in avatar or not target.startswith("https://vercel.com/"): raise SystemExit("FAIL_VERCEL_PROVIDER")
+                  if vs.get("state")=="success": vercel_ok=True
+                  elif vs.get("state") in {"failure","error"}: raise SystemExit("FAIL_VERCEL_TERMINAL:"+str(vs.get("state")))
+              if privacy_ok and vercel_ok: break
+              if time.monotonic()>=deadline: raise SystemExit("FAIL_EXACT_SHA_REQUIRED_CHECK_TIMEOUT")
+              time.sleep(10)
+          readback=get(f"https://api.github.com/repos/{PUBLIC_REPO}/branches/main", token)
+          if norm((readback.get("commit") or {}).get("sha"),"FAIL_PUBLIC_READBACK_SHA")!=public_sha: raise SystemExit("FAIL_PUBLIC_MAIN_RACE")
+          if readback.get("protected") is not True: raise SystemExit("FAIL_PUBLIC_READBACK_UNPROTECTED")
+          required_apps(readback)
+          verify_ruleset(token)
+          verify_privacy_blob(public_sha, token)
+          final_sha,final_tree=verify_anchor(public_sha)
+          if (final_sha,final_tree)!=(canonical_sha,canonical_tree): raise SystemExit("FAIL_ANCHOR_RACE")
+          with open(os.environ["GITHUB_OUTPUT"],"a",encoding="utf-8") as f:
+              f.write(f"canonical_sha={canonical_sha}\n")
+              f.write(f"canonical_tree_sha={canonical_tree}\n")
+              f.write(f"public_sha={public_sha}\n")
+
+  apply-desktop-authority:
+    name: Apply exact anchored Desktop authority on QUG
+    needs: authorize
+    runs-on: [self-hosted, Linux, X64, rumbo-ci-linux]
+    timeout-minutes: 20
+    env:
+      GH_TOKEN: ${{ github.token }}
+      CANONICAL_SHA: ${{ needs.authorize.outputs.canonical_sha }}
+      CANONICAL_TREE_SHA: ${{ needs.authorize.outputs.canonical_tree_sha }}
+      PUBLIC_AUTHORITY_SHA: ${{ needs.authorize.outputs.public_sha }}
+    steps:
+      - name: Require exact QUGVQLB carrier
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$RUNNER_OS" = "Linux"
+          test "$RUNNER_NAME" = "DESKTOP-QUGVQLB"
+          test "$(hostname)" = "DESKTOP-QUGVQLB"
+          test -x /mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe
+
+      - name: Verify anchored private object and tree without replace refs
+        shell: bash
+        run: |
+          set -euo pipefail
+          export GIT_NO_REPLACE_OBJECTS=1
+          repo=/mnt/c/Users/Usuario/rumbo_dev/rumbo-control-queue
+          test -d "$repo/.git"
+          test -z "$(git -C "$repo" for-each-ref --format="%(refname)" refs/replace)"
+          git -C "$repo" fetch origin main --quiet
+          git -C "$repo" cat-file -e "$CANONICAL_SHA^{commit}"
+          test "$(git -C "$repo" show -s --format=%T "$CANONICAL_SHA")" = "$CANONICAL_TREE_SHA"
+          echo "RUMBO_PUBLIC_TRUST_ROOT_PRIVATE_BINDING=PASS"
+
+      - name: Revalidate current public authority immediately before carrier
+        shell: python
+        run: |
+          import json, os, re, urllib.parse, urllib.request
+          SHA=re.compile(r"^[0-9a-f]{40}$")
+          PUBLIC_REPO="RUMBO-IA/Rumbo"; RULESET_ID=22317339; PRIVACY_WORKFLOW_ID=347174988
+          PRIVACY_BLOB="1cb3ed7881961516b54fb5ab663890914440463a"; PRIVACY_APP=15368; VERCEL_APP=8329
+          def get(url):
+              req=urllib.request.Request(url,headers={"Accept":"application/vnd.github+json","Authorization":"Bearer "+os.environ["GH_TOKEN"],"User-Agent":"RUMBO-public-trust-root-r4-readback"})
+              with urllib.request.urlopen(req,timeout=20) as r: return json.load(r)
+          def norm(v,code):
+              v=str(v or "").strip().lower()
+              if not SHA.fullmatch(v): raise SystemExit(code+":"+v)
+              return v
+          expected=norm(os.environ["PUBLIC_AUTHORITY_SHA"],"FAIL_PUBLIC_ENV_SHA")
+          branch=get(f"https://api.github.com/repos/{PUBLIC_REPO}/branches/main")
+          actual=norm((branch.get("commit") or {}).get("sha"),"FAIL_PUBLIC_MAIN_SHA")
+          if actual!=expected or branch.get("protected") is not True: raise SystemExit("FAIL_PUBLIC_AUTHORITY_SUPERSEDED")
+          required=((branch.get("protection") or {}).get("required_status_checks") or {})
+          apps={str(x.get("context")):x.get("app_id") for x in (required.get("checks") or []) if isinstance(x,dict)}
+          if apps.get("privacy")!=PRIVACY_APP or apps.get("Vercel")!=VERCEL_APP: raise SystemExit("FAIL_REQUIRED_APP")
+          rs=get(f"https://api.github.com/repos/{PUBLIC_REPO}/rulesets/{RULESET_ID}")
+          types={x.get("type") for x in (rs.get("rules") or []) if isinstance(x,dict)}
+          if rs.get("enforcement")!="active" or rs.get("bypass_actors") or "non_fast_forward" not in types: raise SystemExit("FAIL_RULESET_READBACK")
+          ref=urllib.parse.quote(actual,safe="")
+          meta=get(f"https://api.github.com/repos/{PUBLIC_REPO}/contents/.github/workflows/privacy-gate.yml?ref={ref}")
+          if meta.get("sha")!=PRIVACY_BLOB: raise SystemExit("FAIL_PRIVACY_WORKFLOW_BLOB")
+          runs=get(f"https://api.github.com/repos/{PUBLIC_REPO}/actions/workflows/{PRIVACY_WORKFLOW_ID}/runs?branch=main&event=push&per_page=100").get("workflow_runs") or []
+          exact=[x for x in runs if isinstance(x,dict) and x.get("workflow_id")==PRIVACY_WORKFLOW_ID and x.get("event")=="push" and x.get("head_branch")=="main" and str(x.get("head_sha") or "").lower()==actual and str(x.get("path") or "") in {".github/workflows/privacy-gate.yml",".github/workflows/privacy-gate.yml@main"}]
+          if not exact: raise SystemExit("FAIL_PRIVACY_RUN_MISSING")
+          pr=max(exact,key=lambda x:(int(x.get("run_number") or 0),int(x.get("id") or 0)))
+          if pr.get("status")!="completed" or pr.get("conclusion")!="success": raise SystemExit("FAIL_PRIVACY_NOT_SUCCESS")
+          statuses=get(f"https://api.github.com/repos/{PUBLIC_REPO}/commits/{actual}/status").get("statuses") or []
+          rows=[x for x in statuses if isinstance(x,dict) and x.get("context")=="Vercel"]
+          if not rows: raise SystemExit("FAIL_VERCEL_MISSING")
+          vs=max(rows,key=lambda x:int(x.get("id") or 0))
+          if f"/in/{VERCEL_APP}" not in str(vs.get("avatar_url") or "") or not str(vs.get("target_url") or "").startswith("https://vercel.com/") or vs.get("state")!="success": raise SystemExit("FAIL_VERCEL_NOT_TRUSTED_SUCCESS")
+          with urllib.request.urlopen(f"https://raw.githubusercontent.com/{PUBLIC_REPO}/{actual}/docs/control-authority-anchor-v1.json",timeout=20) as r: anchor=json.load(r)
+          subject=anchor.get("subject") or {}
+          if norm(subject.get("authorized_main_sha"),"FAIL_ANCHOR_SHA")!=norm(os.environ["CANONICAL_SHA"],"FAIL_CANONICAL_ENV_SHA"): raise SystemExit("FAIL_CANONICAL_SUPERSEDED")
+          if norm(subject.get("authorized_tree_sha"),"FAIL_ANCHOR_TREE")!=norm(os.environ["CANONICAL_TREE_SHA"],"FAIL_CANONICAL_TREE_ENV"): raise SystemExit("FAIL_CANONICAL_TREE_SUPERSEDED")
+
+      - name: Execute exact anchored carrier through Windows interop
+        shell: bash
+        run: |
+          set -euo pipefail
+          export GIT_NO_REPLACE_OBJECTS=1
+          repo=/mnt/c/Users/Usuario/rumbo_dev/rumbo-control-queue
+          test -z "$(git -C "$repo" for-each-ref --format="%(refname)" refs/replace)"
+          wt="$RUNNER_TEMP/rumbo-public-trust-root-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
+          rm -rf "$wt"
+          git -C "$repo" worktree add --detach "$wt" "$CANONICAL_SHA"
+          trap 'git -C "$repo" worktree remove --force "$wt" >/dev/null 2>&1 || true' EXIT
+          script_win="$(wslpath -w "$wt/operations/desktop-commander-zero-spend-r2/APPLY_DESKTOP_AUTHORITY_WSL_R2.ps1")"
+          ps=/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe
+          "$ps" -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "
+            \$ErrorActionPreference='Stop';
+            \$env:GIT_NO_REPLACE_OBJECTS='1';
+            \$env:GITHUB_REPOSITORY='RUMBO-IA/rumbo-control-queue';
+            \$env:GITHUB_REF='refs/heads/main';
+            \$env:GITHUB_SHA='$CANONICAL_SHA';
+            \$env:GITHUB_EVENT_NAME='workflow_dispatch';
+            \$env:RUMBO_DURABLE_ACTIVATION='1';
+            \$env:RUMBO_AUTHORITY_REF='refs/heads/main';
+            \$env:RUMBO_SOURCE_MAIN_SHA='$CANONICAL_SHA';
+            \$env:RUMBO_DURABLE_ACTIVATION_SHA='$CANONICAL_SHA';
+            \$env:RUMBO_CANONICAL_SHA='$CANONICAL_SHA';
+            \$env:RUMBO_PUBLIC_AUTHORITY_SHA='$PUBLIC_AUTHORITY_SHA';
+            & '$script_win' -AuthorityMode canonical -CanonicalSha '$CANONICAL_SHA' -SourceRepo 'C:\\Users\\Usuario\\rumbo_dev\\rumbo-control-queue'
+          "
