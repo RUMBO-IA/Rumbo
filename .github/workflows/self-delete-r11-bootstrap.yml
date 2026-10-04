@@ -1,0 +1,27 @@
+name: Delete superseded R11 bootstrap ref
+
+on:
+  push:
+    branches:
+      - bootstrap/qug-trust-root-r11-p1-20261004
+    paths:
+      - ".github/workflows/self-delete-r11-bootstrap.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    if: github.ref == 'refs/heads/bootstrap/qug-trust-root-r11-p1-20261004'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Delete only this superseded branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF" = "refs/heads/bootstrap/qug-trust-root-r11-p1-20261004"
+          gh api --method DELETE repos/RUMBO-IA/Rumbo/git/refs/heads/bootstrap/qug-trust-root-r11-p1-20261004
+          echo "SUPERSEDED_R11_BOOTSTRAP_REF_DELETED=PASS"
