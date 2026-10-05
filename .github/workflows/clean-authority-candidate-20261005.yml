@@ -1,0 +1,58 @@
+name: Build clean authority candidate 2026-10-05
+
+on:
+  push:
+    branches:
+      - fix/control-authority-anchor-b667881-r1-20261005
+    paths:
+      - ".github/workflows/clean-authority-candidate-20261005.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  build-clean:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout bootstrap branch
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Rebuild exact two-file candidate from protected main
+        shell: bash
+        env:
+          CLEAN_BRANCH: fix/control-authority-anchor-b667881-r2-clean-20261005
+          BASE_SHA: 9b47dd9d754687dc5ec5882c3849eb24255d3354
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse origin/main)" = "$BASE_SHA"
+
+          tmp="$(mktemp -d)"
+          git show "$GITHUB_SHA:docs/control-authority-anchor-v1.json" > "$tmp/anchor.json"
+          git show "$GITHUB_SHA:scripts/test_control_authority_anchor.py" > "$tmp/test.py"
+
+          git checkout --detach "$BASE_SHA"
+          git checkout -B "$CLEAN_BRANCH"
+          cp "$tmp/anchor.json" docs/control-authority-anchor-v1.json
+          cp "$tmp/test.py" scripts/test_control_authority_anchor.py
+
+          git add docs/control-authority-anchor-v1.json scripts/test_control_authority_anchor.py
+          test "$(git diff --cached --name-only | wc -l)" -eq 2
+          test "$(git diff --cached --name-only | sed -n '1p')" = "docs/control-authority-anchor-v1.json"
+          test "$(git diff --cached --name-only | sed -n '2p')" = "scripts/test_control_authority_anchor.py"
+
+          git config user.name "fscfede-beep"
+          git config user.email "293577326+fscfede-beep@users.noreply.github.com"
+          git commit -m "fix(authority): select governed private main b667881"
+
+          test "$(git rev-list --count "$BASE_SHA"..HEAD)" -eq 1
+          test "$(git log -1 --format='%an')" = "fscfede-beep"
+          test "$(git log -1 --format='%ae')" = "293577326+fscfede-beep@users.noreply.github.com"
+          test "$(git log -1 --format='%cn')" = "fscfede-beep"
+          test "$(git log -1 --format='%ce')" = "293577326+fscfede-beep@users.noreply.github.com"
+
+          git push origin "HEAD:refs/heads/$CLEAN_BRANCH"
+          echo "CLEAN_CANDIDATE_SHA=$(git rev-parse HEAD)"
