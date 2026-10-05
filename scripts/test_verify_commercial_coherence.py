@@ -42,6 +42,13 @@ class CommercialCoherenceTests(unittest.TestCase):
         )
         self.assertIn("REFUND_LINK_MISSING", errors)
 
+    def test_portal_plan_comes_from_subscription_ledger(self):
+        portal = (ROOT / "portal.js").read_text(encoding="utf-8")
+        self.assertNotIn("workspace.plan_id", portal)
+        self.assertNotIn("workspaces?select=id,name,slug,plan_id", portal)
+        self.assertIn("subscriptions?select=plan_id,status,current_period_start,current_period_end", portal)
+        self.assertIn("No active subscription", portal)
+
     def test_monthly_pricing_is_rejected(self):
         errors = verifier.check(self.readme, self.html + "\n<div>USD 149/mes</div>")
         self.assertIn("MONTHLY_PRICE", errors)
