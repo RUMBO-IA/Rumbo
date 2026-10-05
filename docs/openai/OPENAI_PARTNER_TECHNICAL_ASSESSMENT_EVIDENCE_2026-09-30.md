@@ -1,46 +1,150 @@
-# OpenAI Partner Technical Assessment — Supporting Evidence
+# OpenAI Partner Technical Assessment — Supporting Evidence V2
 
 **Organization:** RUMBO IA  
-**Date:** 2026-09-30  
-**Status:** Evidence-bounded support for the reopened OpenAI Partner Network Technical Capability Assessment.
+**Date:** 2026-10-05  
+**Status:** Evidence-bounded support for OpenAI Partner Network / technical-capability review. This document does not claim an OpenAI partner tier, specialization, certification, SIWC approval, customer production deployment, or measured customer ROI.
 
-## Organization and current commercial state
+## Company and product boundary
 
-RUMBO IA is a founder-operated AI systems company in Argentina. The current commercial product direction is **human-controlled AI CRM and workflow automation for small businesses in Argentina and Latin America**.
+RUMBO IA builds **Operational AI Systems** with human control, explicit authority boundaries and verifiable outcomes.
 
-Current state:
-- one founder / technical practitioner;
-- product and engineering prototypes are built and tested in controlled environments;
-- controlled pilot intake is active / being prepared;
-- **0 completed customer AI/ML production deployments are claimed**;
-- **0 customer ROI or production-impact metrics are claimed**;
-- no OpenAI endorsement, certification, or partner-tier status is claimed beyond what OpenAI explicitly confirms;
-- no external AI or hyperscaler certification is currently claimed.
+The strategic platform direction is an **AI Agent Assurance & Execution Control Plane**: a vendor-neutral layer for policy/preflight, state revalidation, bounded execution, effect readback, receipts, replay/idempotency controls, recovery and evidence export.
 
-## Intended solution
+The current public product surface is intentionally narrower and organized around three lines:
+1. **Revenue Recovery** — bounded commercial workflows for stalled leads, forgotten quotes, no-shows and dormant customers.
+2. **Agent Reliability** — state, continuity, execution controls, readback and evidence for AI agents.
+3. **Guardian** — defensive assurance, policy boundaries and auditability for higher-risk authorized workflows.
 
-RUMBO IA is building a bounded operating layer for customer-facing commercial workflows, including lead and conversation organization, proposal/follow-up workflows, approved business knowledge, revenue-recovery workflows, supervised AI assistance, tool use behind explicit authorization boundaries, human approval for consequential actions, and evidence/readback/recovery controls.
+The current public commercial entry remains a bounded Revenue Recovery Sprint rather than an automatically activated recurring SaaS subscription.
 
-The goal is not fully autonomous business execution. The product is designed around explicit supervision and bounded automation.
+## Current evidence boundary
 
-## OpenAI platform usage and intended use
+Current evidence supports:
+- founder-operated engineering and product development;
+- built and tested control-plane, reliability, commercial-portal and defensive-assurance components;
+- controlled pilot intake and bounded commercial offer preparation;
+- tenant-aware authentication/workspace architecture;
+- policy, execution-receipt, MCP-call and usage-ledger surfaces;
+- public evidence and claim controls.
 
-The connected OpenAI Platform account currently exposes organization **Rumbo** and project **RUMBO-AI-DEV**.
+Not claimed:
+- completed customer AI/ML production deployments;
+- measured customer ROI or production-impact metrics;
+- production-scale OpenAI traffic;
+- OpenAI Select, Advanced or Elite status;
+- an OpenAI specialization in Codex, cybersecurity or agents;
+- Sign in with ChatGPT commercial approval or client credentials;
+- ISO 27001, SOC 2, HIPAA, PCI DSS or equivalent certification;
+- recurring SaaS billing live in production.
 
-Planned / current engineering usage includes bounded prototyping and evaluation of OpenAI-powered assistants or agents for classification and summarization, business-knowledge retrieval, workflow assistance, tool-mediated actions with explicit permission checks, human-approval gates, reliability/regression evaluation, recovery, and final-state verification.
+## OpenAI platform context
 
-No production-traffic volume, customer count, or production-scale OpenAI workload is asserted here.
+The connected OpenAI Platform account currently exposes organization **Rumbo** with projects:
+- **Rumbo** (initial project)
+- **RUMBO-AI-DEV**
+
+OpenAI usage is separated from RUMBO commercial billing and entitlement state.
+
+Planned / current engineering use includes bounded prototyping and evaluation for:
+- classification and summarization;
+- approved business-knowledge retrieval;
+- agent/tool workflows with explicit authorization;
+- human approval for consequential actions;
+- reliability and regression evaluation;
+- recovery and final-state verification;
+- Responses/agent workflows where the applicable account and product permissions are separately enabled.
+
+No API key, secret, organization identifier or project identifier is published in this evidence document.
+
+## Sign in with ChatGPT boundary
+
+OpenAI documents Sign in with ChatGPT for websites as an Authorization Code + PKCE / OpenID Connect integration available to selected commercial partners through a limited trial.
+
+RUMBO therefore treats commercial SIWC as **external-approval-gated**:
+- no production SIWC button is shown without verified commercial approval and credentials;
+- identity scopes are not treated as permission to access ChatGPT conversations or unrelated OpenAI resources;
+- ChatGPT plan usage is a separate permission from identity;
+- ChatGPT plan usage is not a payment rail for RUMBO subscription, support, storage, governance or managed-service fees.
+
+Official reference:
+- https://developers.openai.com/siwc/quickstart
+- https://developers.openai.com/siwc/website
 
 ## Delivery methodology
 
-1. Define the business outcome, accountable human owner, and acceptance criteria.
-2. Map systems, data, credentials, permissions, privacy constraints, and sensitive actions.
-3. Implement the smallest useful bounded prototype.
-4. Evaluate deterministic and adversarial cases, including stale context, duplicate execution, partial failure, missing readback, permission errors, and unknown outcomes.
-5. Apply data minimization, least privilege, privacy/security checks, and explicit demo/test versus production boundaries.
-6. Run a controlled pilot with simulated or customer-authorized data and human supervision for consequential actions.
-7. Verify the intended effect through readback/evidence; API/tool success is not treated as proof of final business state.
-8. Expand scope only after acceptance evidence, rollback planning, and owner authorization.
+1. Define the business outcome, accountable human owner and acceptance criteria.
+2. Map systems, data, credentials, permissions, privacy constraints and sensitive actions.
+3. Bind the execution to explicit authority and a fresh-state preflight.
+4. Implement the smallest useful bounded workflow.
+5. Evaluate deterministic and adversarial cases, including stale context, duplicate execution, partial failure, missing readback, permission errors and unknown outcomes.
+6. Apply data minimization, least privilege, privacy/security checks and explicit demo/test versus production boundaries.
+7. Run a controlled pilot with simulated or customer-authorized data and human supervision for consequential actions.
+8. Verify intended effects through readback/evidence; API/tool success is not treated as proof of final business state.
+9. Expand scope only after acceptance evidence, rollback planning and owner authorization.
+
+## Execution-control architecture
+
+Target execution model:
+
+```text
+request
+  -> identity / tenant
+  -> authority + policy preflight
+  -> fresh state validation
+  -> execution adapter
+  -> provider/system effect
+  -> independent readback
+  -> receipt / evidence ledger
+  -> reconciliation / recovery
+```
+
+The design separates:
+- capability from authorization;
+- authorization from execution;
+- execution from verified effect;
+- workspace identity from commercial entitlement;
+- processor events from RUMBO entitlement decisions;
+- public product claims from private-control authority.
+
+Unknown or ambiguous outcome is a first-class state and is not treated as success.
+
+## Commercial control-plane evidence
+
+The current customer-facing candidate includes:
+- account sign-in / registration backed by Supabase Auth;
+- automatic profile + workspace + owner-membership provisioning on user creation;
+- tenant-scoped workspace access;
+- subscription-ledger-derived commercial plan display;
+- MCP call history;
+- billable-usage history;
+- execution receipts;
+- support-ticket intake;
+- verified partner-record surface.
+
+Commercial entitlement is being reconciled around the subscription/commercial ledger rather than legacy workspace metadata. A workspace placeholder such as `starter` is not treated as an active commercial plan.
+
+The current recurring catalog is frozen as a **candidate, not live**. No recurring checkout should be inferred from catalogue files alone.
+
+## Billing and provider boundary
+
+RUMBO's provider-neutral billing architecture can represent:
+- Stripe;
+- Paddle;
+- PayPal Invoice;
+- Lemon Squeezy;
+- Mercado Pago.
+
+This list is architectural, not an activation claim. The existing private runtime has a Stripe adapter; non-Stripe adapters are not claimed implemented.
+
+The target global architecture is:
+- Merchant-of-Record candidate for recurring global SaaS;
+- invoice/manual-payment path for bounded services and pilots;
+- local payment rails only as optional regional channels;
+- normalized signed provider events;
+- idempotency/replay controls;
+- RUMBO-owned subscription and entitlement decisions.
+
+No live recurring products or prices are claimed approved.
 
 ## Governance and Responsible AI
 
@@ -57,45 +161,102 @@ Operational governance is fail-closed:
 - recovery preserves evidence and re-establishes authority before continuing;
 - final state is verified through readback where applicable.
 
-Escalation procedure: stop the affected execution, preserve evidence/state, route to the owner, reassess scope/permissions/risk, and resume only after authorization and state are reconciled.
+Escalation procedure: stop the affected execution, preserve evidence/state, route to the owner, reassess scope/permissions/risk, and resume only after authority and state are reconciled.
 
 ## Security and compliance claim boundary
 
 RUMBO IA currently claims **no external AI compliance certification**.
 
-Current engineering controls include human supervision, explicit authorization boundaries, least privilege, data minimization, privacy-by-design, fail-closed behavior, audit/evidence records, security headers/content-security controls on public web surfaces, and separate defensive security work that is not exposed as a privileged customer-facing cyber service.
+Engineering controls include:
+- human supervision;
+- explicit authorization boundaries;
+- least privilege;
+- data minimization;
+- privacy-by-design;
+- fail-closed behavior;
+- RLS / tenant isolation on customer data surfaces;
+- append-only evidence where appropriate;
+- execution/readback receipts;
+- security headers and content-security controls on public web surfaces;
+- defensive security work kept separate from privileged customer-facing cyber services unless separately authorized.
 
-RUMBO IA does **not** claim ISO 27001, SOC 2, HIPAA, PCI DSS, or equivalent certification unless separately evidenced in the future.
+RUMBO IA does **not** claim ISO 27001, SOC 2, HIPAA, PCI DSS or equivalent certification unless separately evidenced in the future.
+
+## Partner Network alignment
+
+OpenAI publicly describes Partner Network progression through **Select, Advanced and Elite**, with expectations around commercial performance, technical capability, co-selling participation and deployment experience, plus potential specializations in areas such as Codex, cybersecurity and agents.
+
+RUMBO's current evidence is primarily relevant to the **technical-capability** dimension:
+- agent execution boundaries;
+- reliability / recovery;
+- policy and evidence controls;
+- defensive assurance;
+- controlled commercial workflows;
+- implementation methodology.
+
+This document does **not** infer any Partner Network tier or specialization from technical work alone.
+
+Official reference:
+- https://openai.com/index/introducing-openai-partner-network/
 
 ## Current use case submitted for assessment
 
-**RUMBO IA human-controlled CRM / Revenue Recovery**
+**RUMBO IA — Revenue Recovery with Agent Assurance controls**
 
-Target outcome: organize fragmented customer conversations, leads, proposals, and follow-ups while reducing manual operational gaps.
+Target outcome: organize fragmented customer conversations, leads, proposals and follow-ups while reducing manual operational gaps, with control-plane evidence around consequential actions.
 
-Implementation pattern: AI-assisted classification/summarization, approved business knowledge, bounded workflow automation, explicit human approval for consequential actions, and audit/readback controls.
+Implementation pattern:
+- AI-assisted classification/summarization;
+- approved business knowledge;
+- bounded workflow automation;
+- explicit human approval for consequential actions;
+- state revalidation;
+- audit/readback controls;
+- execution receipts and recovery for interrupted or ambiguous outcomes.
 
-Current evidence class: **BUILT / DEMO / TESTED / CONTROLLED PILOT INTAKE**.
+Current evidence class:
+
+**BUILT / DEMO / TESTED / CONTROLLED PILOT INTAKE**
 
 Not claimed:
 - completed customer production deployment;
 - measured customer ROI;
 - production-scale usage;
-- OpenAI certification or endorsement.
+- OpenAI certification, endorsement, tier or specialization.
 
 ## Public evidence map
 
-- `README.md` — current company/product positioning and claim boundaries.
-- `apps/landing-publica/index.html` — current public commercial product surface.
-- `security.html` — defensive security scope and explicit separation from the commercial product.
-- `docs/brand/CLAIMS_POLICY_V1.md` — public claim policy and prohibited unsupported claims.
-- `docs/brand/MESSAGING_V1.md` — canonical product/capability descriptions.
+- `README.md` — current company/product positioning, commercial entry and claim boundaries.
+- `index.html` — Operational AI Systems surface: Revenue Recovery, Agent Reliability and Guardian.
+- `docs/openai/COMMERCIAL_PLATFORM_V1.md` — strategic AI Agent Assurance & Execution Control Plane boundary and commercial architecture.
+- `dashboard.html` / `portal.js` — customer control-plane candidate for workspace, subscription state, MCP calls, usage and execution receipts.
+- `security.html` — defensive security / Agent Reliability scope and claim separation.
+- `docs/brand/CLAIMS_POLICY_V1.md` — public claim policy.
+- `docs/brand/PROFILE_COPY_V2.md` — current Operational AI Systems profile narrative.
 - `docs/brand/production_lock_v1.json` — governed production-surface authority record.
 - `scripts/verify_public_production_surface.py` — exact public-surface verification.
-- repository tests and CI — deterministic regression and governance checks.
+- repository CI — brand, privacy, commercial-coherence, security-header and control-authority checks.
+
+## Open gaps before stronger partner claims
+
+1. Complete at least one authorized customer production deployment and preserve deployment evidence.
+2. Measure customer outcome/ROI with an agreed baseline before publishing impact claims.
+3. Keep OpenAI Platform production usage separate from demos and evaluations.
+4. Complete any OpenAI-requested commercial/technical assessment steps.
+5. Obtain explicit SIWC approval/client credentials before enabling commercial SIWC.
+6. Complete billing-provider onboarding and production authority before enabling recurring checkout.
+7. Add compliance certifications only after independent evidence exists.
 
 ## Accuracy boundary
 
-This document intentionally distinguishes built/tested capability from production deployment, pilot preparation from customer production, internal/defensive engineering from commercial customer services, public source code or submitted upstream work from accepted third-party contributions, and technical capability from external certification.
+This document intentionally distinguishes:
+- built/tested capability from customer production deployment;
+- pilot intake from completed customer pilot;
+- public source code from private-control authority;
+- login identity from inference permission;
+- payment-provider capability from provider activation;
+- technical capability from OpenAI Partner Network tier or specialization;
+- demos and tests from customer ROI.
 
-Any future production, customer, certification, partner-tier, or measured-impact claim should be added only after separate evidence exists.
+Any future production, customer, certification, partner-tier, specialization, SIWC or measured-impact claim should be added only after separate evidence exists.
+
