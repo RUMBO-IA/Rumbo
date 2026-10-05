@@ -1,4 +1,4 @@
-name: Commercial readiness branch rewrite
+name: Commercial readiness clean branch bootstrap
 
 on:
   push:
@@ -21,7 +21,6 @@ jobs:
       - name: Rebuild clean RED candidate
         shell: bash
         env:
-          EXPECTED_BRANCH_HEAD: ${{ github.sha }}
         run: |
           python - <<'PY'
           from pathlib import Path
@@ -68,4 +67,4 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add scripts/test_verify_commercial_coherence.py
           git commit -m "test(commercial): require refund policy and gated login"
-          git push --force-with-lease=refs/heads/fix/commercial-readiness-reconcile-v1:$EXPECTED_BRANCH_HEAD origin HEAD:refs/heads/fix/commercial-readiness-reconcile-v1
+          git push origin HEAD:refs/heads/fix/commercial-readiness-reconcile-v2-clean
