@@ -108,6 +108,25 @@ class PublicProductionSurfaceTests(unittest.TestCase):
         self.assertEqual("SOURCE_MISSING", check["status"])
         self.assertIsNone(body)
 
+    def test_trust_center_routes_are_required_by_production_watch(self):
+        expected = {
+            "/trust-center",
+            "/processing-terms",
+            "/subprocessors",
+            "/retention",
+            "/responsible-ai",
+            "/security",
+            "/incident-response",
+            "/continuity",
+            "/support-policy",
+            "/status",
+            "/refund",
+            "/support",
+        }
+        actual = {route for route, _ in surface.TRUST_HTML_ROUTES}
+        self.assertEqual(expected, actual)
+        self.assertTrue(expected.issubset({route for route, _ in surface.HTML_ROUTES}))
+
     @mock.patch.object(surface, "verify_asset")
     def test_verify_surface_discovers_stylesheet_from_each_html_route(self, verify_asset):
         def fake_verify_asset(**kwargs):
