@@ -469,36 +469,7 @@ jobs:
             exit 1
           fi
 
-          dangerous="$(git -C "$repo" config --local --no-includes --name-only --list \
-            | tr '[:upper:]' '[:lower:]' \
-            | grep -E '^(core\.(hookspath|fsmonitor|sshcommand|gitproxy|alternaterefscommand)|include\.path|includeif\..*\.path|credential\.helper|protocol\..*\.allow|filter\..*\.(clean|smudge|process|required)|diff\..*\.command|merge\..*\.driver|url\..*\.(insteadof|pushinsteadof)|http(\..*)?\.proxy|remote\..*\.(proxy|uploadpack|receivepack))
-            echo "FAIL_PRIVATE_REPLACE_REFS_PRESENT" >&2
-            exit 1
-          fi
-          wt="$RUNNER_TEMP/rumbo-public-trust-root-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
-          hooks="$RUNNER_TEMP/rumbo-public-trust-root-empty-hooks-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
-          rm -rf "$wt" "$hooks"
-          mkdir -p "$hooks"
-          git -c core.hooksPath="$hooks" -C "$repo" worktree add --detach "$wt" "$CANONICAL_SHA"
-          trap 'git -c core.hooksPath="$hooks" -C "$repo" worktree remove --force "$wt" >/dev/null 2>&1 || true' EXIT
-          script_win="$(wslpath -w "$wt/operations/desktop-commander-zero-spend-r2/APPLY_DESKTOP_AUTHORITY_WSL_R2.ps1")"
-          ps=/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe
-          "$ps" -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "
-            \$ErrorActionPreference='Stop';
-            \$env:GITHUB_REPOSITORY='RUMBO-IA/rumbo-control-queue';
-            \$env:GITHUB_REF='refs/heads/main';
-            \$env:GITHUB_SHA='$CANONICAL_SHA';
-            \$env:GITHUB_EVENT_NAME='workflow_dispatch';
-            \$env:RUMBO_DURABLE_ACTIVATION='1';
-            \$env:RUMBO_AUTHORITY_REF='refs/heads/main';
-            \$env:RUMBO_SOURCE_MAIN_SHA='$CANONICAL_SHA';
-            \$env:RUMBO_DURABLE_ACTIVATION_SHA='$CANONICAL_SHA';
-            \$env:RUMBO_CANONICAL_SHA='$CANONICAL_SHA';
-            \$env:RUMBO_PUBLIC_AUTHORITY_SHA='$PUBLIC_AUTHORITY_SHA';
-            & '$script_win' -AuthorityMode canonical -CanonicalSha '$CANONICAL_SHA' -SourceRepo 'C:\\Users\\Usuario\\rumbo_dev\\rumbo-control-queue'
-          "
- \
-            || true)"
+          dangerous="$(git -C "$repo" config --local --no-includes --name-only --list             | tr '[:upper:]' '[:lower:]'             | grep -E '^(core\.(hookspath|fsmonitor|sshcommand|gitproxy|alternaterefscommand|attributesfile)|include\.path|includeif\..*\.path|credential\.helper|protocol\..*\.allow|filter\..*\.(clean|smudge|process|required)|diff\..*\.command|merge\..*\.driver|url\..*\.(insteadof|pushinsteadof)|http(\..*)?\.proxy|remote\..*\.(proxy|uploadpack|receivepack))$'             || true)"
           if [ -n "$dangerous" ]; then
             echo "FAIL_PRIVATE_DANGEROUS_GIT_CONFIG_BEFORE_MATERIALIZATION:$dangerous" >&2
             exit 1
@@ -508,13 +479,16 @@ jobs:
             echo "FAIL_PRIVATE_REPLACE_REFS_PRESENT" >&2
             exit 1
           fi
-          export GIT_NO_REPLACE_OBJECTS=1
+
           wt="$RUNNER_TEMP/rumbo-public-trust-root-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
           hooks="$RUNNER_TEMP/rumbo-public-trust-root-empty-hooks-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
           rm -rf "$wt" "$hooks"
           mkdir -p "$hooks"
-          git -c core.hooksPath="$hooks" -C "$repo" worktree add --detach "$wt" "$CANONICAL_SHA"
+
+          git             -c core.hooksPath="$hooks"             -c core.fsmonitor=false             -c core.attributesFile=/dev/null             -C "$repo"             worktree add --detach "$wt" "$CANONICAL_SHA"
+
           trap 'git -c core.hooksPath="$hooks" -C "$repo" worktree remove --force "$wt" >/dev/null 2>&1 || true' EXIT
+
           script_win="$(wslpath -w "$wt/operations/desktop-commander-zero-spend-r2/APPLY_DESKTOP_AUTHORITY_WSL_R2.ps1")"
           ps=/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe
           "$ps" -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "
