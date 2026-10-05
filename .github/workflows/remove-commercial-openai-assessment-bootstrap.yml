@@ -1,0 +1,22 @@
+name: Remove disposable commercial OpenAI assessment branch
+
+on:
+  push:
+    branches:
+      - fix/commercial-openai-assessment-v1
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: main
+          fetch-depth: 0
+          persist-credentials: true
+      - name: Delete disposable assessment branch
+        run: git push origin --delete refs/heads/fix/commercial-openai-assessment-v1
