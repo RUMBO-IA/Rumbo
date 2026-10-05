@@ -42,7 +42,7 @@ jobs:
           clean_branch="fix/openai-support-brand-alignment-v48-clean-20261005"
 
           test "$(git rev-parse HEAD)" = "$base"
-          bootstrap_head="$(python -c 'import json,os; print(json.load(open(os.environ[\"GITHUB_EVENT_PATH\"]))[\"pull_request\"][\"head\"][\"sha\"])')"
+          bootstrap_head="$(jq -r '.pull_request.head.sha' "$GITHUB_EVENT_PATH")"
           test "$(git ls-remote origin "refs/heads/$bootstrap_branch" | awk '{print $1}')" = "$bootstrap_head"
           test "$(git ls-remote origin "refs/heads/$source_branch" | awk '{print $1}')" = "$source_head"
           if git ls-remote --exit-code --heads origin "refs/heads/$clean_branch" >/dev/null 2>&1; then
