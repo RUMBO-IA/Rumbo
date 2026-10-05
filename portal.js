@@ -166,10 +166,18 @@ async function workspaceContext(user, session) {
   if (!memberships?.length) return null;
   const membership = memberships[0];
   const rows = await rest(
-    `workspaces?select=id,name,slug,plan_id&id=eq.${encodeURIComponent(membership.workspace_id)}&limit=1`,
+    `workspaces?select=id,name,slug&id=eq.${encodeURIComponent(membership.workspace_id)}&limit=1`,
     { session }
   );
   return rows?.length ? { ...rows[0], role: membership.role } : null;
+}
+
+async function subscriptionContext(workspaceId, session) {
+  const rows = await rest(
+    `subscriptions?select=plan_id,status,current_period_start,current_period_end&workspace_id=eq.${encodeURIComponent(workspaceId)}&status=in.(trialing,active,past_due)&order=current_period_end.desc&limit=1`,
+    { session }
+  );
+  return rows?.length ? rows[0] : null;
 }
 
 function renderRows(target, rows, fields) {
@@ -211,15 +219,17 @@ async function loadDashboard() {
       return;
     }
     qsa('[data-workspace-name]').forEach(n => { n.textContent = workspace.name; });
-    qsa('[data-workspace-plan]').forEach(n => { n.textContent = workspace.plan_id; });
     qsa('[data-workspace-role]').forEach(n => { n.textContent = workspace.role; });
 
     const wid = encodeURIComponent(workspace.id);
-    const [usage, receipts, calls] = await Promise.all([
+    const [subscription, usage, receipts, calls] = await Promise.all([
+      subscriptionContext(workspace.id, session),
       rest(`rumbo_usage_events?select=occurred_at,meter,billable_units,amount,currency,request_id&workspace_id=eq.${wid}&order=occurred_at.desc&limit=20`, { session }),
       rest(`rumbo_execution_receipts?select=created_at,request_id,effect_status,receipt_hash&workspace_id=eq.${wid}&order=created_at.desc&limit=20`, { session }),
       rest(`rumbo_mcp_calls?select=started_at,server_name,tool_name,status,latency_ms,request_id&workspace_id=eq.${wid}&order=started_at.desc&limit=20`, { session })
     ]);
+    const planLabel = subscription ? `${subscription.plan_id} · ${subscription.status}` : 'No active subscription';
+    qsa('[data-workspace-plan]').forEach(n => { n.textContent = planLabel; });
     renderRows('#usage-list', usage, [['occurred_at','Time'],['meter','Meter'],['billable_units','Units'],['amount','Amount'],['currency','Currency'],['request_id','Request']]);
     renderRows('#receipt-list', receipts, [['created_at','Time'],['request_id','Request'],['effect_status','Effect'],['receipt_hash','Receipt']]);
     renderRows('#call-list', calls, [['started_at','Time'],['server_name','Server'],['tool_name','Tool'],['status','Status'],['latency_ms','Latency ms'],['request_id','Request']]);
