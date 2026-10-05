@@ -144,14 +144,6 @@ async function handleSignup() {
   }
 }
 
-function handleGoogle() {
-  const redirectTo = new URL('login.html', location.href).href;
-  const url = new URL(`${SUPABASE_URL}/auth/v1/authorize`);
-  url.searchParams.set('provider', 'google');
-  url.searchParams.set('redirect_to', redirectTo);
-  location.href = url.toString();
-}
-
 async function handleLogout() {
   const session = storedSession();
   if (session?.access_token) {
@@ -315,7 +307,6 @@ function init() {
   }
   qs('#login-form')?.addEventListener('submit', handleLogin);
   qs('#signup-button')?.addEventListener('click', handleSignup);
-  qs('#google-button')?.addEventListener('click', handleGoogle);
   qsa('[data-logout]').forEach(n => n.addEventListener('click', handleLogout));
   if (document.body.dataset.page === 'dashboard') loadDashboard();
   if (document.body.dataset.page === 'support') loadSupport();
