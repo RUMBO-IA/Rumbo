@@ -10,6 +10,7 @@ REGISTRY_PATH = pathlib.Path("docs/brand/identity_registry_v1.json")
 PRODUCTION_LOCK_PATH = pathlib.Path("docs/brand/production_lock_v1.json")
 DISTRIBUTION_LOCK_PATH = pathlib.Path("docs/brand/distribution_lock_v1.json")
 PRIMARY = pathlib.Path("index.html")
+OPENAI_SUPPORT = pathlib.Path("openai-support.html")
 README = pathlib.Path("README.md")
 SECONDARY_REQUIRED = (
     pathlib.Path("apps/landing-publica/index.html"),
@@ -151,7 +152,7 @@ def _read_required(root: pathlib.Path, rel: pathlib.Path, errors: list[str]) -> 
 
 
 def _public_surfaces(root: pathlib.Path) -> list[pathlib.Path]:
-    rels = [PRIMARY, README, *SECONDARY_REQUIRED, SECONDARY_README]
+    rels = [PRIMARY, OPENAI_SUPPORT, README, *SECONDARY_REQUIRED, SECONDARY_README]
     seen = set(rels)
     for pattern in PUBLIC_GLOBS:
         for path in sorted(root.glob(pattern)):
@@ -204,7 +205,7 @@ def verify(root: pathlib.Path = ROOT) -> list[str]:
     except (OSError, ValueError, json.JSONDecodeError) as exc:
         return [f"distribution lock invalid: {exc}"]
 
-    required = [PRIMARY, README, *SECONDARY_REQUIRED, SECONDARY_README]
+    required = [PRIMARY, OPENAI_SUPPORT, README, *SECONDARY_REQUIRED, SECONDARY_README]
     texts = {rel: _read_required(root, rel, errors) for rel in required}
     if errors:
         return errors
@@ -219,6 +220,23 @@ def verify(root: pathlib.Path = ROOT) -> list[str]:
             errors,
             require_human_control=require_human_control,
         )
+
+    support = texts[OPENAI_SUPPORT].casefold()
+    for required_phrase in (
+        "operational ai systems",
+        "revenue recovery",
+        "agent reliability",
+        "guardian",
+        "human control",
+    ):
+        if required_phrase not in support:
+            errors.append(f"openai-support missing current brand semantic: {required_phrase}")
+    for legacy_phrase in (
+        "ai crm and automation for small businesses",
+        "one operating layer for customer work",
+    ):
+        if legacy_phrase in support:
+            errors.append(f"openai-support contains legacy CRM-only semantic: {legacy_phrase}")
 
     primary = texts[PRIMARY]
     missing_colors = sorted(color for color in REQUIRED_PRIMARY_COLORS if color not in primary.casefold())
