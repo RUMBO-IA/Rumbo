@@ -1,0 +1,102 @@
+name: RUMBO Public README Brand Alignment V51 Clean Rematerializer
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [main]
+    paths:
+      - ".github/workflows/public-readme-brand-alignment-v51-bootstrap.yml"
+      - "README.md"
+      - "scripts/verify_brand_contract.py"
+      - "scripts/test_verify_brand_contract.py"
+
+permissions:
+  contents: write
+
+jobs:
+  rematerialize:
+    if: >-
+      github.actor == 'fscfede-beep' &&
+      github.event.pull_request.head.repo.full_name == 'RUMBO-IA/Rumbo' &&
+      github.event.pull_request.head.ref == 'fix/public-readme-brand-alignment-v51-20261005' &&
+      github.event.pull_request.base.sha == '014893b85384ddb9b13ed2a623edc02627fe0478'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: 014893b85384ddb9b13ed2a623edc02627fe0478
+          fetch-depth: 0
+          persist-credentials: true
+      - name: Validate source and rematerialize clean candidate
+        env:
+          SOURCE_HEAD: ${{ github.event.pull_request.head.sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          temp_branch="fix/public-readme-brand-alignment-v51-20261005"
+          clean_branch="fix/public-readme-brand-alignment-v51-clean-20261005"
+          base="014893b85384ddb9b13ed2a623edc02627fe0478"
+          bootstrap=".github/workflows/public-readme-brand-alignment-v51-bootstrap.yml"
+
+          [[ "$SOURCE_HEAD" =~ ^[0-9a-f]{40}$ ]]
+          test "$(git ls-remote origin "refs/heads/$temp_branch" | awk '{print $1}')" = "$SOURCE_HEAD"
+          if git ls-remote --exit-code --heads origin "refs/heads/$clean_branch" >/dev/null 2>&1; then
+            echo "FAIL_CLOSED_CLEAN_BRANCH_EXISTS" >&2
+            exit 3
+          fi
+
+          git fetch origin "$SOURCE_HEAD" --quiet
+          mapfile -t changed < <(git diff --name-only "$base" "$SOURCE_HEAD" | sort)
+          allowed=("$bootstrap" "README.md" "scripts/test_verify_brand_contract.py" "scripts/verify_brand_contract.py")
+          required=("$bootstrap" "README.md" "scripts/test_verify_brand_contract.py" "scripts/verify_brand_contract.py")
+          test "${#changed[@]}" -eq "${#allowed[@]}"
+          for path in "${changed[@]}"; do
+            ok=0
+            for candidate in "${allowed[@]}"; do
+              if [[ "$path" == "$candidate" ]]; then ok=1; break; fi
+            done
+            test "$ok" -eq 1
+          done
+          for path in "${required[@]}"; do
+            printf '%s\n' "${changed[@]}" | grep -Fxq "$path"
+          done
+
+          for path in README.md scripts/test_verify_brand_contract.py scripts/verify_brand_contract.py; do
+            git show "$SOURCE_HEAD:$path" > "$path"
+          done
+
+          grep -Fq 'Operational AI Systems' README.md
+          grep -Fq 'Revenue Recovery' README.md
+          grep -Fq 'Agent Reliability' README.md
+          grep -Fq 'Guardian' README.md
+          ! grep -Fqi 'Human-controlled AI CRM and automation for small businesses in Latin America.' README.md
+          ! grep -Fqi 'RUMBO IA helps small businesses organize customer conversations' README.md
+          python -m unittest scripts.test_verify_brand_contract -v
+          python scripts/verify_brand_contract.py
+
+          git switch --detach "$base"
+          git switch -c "$clean_branch"
+          for path in README.md scripts/test_verify_brand_contract.py scripts/verify_brand_contract.py; do
+            git show "$SOURCE_HEAD:$path" > "$path"
+          done
+          git add -- README.md scripts/test_verify_brand_contract.py scripts/verify_brand_contract.py
+          mapfile -t staged < <(git diff --cached --name-only | sort)
+          expected=("README.md" "scripts/test_verify_brand_contract.py" "scripts/verify_brand_contract.py")
+          test "${#staged[@]}" -eq "${#expected[@]}"
+          for i in "${!expected[@]}"; do test "${staged[$i]}" = "${expected[$i]}"; done
+          git diff --cached --check
+          python -m unittest scripts.test_verify_brand_contract -v
+          python scripts/verify_brand_contract.py
+
+          git -c core.hooksPath=/dev/null               -c user.name="RUMBO Privacy Automation"               -c user.email="41898282+github-actions[bot]@users.noreply.github.com"               commit -m "docs(brand): align public README with Operational AI Systems"
+
+          clean_sha="$(git rev-parse HEAD)"
+          test "$(git rev-parse HEAD^)" = "$base"
+          meta="$(git show -s --format='%an|%ae|%cn|%ce' HEAD)"
+          test "$meta" = "RUMBO Privacy Automation|41898282+github-actions[bot]@users.noreply.github.com|RUMBO Privacy Automation|41898282+github-actions[bot]@users.noreply.github.com"
+
+          git push --set-upstream origin "$clean_branch"
+          test "$(git ls-remote origin "refs/heads/$clean_branch" | awk '{print $1}')" = "$clean_sha"
+          git push origin --delete "$temp_branch"
+          echo "CLEAN_PUBLIC_README_V51_SHA=$clean_sha"
