@@ -191,6 +191,14 @@ class BrandContractTests(unittest.TestCase):
             self.assertTrue(any("publication/production authority boundary" in e for e in errors))
             self.assertTrue(any("publication receipt" in e for e in errors))
 
+    def test_primary_rejects_stale_candidate_copy_that_denies_production(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = pathlib.Path(td)
+            stale = BASE_INDEX + "<p><strong>Vista candidata.</strong> Demo y ejemplos con datos simulados. No representa resultados de clientes ni producción desplegada.</p>"
+            make_surface(root, index=stale)
+            errors = brand.verify(root)
+            self.assertTrue(any("stale candidate" in e for e in errors), errors)
+
     def test_primary_readme_requires_main_production_boundary(self):
         with tempfile.TemporaryDirectory() as td:
             root = pathlib.Path(td); make_surface(root, readme="# RUMBO IA\nHuman-controlled AI CRM.")
