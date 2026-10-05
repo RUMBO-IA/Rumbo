@@ -2,9 +2,9 @@
 
 [![Public privacy gate](https://github.com/RUMBO-IA/Rumbo/actions/workflows/privacy-gate.yml/badge.svg?branch=main)](https://github.com/RUMBO-IA/Rumbo/actions/workflows/privacy-gate.yml)
 
-Human-controlled AI CRM and automation for small businesses in Latin America.
+RUMBO IA builds Operational AI Systems with human control, explicit authority boundaries and verifiable execution.
 
-RUMBO IA helps small businesses organize customer conversations, leads, follow-ups, approved business knowledge and commercial workflows while keeping humans in control of sensitive decisions.
+The public company model is organized around three pillars: **Revenue Recovery** for bounded commercial workflows, **Agent Reliability** for execution/readback/receipts, and **Guardian** for defensive AI and software assurance. Demos and engineering evidence are kept separate from customer, partner, production and outcome claims.
 
 ## Brand governance
 
@@ -34,6 +34,7 @@ RUMBO IA is bootstrapped, founder-operated in Argentina and currently pre-revenu
 ## Public links
 
 - Website: https://rumbo.verso.fans
+- Trust Center: https://rumbo.verso.fans/trust-center
 - AI Workflow Reliability Reference: https://sebastian-ai-workflow-reliability.miniup.app/
 
 ## Commercial entry

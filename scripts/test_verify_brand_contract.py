@@ -7,10 +7,11 @@ from scripts import verify_brand_contract as brand
 
 BASE_STYLE = ":root{--bg:#171918;--panel:#1f2220;--panel2:#252927;--line:#343835;--text:#F2EFE7;--muted:#A9AAA4;--orange:#E66A2C;--green:#8AB7A2;--blue:#54788A;--red:#C76868}"
 BASE_INDEX = f"<title>RUMBO IA</title><style>{BASE_STYLE}</style><p>IA con control humano</p><span>DATOS SIMULADOS</span>"
-BASE_README = "# RUMBO IA — Operational AI Systems\nHuman-controlled operational AI systems. main is not production. Production: rumbo.verso.fans application 34c625c65e047fdec06a5bef7064d2de6bed48ba deployment dpl_8KbqvsKuua22xK4EQYZmtF3KXmNK."
+BASE_README = "# RUMBO IA — Operational AI Systems\nHuman-controlled Operational AI Systems: Revenue Recovery, Agent Reliability and Guardian. main is not production. Production: rumbo.verso.fans application 34c625c65e047fdec06a5bef7064d2de6bed48ba deployment dpl_8KbqvsKuua22xK4EQYZmtF3KXmNK."
 SECONDARY = "<title>RUMBO IA</title><p>Human-controlled AI workspace.</p>"
 SECONDARY_README = "# RUMBO IA secondary landing\nHuman-controlled candidate surface. Production promotion requires a publication receipt."
 LEGAL = "<title>RUMBO IA</title><p>Legal information for RUMBO IA.</p>"
+TRUST_DOC = "<title>RUMBO IA Trust</title><p>Operational trust information for RUMBO IA.</p>"
 SUPPORT = "<title>RUMBO IA | Operational AI Systems Support</title><p>Operational AI Systems with human control.</p><p>Revenue Recovery · Agent Reliability · Guardian</p>"
 REGISTRY = {
     "schema_version": 1,
@@ -53,6 +54,8 @@ def make_surface(root: pathlib.Path, index: str = BASE_INDEX, readme: str = BASE
     (root / "index.html").write_text(index, encoding="utf-8")
     (root / "README.md").write_text(readme, encoding="utf-8")
     (root / "openai-support.html").write_text(SUPPORT, encoding="utf-8")
+    for rel in brand.TRUST_REQUIRED:
+        (root / rel).write_text(TRUST_DOC, encoding="utf-8")
     d = root / "docs" / "brand"
     d.mkdir(parents=True)
     (d / "identity_registry_v1.json").write_text(json.dumps(registry), encoding="utf-8")
@@ -203,6 +206,21 @@ class BrandContractTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as td:
             root = pathlib.Path(td); make_surface(root, readme="# RUMBO IA\nHuman-controlled AI CRM.")
             self.assertTrue(any("main-vs-production" in e for e in brand.verify(root)))
+
+    def test_readme_rejects_legacy_crm_latam_positioning(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = pathlib.Path(td)
+            legacy = BASE_README + "\nHuman-controlled AI CRM and workflow automation for small businesses in Latin America."
+            make_surface(root, readme=legacy)
+            errors = brand.verify(root)
+            self.assertTrue(any("README contains legacy CRM/LATAM positioning" in e for e in errors), errors)
+
+    def test_trust_center_required_surfaces_fail_closed_when_missing(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = pathlib.Path(td); make_surface(root)
+            (root / "trust-center.html").unlink()
+            errors = brand.verify(root)
+            self.assertTrue(any("trust-center.html" in e for e in errors), errors)
 
     def test_missing_production_lock_fails_closed(self):
         with tempfile.TemporaryDirectory() as td:
