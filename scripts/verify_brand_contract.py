@@ -239,7 +239,10 @@ def verify(root: pathlib.Path = ROOT) -> list[str]:
             errors.append(f"openai-support contains legacy CRM-only semantic: {legacy_phrase}")
 
     primary = texts[PRIMARY]
-    missing_colors = sorted(color for color in REQUIRED_PRIMARY_COLORS if color not in primary.casefold())
+    primary_low = primary.casefold()
+    if "vista candidata" in primary_low:
+        errors.append("primary site contains stale candidate wording that denies current production")
+    missing_colors = sorted(color for color in REQUIRED_PRIMARY_COLORS if color not in primary_low)
     if missing_colors:
         errors.append(f"primary site missing canonical colors: {missing_colors}")
     if "datos simulados" not in primary.casefold() and "demo" not in primary.casefold():

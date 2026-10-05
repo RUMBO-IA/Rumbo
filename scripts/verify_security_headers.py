@@ -5,6 +5,13 @@ root = Path(__file__).resolve().parents[1]
 config = json.loads((root / "vercel.json").read_text(encoding="utf-8"))
 html = (root / "index.html").read_text(encoding="utf-8")
 headers = {h["key"]: h["value"] for h in config["headers"][0]["headers"]}
+redirects = {(r.get("source"), r.get("destination"), r.get("permanent")) for r in config.get("redirects", [])}
+required_redirects = {
+    ("/apps/landing-publica", "/", True),
+    ("/apps/landing-publica/index.html", "/", True),
+}
+assert required_redirects <= redirects, f"missing legacy landing redirects: {sorted(required_redirects - redirects)}"
+assert config.get("git", {}).get("deploymentEnabled", {}).get("main") is False
 
 scripts = re.findall(r"<script>(.*?)</script>", html, flags=re.S)
 assert len(scripts) == 1, f"expected one inline script, got {len(scripts)}"
