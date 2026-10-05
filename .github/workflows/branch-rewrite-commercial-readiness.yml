@@ -1,0 +1,71 @@
+name: Commercial readiness branch rewrite
+
+on:
+  push:
+    branches:
+      - fix/commercial-readiness-reconcile-v1
+
+permissions:
+  contents: write
+
+jobs:
+  rewrite:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: main
+          fetch-depth: 0
+          persist-credentials: true
+      - name: Rebuild clean RED candidate
+        shell: bash
+        env:
+          EXPECTED_BRANCH_HEAD: ${{ github.sha }}
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path("scripts/test_verify_commercial_coherence.py")
+          c = p.read_text(encoding="utf-8")
+          old = """    def test_current_public_surface_passes(self):
+                  self.assertEqual(verifier.check(self.readme, self.html), [])
+          """
+          new = """    def test_current_public_surface_passes(self):
+                  self.assertEqual(verifier.check(self.readme, self.html), [])
+
+              def test_commercial_entrypoints_are_ready(self):
+                  login = (ROOT / "login.html").read_text(encoding="utf-8")
+                  terms = (ROOT / "terms.html").read_text(encoding="utf-8")
+                  refund = (ROOT / "refund.html").read_text(encoding="utf-8")
+                  self.assertEqual(
+                      verifier.check_commercial_entrypoints(self.html, login, terms, refund),
+                      [],
+                  )
+
+              def test_unverified_google_login_is_rejected(self):
+                  errors = verifier.check_commercial_entrypoints(
+                      self.html,
+                      '<button id="google-button">Continue with Google</button>',
+                      '<a href="/refund">Refunds</a>',
+                      '<h1>Refund Policy</h1>',
+                  )
+                  self.assertIn("UNVERIFIED_GOOGLE_LOGIN_VISIBLE", errors)
+
+              def test_refund_policy_must_be_linked(self):
+                  errors = verifier.check_commercial_entrypoints(
+                      self.html,
+                      '<p>Email login only.</p>',
+                      '<p>No refund link here.</p>',
+                      '<h1>Refund Policy</h1>',
+                  )
+                  self.assertIn("REFUND_LINK_MISSING", errors)
+          """
+          if old not in c:
+              raise SystemExit("expected test anchor not found")
+          p.write_text(c.replace(old, new), encoding="utf-8")
+          PY
+          git config user.name "RUMBO Privacy Automation"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add scripts/test_verify_commercial_coherence.py
+          git commit -m "test(commercial): require refund policy and gated login"
+          git push --force-with-lease=refs/heads/fix/commercial-readiness-reconcile-v1:$EXPECTED_BRANCH_HEAD origin HEAD:refs/heads/fix/commercial-readiness-reconcile-v1
