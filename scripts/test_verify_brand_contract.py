@@ -7,7 +7,7 @@ from scripts import verify_brand_contract as brand
 
 BASE_STYLE = ":root{--bg:#171918;--panel:#1f2220;--panel2:#252927;--line:#343835;--text:#F2EFE7;--muted:#A9AAA4;--orange:#E66A2C;--green:#8AB7A2;--blue:#54788A;--red:#C76868}"
 BASE_INDEX = f"<title>RUMBO IA</title><style>{BASE_STYLE}</style><p>IA con control humano</p><span>DATOS SIMULADOS</span>"
-BASE_README = "# RUMBO IA — Operational AI Systems\nHuman-controlled operational AI systems. main is not production. Production: rumbo.verso.fans application 34c625c65e047fdec06a5bef7064d2de6bed48ba deployment dpl_8KbqvsKuua22xK4EQYZmtF3KXmNK."
+BASE_README = "# RUMBO IA — Operational AI Systems\nHuman-controlled Operational AI Systems across Revenue Recovery, Agent Reliability, and Guardian. main is not production. Production: rumbo.verso.fans application 34c625c65e047fdec06a5bef7064d2de6bed48ba deployment dpl_8KbqvsKuua22xK4EQYZmtF3KXmNK."
 SECONDARY = "<title>RUMBO IA</title><p>Human-controlled AI workspace.</p>"
 SECONDARY_README = "# RUMBO IA secondary landing\nHuman-controlled candidate surface. Production promotion requires a publication receipt."
 LEGAL = "<title>RUMBO IA</title><p>Legal information for RUMBO IA.</p>"
@@ -203,6 +203,20 @@ class BrandContractTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as td:
             root = pathlib.Path(td); make_surface(root, readme="# RUMBO IA\nHuman-controlled AI CRM.")
             self.assertTrue(any("main-vs-production" in e for e in brand.verify(root)))
+
+    def test_readme_requires_current_operational_ai_semantics(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = pathlib.Path(td)
+            readme = BASE_README.replace("Guardian", "Operations")
+            make_surface(root, readme=readme)
+            self.assertTrue(any("README missing current brand semantic: guardian" in e for e in brand.verify(root)))
+
+    def test_readme_rejects_legacy_crm_latam_framing(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = pathlib.Path(td)
+            legacy = BASE_README + "\nHuman-controlled AI CRM and automation for small businesses in Latin America."
+            make_surface(root, readme=legacy)
+            self.assertTrue(any("README contains legacy CRM/LATAM framing" in e for e in brand.verify(root)))
 
     def test_missing_production_lock_fails_closed(self):
         with tempfile.TemporaryDirectory() as td:
