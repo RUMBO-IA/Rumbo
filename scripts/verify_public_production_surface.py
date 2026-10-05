@@ -13,6 +13,20 @@ import urllib.request
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 DEFAULT_LOCK = ROOT / "docs" / "brand" / "production_lock_v1.json"
+TRUST_HTML_ROUTES = (
+    ("/trust-center", "trust-center.html"),
+    ("/processing-terms", "processing-terms.html"),
+    ("/subprocessors", "subprocessors.html"),
+    ("/retention", "retention.html"),
+    ("/responsible-ai", "responsible-ai.html"),
+    ("/security", "security.html"),
+    ("/incident-response", "incident-response.html"),
+    ("/continuity", "continuity.html"),
+    ("/support-policy", "support-policy.html"),
+    ("/status", "status.html"),
+    ("/refund", "refund.html"),
+    ("/support", "support.html"),
+)
 HTML_ROUTES = (
     ("/", "index.html"),
     ("/openai-support", "openai-support.html"),
@@ -20,6 +34,7 @@ HTML_ROUTES = (
     ("/openai-terms", "openai-terms.html"),
     ("/privacy", "privacy.html"),
     ("/terms", "terms.html"),
+    *TRUST_HTML_ROUTES,
 )
 
 
