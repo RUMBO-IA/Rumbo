@@ -36,6 +36,18 @@
       ]
     }
   ],
+  "redirects": [
+    {
+      "source": "/apps/landing-publica",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/apps/landing-publica/index.html",
+      "destination": "/",
+      "permanent": true
+    }
+  ],
   "git": {
     "deploymentEnabled": {
       "main": false,
