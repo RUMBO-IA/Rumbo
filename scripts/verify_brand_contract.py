@@ -33,6 +33,16 @@ HUMAN_CONTROL = re.compile(
     r"human[- ]controlled|human control|control humano|persona aprobando|una persona aprueba",
     re.I,
 )
+REQUIRED_README_SEMANTICS = (
+    "operational ai systems",
+    "revenue recovery",
+    "agent reliability",
+    "guardian",
+)
+FORBIDDEN_README_LEGACY_FRAMING = (
+    "human-controlled ai crm and automation for small businesses in latin america",
+    "rumbo ia helps small businesses organize customer conversations",
+)
 
 
 def _normalize(text: str) -> str:
@@ -251,6 +261,12 @@ def verify(root: pathlib.Path = ROOT) -> list[str]:
     readme = texts[README].casefold()
     if "main" not in readme or "production" not in readme:
         errors.append("README must preserve main-vs-production release posture")
+    for required_phrase in REQUIRED_README_SEMANTICS:
+        if required_phrase not in readme:
+            errors.append(f"README missing current brand semantic: {required_phrase}")
+    for legacy_phrase in FORBIDDEN_README_LEGACY_FRAMING:
+        if legacy_phrase in readme:
+            errors.append(f"README contains legacy CRM/LATAM framing: {legacy_phrase}")
     for field in ("domain", "application_sha", "deployment_id"):
         value = str(production_lock[field]).casefold()
         if value not in readme:
