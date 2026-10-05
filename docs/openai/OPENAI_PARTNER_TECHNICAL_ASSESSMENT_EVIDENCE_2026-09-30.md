@@ -93,7 +93,7 @@ request
   -> fresh state validation
   -> execution adapter
   -> provider/system effect
-  -> independent readback
+  -> destination readback
   -> receipt / evidence ledger
   -> reconciliation / recovery
 ```
@@ -245,7 +245,7 @@ Not claimed:
 4. Complete any OpenAI-requested commercial/technical assessment steps.
 5. Obtain explicit SIWC approval/client credentials before enabling commercial SIWC.
 6. Complete billing-provider onboarding and production authority before enabling recurring checkout.
-7. Add compliance certifications only after independent evidence exists.
+7. Add compliance certifications only after separate evidence exists.
 
 ## Accuracy boundary
 
