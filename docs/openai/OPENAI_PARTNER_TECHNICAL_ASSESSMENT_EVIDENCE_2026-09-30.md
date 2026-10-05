@@ -17,6 +17,20 @@ The current public product surface is intentionally narrower and organized aroun
 
 The current public commercial entry remains a bounded Revenue Recovery Sprint rather than an automatically activated recurring SaaS subscription.
 
+## Organization identity clarification
+
+RUMBO IA's current website and this assessment describe the **same organization and the same AI delivery practice**.
+
+The current public company surface at `rumbo.verso.fans` identifies RUMBO IA as **Operational AI Systems** and presents three product lines: Revenue Recovery, Agent Reliability and Guardian. RUMBO IA is not presenting a separate staffing or recruiting business as its current company identity.
+
+Any earlier public surface that could have created a staffing/recruiting impression should not be treated as the current organizational positioning or as evidence of a separate customer-AI practice. The AI systems, implementation methodology, commercial pilot intake, reliability work and assurance controls described here are all RUMBO IA work under the same company identity.
+
+The intended-solution narrative and the current website are therefore aligned:
+- one organization: RUMBO IA
+- one operating thesis: human-controlled Operational AI Systems
+- one strategic control layer: AI Agent Assurance & Execution Control Plane
+- current public product lines: Revenue Recovery, Agent Reliability and Guardian
+
 ## Current evidence boundary
 
 Current evidence supports:
