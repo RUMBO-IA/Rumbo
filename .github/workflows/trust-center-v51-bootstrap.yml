@@ -32,14 +32,14 @@ jobs:
     if: >-
       github.actor == 'fscfede-beep' &&
       github.event.pull_request.head.repo.full_name == 'RUMBO-IA/Rumbo' &&
-      github.event.pull_request.head.ref == 'ops/production-authority-v50-clean-r1-20261005' &&
-      github.event.pull_request.base.sha == '014893b85384ddb9b13ed2a623edc02627fe0478'
+      github.event.pull_request.head.ref == 'bootstrap/trust-center-v51-r2-20261005' &&
+      github.event.pull_request.base.sha == '9b47dd9d754687dc5ec5882c3849eb24255d3354'
     runs-on: ubuntu-latest
     timeout-minutes: 7
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
-          ref: 014893b85384ddb9b13ed2a623edc02627fe0478
+          ref: 9b47dd9d754687dc5ec5882c3849eb24255d3354
           fetch-depth: 0
           persist-credentials: true
       - name: Validate source and rematerialize clean trust candidate
@@ -48,9 +48,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          temp_branch="ops/production-authority-v50-clean-r1-20261005"
-          clean_branch="fix/trust-center-v51-clean-20261005"
-          base="014893b85384ddb9b13ed2a623edc02627fe0478"
+          temp_branch="bootstrap/trust-center-v51-r2-20261005"
+          clean_branch="fix/trust-center-v51-r2-clean-20261005"
+          base="9b47dd9d754687dc5ec5882c3849eb24255d3354"
           bootstrap=".github/workflows/trust-center-v51-bootstrap.yml"
 
           [[ "$SOURCE_HEAD" =~ ^[0-9a-f]{40}$ ]]
