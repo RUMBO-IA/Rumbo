@@ -89,15 +89,46 @@ def check(readme: str, html: str) -> list[str]:
     return sorted(set(errors))
 
 
+
+def check_commercial_entrypoints(index_html: str, login_html: str, terms_html: str, refund_html: str) -> list[str]:
+    errors: list[str] = []
+    login_folded = login_html.casefold()
+    if 'id="google-button"' in login_folded or "continue with google" in login_folded:
+        errors.append("UNVERIFIED_GOOGLE_LOGIN_VISIBLE")
+    if "sign in with chatgpt" not in login_folded or "verified commercial siwc approval" not in login_folded:
+        errors.append("SIWC_GATE_NOTICE_MISSING")
+
+    link_surface = (index_html + "\n" + terms_html).casefold()
+    if 'href="/refund"' not in link_surface and 'href="refund.html"' not in link_surface:
+        errors.append("REFUND_LINK_MISSING")
+
+    refund_folded = refund_html.casefold()
+    if "refund policy" not in refund_folded:
+        errors.append("REFUND_POLICY_TITLE_MISSING")
+    if "sebastian@rumbo.verso.fans" not in refund_folded:
+        errors.append("REFUND_CONTACT_MISSING")
+    return sorted(set(errors))
+
 def main() -> int:
-    if not README.is_file() or not INDEX.is_file():
+    login = ROOT / "login.html"
+    terms = ROOT / "terms.html"
+    refund = ROOT / "refund.html"
+    if not all(path.is_file() for path in (README, INDEX, login, terms, refund)):
         print("COMMERCIAL_COHERENCE_FAIL: REQUIRED_PUBLIC_SURFACE_MISSING")
         return 1
 
+    index_html = INDEX.read_text(encoding="utf-8")
     errors = check(
         README.read_text(encoding="utf-8"),
-        INDEX.read_text(encoding="utf-8"),
+        index_html,
     )
+    errors.extend(check_commercial_entrypoints(
+        index_html,
+        login.read_text(encoding="utf-8"),
+        terms.read_text(encoding="utf-8"),
+        refund.read_text(encoding="utf-8"),
+    ))
+    errors = sorted(set(errors))
     if errors:
         print(f"COMMERCIAL_COHERENCE_FAIL: {len(errors)} violation(s)")
         for error in errors:

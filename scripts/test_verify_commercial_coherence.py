@@ -15,6 +15,40 @@ class CommercialCoherenceTests(unittest.TestCase):
     def test_current_public_surface_passes(self):
         self.assertEqual(verifier.check(self.readme, self.html), [])
 
+    def test_commercial_entrypoints_are_ready(self):
+        login = (ROOT / "login.html").read_text(encoding="utf-8")
+        terms = (ROOT / "terms.html").read_text(encoding="utf-8")
+        refund = (ROOT / "refund.html").read_text(encoding="utf-8")
+        self.assertEqual(
+            verifier.check_commercial_entrypoints(self.html, login, terms, refund),
+            [],
+        )
+
+    def test_unverified_google_login_is_rejected(self):
+        errors = verifier.check_commercial_entrypoints(
+            self.html,
+            '<button id="google-button">Continue with Google</button>',
+            '<a href="/refund">Refunds</a>',
+            '<h1>Refund Policy</h1>',
+        )
+        self.assertIn("UNVERIFIED_GOOGLE_LOGIN_VISIBLE", errors)
+
+    def test_refund_policy_must_be_linked(self):
+        errors = verifier.check_commercial_entrypoints(
+            self.html.replace('<a href="/refund">Refunds</a>', ''),
+            '<p>Email login only. Sign in with ChatGPT is not shown until RUMBO has verified commercial SIWC approval and credentials.</p>',
+            '<p>No refund link here.</p>',
+            '<h1>Refund Policy</h1><p>sebastian@rumbo.verso.fans</p>',
+        )
+        self.assertIn("REFUND_LINK_MISSING", errors)
+
+    def test_portal_plan_comes_from_subscription_ledger(self):
+        portal = (ROOT / "portal.js").read_text(encoding="utf-8")
+        self.assertNotIn("workspace.plan_id", portal)
+        self.assertNotIn("workspaces?select=id,name,slug,plan_id", portal)
+        self.assertIn("subscriptions?select=plan_id,status,current_period_start,current_period_end", portal)
+        self.assertIn("No active subscription", portal)
+
     def test_monthly_pricing_is_rejected(self):
         errors = verifier.check(self.readme, self.html + "\n<div>USD 149/mes</div>")
         self.assertIn("MONTHLY_PRICE", errors)
