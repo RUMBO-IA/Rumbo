@@ -19,8 +19,6 @@ jobs:
       github.event.pull_request.base.sha == 'bbfcd95a986c5c617abfdf25b1ac769e7a7a9b3e'
     runs-on: ubuntu-latest
     timeout-minutes: 5
-    env:
-      BOOTSTRAP_HEAD: \${{ github.event.pull_request.head.sha }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
@@ -44,7 +42,8 @@ jobs:
           clean_branch="fix/openai-support-brand-alignment-v48-clean-20261005"
 
           test "$(git rev-parse HEAD)" = "$base"
-          test "$(git ls-remote origin "refs/heads/$bootstrap_branch" | awk '{print $1}')" = "$BOOTSTRAP_HEAD"
+          bootstrap_head="$(python -c 'import json,os; print(json.load(open(os.environ[\"GITHUB_EVENT_PATH\"]))[\"pull_request\"][\"head\"][\"sha\"])')"
+          test "$(git ls-remote origin "refs/heads/$bootstrap_branch" | awk '{print $1}')" = "$bootstrap_head"
           test "$(git ls-remote origin "refs/heads/$source_branch" | awk '{print $1}')" = "$source_head"
           if git ls-remote --exit-code --heads origin "refs/heads/$clean_branch" >/dev/null 2>&1; then
             echo "FAIL_CLOSED_CLEAN_BRANCH_EXISTS" >&2
