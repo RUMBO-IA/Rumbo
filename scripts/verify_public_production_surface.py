@@ -27,15 +27,15 @@ TRUST_HTML_ROUTES = (
     ("/refund", "refund.html"),
     ("/support", "support.html"),
 )
-HTML_ROUTES = (
+BASE_HTML_ROUTES = (
     ("/", "index.html"),
     ("/openai-support", "openai-support.html"),
     ("/openai-privacy", "openai-privacy.html"),
     ("/openai-terms", "openai-terms.html"),
     ("/privacy", "privacy.html"),
     ("/terms", "terms.html"),
-    *TRUST_HTML_ROUTES,
 )
+HTML_ROUTES = BASE_HTML_ROUTES
 
 
 class StylesheetParser(HTMLParser):
@@ -172,13 +172,22 @@ def verify_asset(
     check.update(comparison)
     check["status"] = "PASS" if comparison["match"] else "DRIFT"
     return check, live_raw
+def routes_for_authorized_source(root: pathlib.Path, app_sha: str) -> tuple[tuple[str, str], ...]:
+    try:
+        read_authorized_source(root, app_sha, "trust-center.html")
+    except Exception:
+        return BASE_HTML_ROUTES
+    return BASE_HTML_ROUTES + TRUST_HTML_ROUTES
+
+
 def verify_surface(root: pathlib.Path, lock: dict, timeout: float) -> dict:
     domain = lock["domain"]
     app_sha = lock["application_sha"]
     checks: list[dict] = []
     stylesheet_routes: set[str] = set()
+    html_routes = routes_for_authorized_source(root, app_sha)
 
-    for route, source_path in HTML_ROUTES:
+    for route, source_path in html_routes:
         check, live_raw = verify_asset(
             domain=domain,
             route=route,
