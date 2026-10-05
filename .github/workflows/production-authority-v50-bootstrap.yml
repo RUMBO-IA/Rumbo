@@ -1,0 +1,104 @@
+name: RUMBO Production Authority V50 Clean Rematerializer
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [main]
+    paths:
+      - ".github/workflows/production-authority-v50-bootstrap.yml"
+      - "docs/brand/production_lock_v1.json"
+      - "README.md"
+
+permissions:
+  contents: write
+
+jobs:
+  rematerialize:
+    if: >-
+      github.actor == 'fscfede-beep' &&
+      github.event.pull_request.head.repo.full_name == 'RUMBO-IA/Rumbo' &&
+      github.event.pull_request.head.ref == 'bootstrap/production-authority-v50-20261005' &&
+      github.event.pull_request.base.sha == '6eeadb84b1dd57f17c4a46891770d2425e83c742'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: 6eeadb84b1dd57f17c4a46891770d2425e83c742
+          fetch-depth: 0
+          persist-credentials: true
+      - name: Rematerialize exact production authority lock
+        env:
+          SOURCE_HEAD: ${{ github.event.pull_request.head.sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          temp_branch="bootstrap/production-authority-v50-20261005"
+          clean_branch="ops/production-authority-v50-clean-r1-20261005"
+          base="6eeadb84b1dd57f17c4a46891770d2425e83c742"
+          bootstrap=".github/workflows/production-authority-v50-bootstrap.yml"
+          lock="docs/brand/production_lock_v1.json"
+          readme="README.md"
+
+          [[ "$SOURCE_HEAD" =~ ^[0-9a-f]{40}$ ]]
+          test "$(git ls-remote origin "refs/heads/$temp_branch" | awk '{print $1}')" = "$SOURCE_HEAD"
+          if git ls-remote --exit-code --heads origin "refs/heads/$clean_branch" >/dev/null 2>&1; then
+            echo "FAIL_CLOSED_CLEAN_BRANCH_EXISTS" >&2
+            exit 3
+          fi
+
+          git fetch origin "$SOURCE_HEAD" --quiet
+          mapfile -t changed < <(git diff --name-only "$base" "$SOURCE_HEAD" | sort)
+          expected=("$bootstrap" "$readme" "$lock")
+          test "${#changed[@]}" -eq 3
+          for i in "${!expected[@]}"; do test "${changed[$i]}" = "${expected[$i]}"; done
+
+          git show "$SOURCE_HEAD:$lock" > "$RUNNER_TEMP/lock.json"
+          python - "$RUNNER_TEMP/lock.json" <<'PY'
+          import json,sys
+          d=json.load(open(sys.argv[1],encoding="utf-8"))
+          expected={
+            "schema_version":1,
+            "registry_issue":"RUMBO-IA/Rumbo#72",
+            "owner_authorization_comment_id":6001040749,
+            "application_sha":"6eeadb84b1dd57f17c4a46891770d2425e83c742",
+            "deployment_id":"dpl_961FH2Y7gDi6T2unCTvii6AASvnb",
+            "domain":"rumbo.verso.fans",
+            "status":"AUTHORIZED",
+            "invariant":"MAIN_ADVANCE != PRODUCTION_AUTHORITY",
+          }
+          assert d == expected, (d, expected)
+          PY
+
+          git show "$SOURCE_HEAD:$readme" | grep -Fq '6eeadb84b1dd57f17c4a46891770d2425e83c742'
+          git show "$SOURCE_HEAD:$readme" | grep -Fq 'dpl_961FH2Y7gDi6T2unCTvii6AASvnb'
+          git show "$SOURCE_HEAD:$readme" | grep -Fq '6001040749'
+
+          git switch --detach "$base"
+          git switch -c "$clean_branch"
+          for path in "$readme" "$lock"; do
+            mkdir -p "$(dirname "$path")"
+            git show "$SOURCE_HEAD:$path" > "$path"
+          done
+          git add -- "$readme" "$lock"
+
+          mapfile -t staged < <(git diff --cached --name-only | sort)
+          expected_clean=("$readme" "$lock")
+          test "${#staged[@]}" -eq 2
+          for i in "${!expected_clean[@]}"; do test "${staged[$i]}" = "${expected_clean[$i]}"; done
+          git diff --cached --check
+
+          git -c core.hooksPath=/dev/null \
+              -c user.name="RUMBO Privacy Automation" \
+              -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+              commit -m "docs(production): authorize public lineage V50"
+
+          clean_sha="$(git rev-parse HEAD)"
+          test "$(git rev-parse HEAD^)" = "$base"
+          meta="$(git show -s --format='%an|%ae|%cn|%ce' HEAD)"
+          test "$meta" = "RUMBO Privacy Automation|41898282+github-actions[bot]@users.noreply.github.com|RUMBO Privacy Automation|41898282+github-actions[bot]@users.noreply.github.com"
+
+          git push --set-upstream origin "$clean_branch"
+          test "$(git ls-remote origin "refs/heads/$clean_branch" | awk '{print $1}')" = "$clean_sha"
+          git push origin --delete "$temp_branch"
+          echo "CLEAN_PRODUCTION_AUTHORITY_V50_SHA=$clean_sha"
