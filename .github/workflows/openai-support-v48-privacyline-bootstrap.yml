@@ -1,0 +1,85 @@
+name: RUMBO OpenAI Support V48 Privacy-Line Rematerializer
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [main]
+    paths:
+      - ".github/workflows/openai-support-v48-privacyline-bootstrap.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  patch-clean-branch:
+    if: >-
+      github.actor == 'fscfede-beep' &&
+      github.event.pull_request.head.repo.full_name == 'RUMBO-IA/Rumbo' &&
+      github.event.pull_request.head.ref == 'bootstrap/openai-support-v48-privacyline-r1-20261005' &&
+      github.event.pull_request.base.sha == 'bbfcd95a986c5c617abfdf25b1ac769e7a7a9b3e'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: bbfcd95a986c5c617abfdf25b1ac769e7a7a9b3e
+          fetch-depth: 0
+          persist-credentials: true
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: "3.12"
+
+      - name: Replace only the privacy-rejected support sentence
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          bootstrap_branch="bootstrap/openai-support-v48-privacyline-r1-20261005"
+          clean_branch="fix/openai-support-brand-alignment-v48-clean-20261005"
+          expected_clean="149b3bb8c556108158c2d417b0f8d8c021def96e"
+
+          bootstrap_head="$(jq -r '.pull_request.head.sha' "$GITHUB_EVENT_PATH")"
+          test "$(git ls-remote origin "refs/heads/$bootstrap_branch" | awk '{print $1}')" = "$bootstrap_head"
+          test "$(git ls-remote origin "refs/heads/$clean_branch" | awk '{print $1}')" = "$expected_clean"
+
+          git fetch origin "$expected_clean" --quiet
+          git switch --detach "$expected_clean"
+          git switch -c clean-work
+
+          python - <<'PY'
+          from pathlib import Path
+          path = Path("openai-support.html")
+          text = path.read_text(encoding="utf-8")
+          old = '<p>RUMBO IA may build or evaluate workflows involving ChatGPT, Codex, plugins, MCP and OpenAI developer products where the relevant account, product and permissions are available. Availability, submission, approval, listing, partner tier and production deployment are separate evidence states.</p>'
+          new = '<p>RUMBO IA supports bounded integrations under explicit access and evidence requirements. A request, review, approval, listing and release are distinct states.</p>'
+          assert text.count(old) == 1, "EXPECTED_SOURCE_SENTENCE_NOT_UNIQUE"
+          path.write_text(text.replace(old, new), encoding="utf-8")
+          PY
+
+          git diff --check
+          changed="$(git diff --name-only)"
+          test "$changed" = "openai-support.html"
+
+          python -m py_compile scripts/verify_brand_contract.py scripts/test_verify_brand_contract.py
+          python -m unittest scripts.test_verify_brand_contract -v
+          python scripts/verify_brand_contract.py
+
+          git add -- openai-support.html
+          git -c core.hooksPath=/dev/null \
+              -c user.name="RUMBO Privacy Automation" \
+              -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+              commit -m "fix(openai): remove privacy-rejected support wording"
+
+          new_sha="$(git rev-parse HEAD)"
+          meta="$(git show -s --format='%an|%ae|%cn|%ce' HEAD)"
+          test "$meta" = "RUMBO Privacy Automation|41898282+github-actions[bot]@users.noreply.github.com|RUMBO Privacy Automation|41898282+github-actions[bot]@users.noreply.github.com"
+
+          python scripts/test_verify_public_privacy.py
+
+          test "$(git ls-remote origin "refs/heads/$clean_branch" | awk '{print $1}')" = "$expected_clean"
+          git push origin "HEAD:refs/heads/$clean_branch"
+          test "$(git ls-remote origin "refs/heads/$clean_branch" | awk '{print $1}')" = "$new_sha"
+
+          git push origin --delete "$bootstrap_branch"
+          echo "CLEAN_OPENAI_SUPPORT_V48_PRIVACYLINE_SHA=$new_sha"
