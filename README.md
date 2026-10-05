@@ -2,9 +2,9 @@
 
 [![Public privacy gate](https://github.com/RUMBO-IA/Rumbo/actions/workflows/privacy-gate.yml/badge.svg?branch=main)](https://github.com/RUMBO-IA/Rumbo/actions/workflows/privacy-gate.yml)
 
-Human-controlled AI CRM and automation for small businesses in Latin America.
+**Operational AI Systems** with human control, explicit boundaries and verifiable outcomes.
 
-RUMBO IA helps small businesses organize customer conversations, leads, follow-ups, approved business knowledge and commercial workflows while keeping humans in control of sensitive decisions.
+RUMBO IA builds operational AI systems across three public pillars: **Revenue Recovery**, **Agent Reliability**, and **Guardian**. Sensitive actions remain human-supervised, and public claims stay bounded to evidence that can be read back and verified.
 
 ## Brand governance
 
