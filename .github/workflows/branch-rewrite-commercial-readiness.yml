@@ -79,7 +79,7 @@ jobs:
               if "sign in with chatgpt" not in login_folded or "verified commercial siwc approval" not in login_folded:
                   errors.append("SIWC_GATE_NOTICE_MISSING")
 
-              link_surface = (index_html + "\n" + terms_html).casefold()
+              link_surface = (index_html + "\\n" + terms_html).casefold()
               if 'href="/refund"' not in link_surface and 'href="refund.html"' not in link_surface:
                   errors.append("REFUND_LINK_MISSING")
 
