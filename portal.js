@@ -166,10 +166,18 @@ async function workspaceContext(user, session) {
   if (!memberships?.length) return null;
   const membership = memberships[0];
   const rows = await rest(
-    `workspaces?select=id,name,slug,plan_id&id=eq.${encodeURIComponent(membership.workspace_id)}&limit=1`,
+    `workspaces?select=id,name,slug&id=eq.${encodeURIComponent(membership.workspace_id)}&limit=1`,
     { session }
   );
   return rows?.length ? { ...rows[0], role: membership.role } : null;
+}
+
+async function commercialPlanContext(workspaceId, session) {
+  const rows = await rest(
+    `subscriptions?select=plan_id,status,current_period_end&workspace_id=eq.${encodeURIComponent(workspaceId)}&status=in.(trialing,active,past_due)&order=created_at.desc&limit=1`,
+    { session }
+  );
+  return rows?.[0] ?? null;
 }
 
 function renderRows(target, rows, fields) {
@@ -210,8 +218,11 @@ async function loadDashboard() {
       showStatus('Account is valid but no workspace is assigned yet.', 'info');
       return;
     }
+    const commercialPlan = await commercialPlanContext(workspace.id, session);
     qsa('[data-workspace-name]').forEach(n => { n.textContent = workspace.name; });
-    qsa('[data-workspace-plan]').forEach(n => { n.textContent = workspace.plan_id; });
+    qsa('[data-workspace-plan]').forEach(n => {
+      n.textContent = commercialPlan ? `${commercialPlan.plan_id} (${commercialPlan.status})` : 'Not activated';
+    });
     qsa('[data-workspace-role]').forEach(n => { n.textContent = workspace.role; });
 
     const wid = encodeURIComponent(workspace.id);
