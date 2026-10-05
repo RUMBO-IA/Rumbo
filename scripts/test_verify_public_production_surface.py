@@ -108,7 +108,10 @@ class PublicProductionSurfaceTests(unittest.TestCase):
         self.assertEqual("SOURCE_MISSING", check["status"])
         self.assertIsNone(body)
 
-    def test_trust_center_routes_are_required_by_production_watch(self):
+    @mock.patch.object(surface, "read_authorized_source")
+    def test_trust_center_routes_activate_only_for_authorized_source_that_contains_trust_center(self, read_source):
+        read_source.return_value = b"<html>trust</html>"
+        routes = surface.routes_for_authorized_source(pathlib.Path("."), "a" * 40)
         expected = {
             "/trust-center",
             "/processing-terms",
@@ -123,9 +126,14 @@ class PublicProductionSurfaceTests(unittest.TestCase):
             "/refund",
             "/support",
         }
-        actual = {route for route, _ in surface.TRUST_HTML_ROUTES}
-        self.assertEqual(expected, actual)
-        self.assertTrue(expected.issubset({route for route, _ in surface.HTML_ROUTES}))
+        actual = {route for route, _ in routes}
+        self.assertTrue(expected.issubset(actual))
+
+    @mock.patch.object(surface, "read_authorized_source")
+    def test_trust_center_routes_stay_inactive_before_authorized_production_contains_trust_center(self, read_source):
+        read_source.side_effect = RuntimeError("missing")
+        routes = surface.routes_for_authorized_source(pathlib.Path("."), "a" * 40)
+        self.assertEqual(surface.BASE_HTML_ROUTES, routes)
 
     @mock.patch.object(surface, "verify_asset")
     def test_verify_surface_discovers_stylesheet_from_each_html_route(self, verify_asset):
