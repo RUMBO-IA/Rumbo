@@ -10,7 +10,8 @@ BASE_INDEX = f"<title>RUMBO IA</title><style>{BASE_STYLE}</style><p>IA con contr
 BASE_README = "# RUMBO IA — Operational AI Systems\nHuman-controlled operational AI systems. main is not production. Production: rumbo.verso.fans application 34c625c65e047fdec06a5bef7064d2de6bed48ba deployment dpl_8KbqvsKuua22xK4EQYZmtF3KXmNK."
 SECONDARY = "<title>RUMBO IA</title><p>Human-controlled AI workspace.</p>"
 SECONDARY_README = "# RUMBO IA secondary landing\nHuman-controlled candidate surface. Production promotion requires a publication receipt."
-LEGAL = "<title>RUMBO IA</title><p>Legal information for RUMBO IA.</p>"\nSUPPORT = "<title>RUMBO IA | Operational AI Systems Support</title><p>Operational AI Systems with human control.</p><p>Revenue Recovery · Agent Reliability · Guardian</p>"
+LEGAL = "<title>RUMBO IA</title><p>Legal information for RUMBO IA.</p>"
+SUPPORT = "<title>RUMBO IA | Operational AI Systems Support</title><p>Operational AI Systems with human control.</p><p>Revenue Recovery · Agent Reliability · Guardian</p>"
 REGISTRY = {
     "schema_version": 1,
     "roles": ["PARENT_BRAND","PUBLIC_EXPRESSION","PRODUCT","OFFER","PROFILE","TECH_NAMESPACE","SHORT_FORM"],
@@ -50,7 +51,8 @@ DISTRIBUTION_LOCK = {
 
 def make_surface(root: pathlib.Path, index: str = BASE_INDEX, readme: str = BASE_README, registry=REGISTRY, production_lock=PRODUCTION_LOCK, distribution_lock=DISTRIBUTION_LOCK) -> None:
     (root / "index.html").write_text(index, encoding="utf-8")
-    (root / "README.md").write_text(readme, encoding="utf-8")\n    (root / "openai-support.html").write_text(SUPPORT, encoding="utf-8")
+    (root / "README.md").write_text(readme, encoding="utf-8")
+    (root / "openai-support.html").write_text(SUPPORT, encoding="utf-8")
     d = root / "docs" / "brand"
     d.mkdir(parents=True)
     (d / "identity_registry_v1.json").write_text(json.dumps(registry), encoding="utf-8")
