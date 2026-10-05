@@ -11,6 +11,7 @@ BASE_README = "# RUMBO IA — Operational AI Systems\nHuman-controlled operation
 SECONDARY = "<title>RUMBO IA</title><p>Human-controlled AI workspace.</p>"
 SECONDARY_README = "# RUMBO IA secondary landing\nHuman-controlled candidate surface. Production promotion requires a publication receipt."
 LEGAL = "<title>RUMBO IA</title><p>Legal information for RUMBO IA.</p>"
+SUPPORT = "<title>RUMBO IA | Operational AI Systems Support</title><p>Operational AI Systems with human control.</p><p>Revenue Recovery · Agent Reliability · Guardian</p>"
 REGISTRY = {
     "schema_version": 1,
     "roles": ["PARENT_BRAND","PUBLIC_EXPRESSION","PRODUCT","OFFER","PROFILE","TECH_NAMESPACE","SHORT_FORM"],
@@ -51,6 +52,7 @@ DISTRIBUTION_LOCK = {
 def make_surface(root: pathlib.Path, index: str = BASE_INDEX, readme: str = BASE_README, registry=REGISTRY, production_lock=PRODUCTION_LOCK, distribution_lock=DISTRIBUTION_LOCK) -> None:
     (root / "index.html").write_text(index, encoding="utf-8")
     (root / "README.md").write_text(readme, encoding="utf-8")
+    (root / "openai-support.html").write_text(SUPPORT, encoding="utf-8")
     d = root / "docs" / "brand"
     d.mkdir(parents=True)
     (d / "identity_registry_v1.json").write_text(json.dumps(registry), encoding="utf-8")
@@ -66,6 +68,24 @@ def make_surface(root: pathlib.Path, index: str = BASE_INDEX, readme: str = BASE
 
 
 class BrandContractTests(unittest.TestCase):
+    def test_openai_support_is_required(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = pathlib.Path(td); make_surface(root)
+            (root / "openai-support.html").unlink()
+            self.assertTrue(any("openai-support.html" in e for e in brand.verify(root)))
+
+    def test_openai_support_rejects_legacy_crm_only_semantics(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = pathlib.Path(td); make_surface(root)
+            (root / "openai-support.html").write_text(
+                "<title>RUMBO IA | AI CRM and Automation for Small Businesses</title>"
+                "<p>Human control. One operating layer for customer work.</p>",
+                encoding="utf-8",
+            )
+            errors = brand.verify(root)
+            self.assertTrue(any("openai-support missing current brand semantic" in e for e in errors))
+            self.assertTrue(any("legacy CRM-only semantic" in e for e in errors))
+
     def test_valid_surface_with_legal_pages_passes(self):
         with tempfile.TemporaryDirectory() as td:
             root = pathlib.Path(td); make_surface(root)
