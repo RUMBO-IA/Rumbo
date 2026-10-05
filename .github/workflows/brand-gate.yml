@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - "index.html"
+      - "openai-support.html"
       - "README.md"
       - "apps/landing-publica/**"
       - "docs/brand/**"
@@ -20,6 +21,7 @@ on:
   push:
     paths:
       - "index.html"
+      - "openai-support.html"
       - "README.md"
       - "apps/landing-publica/**"
       - "docs/brand/**"
