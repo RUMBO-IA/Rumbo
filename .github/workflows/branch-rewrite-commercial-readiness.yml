@@ -1,4 +1,4 @@
-name: Commercial readiness clean branch bootstrap
+name: Commercial readiness clean green bootstrap
 
 on:
   push:
@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 jobs:
-  rewrite:
+  build-green:
     if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     steps:
@@ -18,17 +18,21 @@ jobs:
           ref: main
           fetch-depth: 0
           persist-credentials: true
-      - name: Rebuild clean RED candidate
+      - name: Build and verify clean GREEN candidate
         shell: bash
         run: |
           python - <<'PY'
           from pathlib import Path
-          p = Path("scripts/test_verify_commercial_coherence.py")
+
+          root = Path(".")
+
+          # Tests first: preserve the RED contract in the GREEN candidate.
+          p = root / "scripts/test_verify_commercial_coherence.py"
           c = p.read_text(encoding="utf-8")
-          old = """    def test_current_public_surface_passes(self):
+          anchor = """    def test_current_public_surface_passes(self):
                   self.assertEqual(verifier.check(self.readme, self.html), [])
           """
-          new = """    def test_current_public_surface_passes(self):
+          tests = """    def test_current_public_surface_passes(self):
                   self.assertEqual(verifier.check(self.readme, self.html), [])
 
               def test_commercial_entrypoints_are_ready(self):
@@ -58,12 +62,159 @@ jobs:
                   )
                   self.assertIn("REFUND_LINK_MISSING", errors)
           """
+          if anchor not in c:
+              raise SystemExit("commercial test anchor missing")
+          p.write_text(c.replace(anchor, tests), encoding="utf-8")
+
+          # Extend commercial verifier with login/refund readiness.
+          p = root / "scripts/verify_commercial_coherence.py"
+          c = p.read_text(encoding="utf-8")
+          insert = """
+
+          def check_commercial_entrypoints(index_html: str, login_html: str, terms_html: str, refund_html: str) -> list[str]:
+              errors: list[str] = []
+              login_folded = login_html.casefold()
+              if 'id="google-button"' in login_folded or "continue with google" in login_folded:
+                  errors.append("UNVERIFIED_GOOGLE_LOGIN_VISIBLE")
+              if "sign in with chatgpt" not in login_folded or "verified commercial siwc approval" not in login_folded:
+                  errors.append("SIWC_GATE_NOTICE_MISSING")
+
+              link_surface = (index_html + "\n" + terms_html).casefold()
+              if 'href="/refund"' not in link_surface and 'href="refund.html"' not in link_surface:
+                  errors.append("REFUND_LINK_MISSING")
+
+              refund_folded = refund_html.casefold()
+              if "refund policy" not in refund_folded:
+                  errors.append("REFUND_POLICY_TITLE_MISSING")
+              if "sebastian@rumbo.verso.fans" not in refund_folded:
+                  errors.append("REFUND_CONTACT_MISSING")
+              return sorted(set(errors))
+          """
+          marker = "\ndef main() -> int:\n"
+          if marker not in c:
+              raise SystemExit("commercial verifier main marker missing")
+          c = c.replace(marker, insert + marker)
+          old_main = """def main() -> int:
+              if not README.is_file() or not INDEX.is_file():
+                  print("COMMERCIAL_COHERENCE_FAIL: REQUIRED_PUBLIC_SURFACE_MISSING")
+                  return 1
+
+              errors = check(
+                  README.read_text(encoding="utf-8"),
+                  INDEX.read_text(encoding="utf-8"),
+              )
+          """
+          new_main = """def main() -> int:
+              login = ROOT / "login.html"
+              terms = ROOT / "terms.html"
+              refund = ROOT / "refund.html"
+              if not all(path.is_file() for path in (README, INDEX, login, terms, refund)):
+                  print("COMMERCIAL_COHERENCE_FAIL: REQUIRED_PUBLIC_SURFACE_MISSING")
+                  return 1
+
+              index_html = INDEX.read_text(encoding="utf-8")
+              errors = check(
+                  README.read_text(encoding="utf-8"),
+                  index_html,
+              )
+              errors.extend(check_commercial_entrypoints(
+                  index_html,
+                  login.read_text(encoding="utf-8"),
+                  terms.read_text(encoding="utf-8"),
+                  refund.read_text(encoding="utf-8"),
+              ))
+              errors = sorted(set(errors))
+          """
+          if old_main not in c:
+              raise SystemExit("commercial verifier main block missing")
+          p.write_text(c.replace(old_main, new_main), encoding="utf-8")
+
+          # Login: email/password remains live; unverified providers remain visibly gated, not clickable.
+          (root / "login.html").write_text("""<!doctype html>
+          <html lang="en">
+          <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width,initial-scale=1">
+            <meta name="description" content="RUMBO IA customer account sign in and registration.">
+            <title>Account — RUMBO IA</title>
+            <link rel="stylesheet" href="styles.css">
+            <link rel="stylesheet" href="portal.css">
+            <script src="portal.js" defer></script>
+          </head>
+          <body data-page="login">
+          <header class="nav"><a class="brand" href="index.html">RUMBO <span>IA</span></a><nav><a href="partners.html">Partners</a><a href="support.html">Support</a></nav></header>
+          <main class="portal-shell">
+            <div class="section-heading"><span>Customer account</span><h1>Sign in to RUMBO IA</h1><p class="lead">Use email and password. Additional identity providers appear only after their configuration is verified for this environment.</p></div>
+            <div class="portal-grid">
+              <section class="portal-card">
+                <h2>Email</h2>
+                <form id="login-form" class="portal-form">
+                  <label>Email<input id="email" type="email" autocomplete="email" required></label>
+                  <label>Password<input id="password" type="password" autocomplete="current-password" minlength="8" required></label>
+                  <div class="portal-actions"><button class="button" type="submit">Sign in</button><button class="button ghost" id="signup-button" type="button">Create account</button></div>
+                </form>
+              </section>
+              <section class="portal-card">
+                <h2>Additional identity providers</h2>
+                <p>Google sign-in is not currently offered on this production surface because the provider has not been verified as enabled.</p>
+                <p class="portal-note">Sign in with ChatGPT is not shown until RUMBO has verified commercial SIWC approval and credentials.</p>
+              </section>
+            </div>
+            <div class="portal-status" data-status aria-live="polite">Ready.</div>
+          </main>
+          <footer><div>© 2026 RUMBO IA · Argentina</div><div><a href="privacy.html">Privacy</a><a href="terms.html">Terms</a><a href="refund.html">Refunds</a></div></footer>
+          </body>
+          </html>
+          """.replace("          ",""), encoding="utf-8")
+
+          # Remove now-unreachable Google redirect code.
+          p = root / "portal.js"
+          c = p.read_text(encoding="utf-8")
+          google_fn = """function handleGoogle() {
+            const redirectTo = new URL('login.html', location.href).href;
+            const url = new URL(`${SUPABASE_URL}/auth/v1/authorize`);
+            url.searchParams.set('provider', 'google');
+            url.searchParams.set('redirect_to', redirectTo);
+            location.href = url.toString();
+          }
+
+          """.replace("          ","")
+          if google_fn not in c:
+              raise SystemExit("google handler block missing")
+          c = c.replace(google_fn, "")
+          listener = "  qs('#google-button')?.addEventListener('click', handleGoogle);\n"
+          if listener not in c:
+              raise SystemExit("google listener missing")
+          p.write_text(c.replace(listener, ""), encoding="utf-8")
+
+          # Truthful refund policy for current pilot/service stage.
+          (root / "refund.html").write_text("""<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Refund Policy — RUMBO IA</title><link rel="stylesheet" href="styles.css"></head><body><header class="nav"><a class="brand" href="index.html">RUMBO <span>IA</span></a></header><main class="section"><div class="section-heading"><span>Payments</span><h2>Refund Policy</h2></div><p>This policy applies to payments made directly for RUMBO IA commercial pilots and services unless a signed order form or contract states different terms.</p><p><strong>Before kickoff.</strong> A customer may request cancellation before agreed work begins. If work has not started and RUMBO IA has not incurred non-refundable third-party costs specifically for that customer, the eligible payment will be returned through the original payment method.</p><p><strong>After kickoff.</strong> Refund requests are reviewed against the written scope and the portion of work not yet performed. Completed work and committed third-party costs are not refundable except where applicable law requires otherwise.</p><p><strong>Recurring services.</strong> RUMBO IA does not currently present an active recurring checkout on this public site. If recurring subscriptions are introduced, cancellation and renewal terms will be shown before purchase and will govern future renewals.</p><p>Payment processors and banks may have their own settlement timing. Nothing in this policy limits mandatory consumer or statutory rights that apply to a transaction.</p><p>For a refund request, contact <a href="mailto:sebastian@rumbo.verso.fans">sebastian@rumbo.verso.fans</a> with the payment reference and the related scope or order.</p><p><strong>Last updated:</strong> 5 October 2026.</p></main></body></html>
+          """.replace("          ",""), encoding="utf-8")
+
+          # Terms reference the refund policy and written commercial scope.
+          (root / "terms.html").write_text("""<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Terms — RUMBO IA</title><link rel="stylesheet" href="styles.css"></head><body><header class="nav"><a class="brand" href="index.html">RUMBO <span>IA</span></a></header><main class="section"><div class="section-heading"><span>Terms</span><h2>Website and commercial terms</h2></div><p>This website presents RUMBO IA and its current controlled commercial offers. Product capabilities, availability, integrations and commercial terms may change as pilots and development progress.</p><p>Any paid pilot or service is governed by the written scope, order form or contract agreed for that engagement. If those documents conflict with this website, the signed commercial document controls for that engagement.</p><p>Refund and cancellation handling is described in the <a href="/refund">Refund Policy</a>, unless a signed agreement states different terms.</p><p>Nothing on this website constitutes a guaranteed outcome, professional advice, partnership, investment solicitation or representation that a third-party provider has approved or endorsed RUMBO IA.</p><p>RUMBO IA names, copy and original materials may not be misrepresented as belonging to another party. Third-party product names remain the property of their respective owners.</p><p>For questions, contact <a href="mailto:sebastian@rumbo.verso.fans">sebastian@rumbo.verso.fans</a>.</p><p><strong>Last updated:</strong> 5 October 2026.</p></main></body></html>
+          """.replace("          ",""), encoding="utf-8")
+
+          p = root / "index.html"
+          c = p.read_text(encoding="utf-8")
+          old = '<a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="/security">Guardian / Security</a>'
+          new = '<a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="/refund">Refunds</a><a href="/security">Guardian / Security</a>'
           if old not in c:
-              raise SystemExit("expected test anchor not found")
+              raise SystemExit("index footer anchor missing")
           p.write_text(c.replace(old, new), encoding="utf-8")
           PY
+
+          python -m unittest scripts.test_verify_commercial_coherence
+          python scripts/verify_commercial_coherence.py
+          python -m unittest scripts.test_verify_brand_contract
+          python scripts/verify_brand_contract.py
+          python scripts/test_verify_public_privacy.py
+          python scripts/verify_security_headers.py
+          python -m unittest scripts.test_control_authority_anchor -v
+          python scripts/verify_control_authority_anchor.py --anchor docs/control-authority-anchor-v1.json --offline
+
           git config user.name "RUMBO Privacy Automation"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add scripts/test_verify_commercial_coherence.py
-          git commit -m "test(commercial): require refund policy and gated login"
-          git push origin HEAD:refs/heads/fix/commercial-readiness-reconcile-v2-clean
+          git add scripts/test_verify_commercial_coherence.py scripts/verify_commercial_coherence.py login.html portal.js refund.html terms.html index.html
+          git commit -m "fix(commercial): gate auth and add refund readiness"
+          git push origin HEAD:refs/heads/fix/commercial-readiness-reconcile-v3-green
