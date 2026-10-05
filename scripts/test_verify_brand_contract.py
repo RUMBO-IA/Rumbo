@@ -204,6 +204,20 @@ class BrandContractTests(unittest.TestCase):
             root = pathlib.Path(td); make_surface(root, readme="# RUMBO IA\nHuman-controlled AI CRM.")
             self.assertTrue(any("main-vs-production" in e for e in brand.verify(root)))
 
+    def test_readme_rejects_legacy_crm_latam_positioning(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = pathlib.Path(td)
+            legacy = BASE_README + "\nHuman-controlled AI CRM and workflow automation for small businesses in Latin America."
+            make_surface(root, readme=legacy)
+            errors = brand.verify(root)
+            self.assertTrue(any("README contains legacy CRM/LATAM positioning" in e for e in errors), errors)
+
+    def test_trust_center_required_surfaces_fail_closed_when_missing(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = pathlib.Path(td); make_surface(root)
+            errors = brand.verify(root)
+            self.assertTrue(any("trust-center.html" in e for e in errors), errors)
+
     def test_missing_production_lock_fails_closed(self):
         with tempfile.TemporaryDirectory() as td:
             root = pathlib.Path(td); make_surface(root)
