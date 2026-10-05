@@ -17,7 +17,9 @@ on:
       - "responsible-ai.html"
       - "retention.html"
       - "scripts/test_verify_brand_contract.py"
+      - "scripts/test_verify_public_production_surface.py"
       - "scripts/verify_brand_contract.py"
+      - "scripts/verify_public_production_surface.py"
       - "security.html"
       - "status.html"
       - "subprocessors.html"
@@ -75,7 +77,9 @@ jobs:
             "responsible-ai.html"
             "retention.html"
             "scripts/test_verify_brand_contract.py"
+            "scripts/test_verify_public_production_surface.py"
             "scripts/verify_brand_contract.py"
+            "scripts/verify_public_production_surface.py"
             "security.html"
             "status.html"
             "subprocessors.html"
@@ -107,7 +111,9 @@ jobs:
             "responsible-ai.html"
             "retention.html"
             "scripts/test_verify_brand_contract.py"
+            "scripts/test_verify_public_production_surface.py"
             "scripts/verify_brand_contract.py"
+            "scripts/verify_public_production_surface.py"
             "security.html"
             "status.html"
             "subprocessors.html"
@@ -144,8 +150,9 @@ jobs:
           for i in "${!expected_clean[@]}"; do test "${staged[$i]}" = "${expected_clean[$i]}"; done
           git diff --cached --check
 
-          python -m unittest scripts.test_verify_brand_contract -v
+          python -m unittest scripts.test_verify_brand_contract scripts.test_verify_public_production_surface -v
           python scripts/verify_brand_contract.py
+          python scripts/verify_public_production_surface.py
           python scripts/verify_security_headers.py
 
           git -c core.hooksPath=/dev/null \
