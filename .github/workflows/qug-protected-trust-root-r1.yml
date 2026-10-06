@@ -485,7 +485,13 @@ jobs:
           rm -rf "$wt" "$hooks"
           mkdir -p "$hooks"
 
-          git             -c core.hooksPath="$hooks"             -c core.fsmonitor=false             -c core.attributesFile=/dev/null             -C "$repo"             worktree add --detach "$wt" "$CANONICAL_SHA"
+          export GIT_CONFIG_COUNT=2
+          export GIT_CONFIG_KEY_0=core.fsmonitor
+          export GIT_CONFIG_VALUE_0=false
+          export GIT_CONFIG_KEY_1=core.attributesFile
+          export GIT_CONFIG_VALUE_1=/dev/null
+
+          git -c core.hooksPath="$hooks" -C "$repo" worktree add --detach "$wt" "$CANONICAL_SHA"
 
           trap 'git -c core.hooksPath="$hooks" -C "$repo" worktree remove --force "$wt" >/dev/null 2>&1 || true' EXIT
 
