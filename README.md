@@ -34,6 +34,7 @@ RUMBO IA is bootstrapped, founder-operated in Argentina and currently pre-revenu
 ## Public links
 
 - Website: https://rumbo.verso.fans
+- Trust Center: https://rumbo.verso.fans/trust-center
 - AI Workflow Reliability Reference: https://sebastian-ai-workflow-reliability.miniup.app/
 
 ## Commercial entry
