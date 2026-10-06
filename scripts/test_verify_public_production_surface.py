@@ -129,11 +129,16 @@ class PublicProductionSurfaceTests(unittest.TestCase):
         actual = {route for route, _ in routes}
         self.assertTrue(expected.issubset(actual))
 
-    @mock.patch.object(surface, "read_authorized_source")
-    def test_trust_center_routes_stay_inactive_before_authorized_production_contains_trust_center(self, read_source):
-        read_source.side_effect = RuntimeError("missing")
-        routes = surface.routes_for_authorized_source(pathlib.Path("."), "a" * 40)
+    def test_trust_center_routes_stay_inactive_only_for_explicit_legacy_revision(self):
+        legacy_sha = next(iter(surface.LEGACY_PRE_TRUST_CENTER_APPLICATION_SHAS))
+        routes = surface.routes_for_authorized_source(pathlib.Path("."), legacy_sha)
         self.assertEqual(surface.BASE_HTML_ROUTES, routes)
+
+    def test_post_activation_revision_enforces_trust_routes_even_if_files_later_disappear(self):
+        routes = surface.routes_for_authorized_source(pathlib.Path("."), "a" * 40)
+        actual = {route for route, _ in routes}
+        self.assertIn("/trust-center", actual)
+        self.assertIn("/subprocessors", actual)
 
     @mock.patch.object(surface, "verify_asset")
     def test_verify_surface_discovers_stylesheet_from_each_html_route(self, verify_asset):
