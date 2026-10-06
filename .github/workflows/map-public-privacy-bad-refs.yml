@@ -1,0 +1,58 @@
+name: Map Public Privacy Bad Refs
+
+on:
+  push:
+    branches:
+      - fix/qug-protected-trust-root-clean-r13-20261004
+    paths:
+      - ".github/workflows/map-public-privacy-bad-refs.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  map:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Map violating commits to all refs
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone --mirror https://github.com/RUMBO-IA/Rumbo.git "$RUNNER_TEMP/rumbo-public.git" >/dev/null 2>&1
+          cd "$RUNNER_TEMP/rumbo-public.git"
+          bad=(
+            13bcc9798bbd70334348f2abc9c1453e70ff3c49
+            15e38560d3cce5b2491e16d8806aab1da0a55ac7
+            18710200097cbfdde9457f838b0eefcb545bc3c7
+            1ce7a2e6ba44f90eac162aa39a4e5715e8fa377e
+            21aec6dd6bed67d9d9a9325fb7df54bd2b058baf
+            2788ff1fef8b9200bb9e6f4f2f3a0a40f7d5b9bf
+            2a1d59030c716fb48657add58e15c19f090445cc
+            3ab3169d94d63c4ff8a3ae1d797a0c396bd8ac70
+            45d4de490294b4ed5c4efe80e1d30d1614063969
+            513b93b536dd3b09e1f9d42d61e69de8b13f0721
+            55e1d4e5bcdc1e9118284352a10b435ea72471bd
+            5d1ef7889de331eb80d6f3dcac5f913e06bdde0a
+            6b9b6f805933c540bf71799b57d2a17deb7042d1
+            74e7b29c66e63678405b3d1cdd9878635fe03d50
+            7c59dd54d5eeec8d22a0ab4a488069b82ab596a7
+            81398e0ab213ba794d1fb4c4467735e75803684f
+            822fef20f175c53bf98a5e1e61645cc65ffdfa7e
+            9e24cea31605b6765a0a0ac97503994a7b7d675c
+            b228d8693110ad3c8a307b916f5c83f4c187dd34
+            b24d1f5fb70a41a5d1506d5cffc300de20d74d4c
+            c0c1f87ad58ad73e625220a6fc455086a44cee55
+            de586ee58ee2d4db7af62c1485d18c65272a01ea
+            e4dacfceaaced3c2db3e0679a228928dd3fb1cbf
+            f16b3811b3f92fa7bb004d69999fb37bc5ac7525
+            f7b3345717d0d6a5788f09891da5408accee397d
+            f91995ae3943a2e3c37c8d281691660f58e99536
+          )
+          for sha in "${bad[@]}"; do
+            printf 'REFMAP %s' "$sha"
+            refs="$(git for-each-ref --format='%(refname)' --contains "$sha" refs/heads refs/tags | sort | paste -sd ',' -)"
+            printf ' %s\n' "${refs:-<NONE>}"
+          done
+          echo "REF_MAP=PASS"
+          echo "EXTERNAL_SPEND_USD=0"
