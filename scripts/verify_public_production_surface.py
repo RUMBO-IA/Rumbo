@@ -36,6 +36,12 @@ BASE_HTML_ROUTES = (
     ("/terms", "terms.html"),
 )
 HTML_ROUTES = BASE_HTML_ROUTES
+# Explicit pre-Trust-Center production boundary. Any authorized application SHA
+# not listed here must expose the Trust Center routes and fails closed if they
+# are missing from the authorized source or the live deployment.
+LEGACY_PRE_TRUST_CENTER_APPLICATION_SHAS = {
+    "6eeadb84b1dd57f17c4a46891770d2425e83c742",
+}
 
 
 class StylesheetParser(HTMLParser):
@@ -173,9 +179,8 @@ def verify_asset(
     check["status"] = "PASS" if comparison["match"] else "DRIFT"
     return check, live_raw
 def routes_for_authorized_source(root: pathlib.Path, app_sha: str) -> tuple[tuple[str, str], ...]:
-    try:
-        read_authorized_source(root, app_sha, "trust-center.html")
-    except Exception:
+    del root
+    if app_sha in LEGACY_PRE_TRUST_CENTER_APPLICATION_SHAS:
         return BASE_HTML_ROUTES
     return BASE_HTML_ROUTES + TRUST_HTML_ROUTES
 
