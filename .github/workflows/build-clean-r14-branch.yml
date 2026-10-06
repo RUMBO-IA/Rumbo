@@ -1,0 +1,58 @@
+name: Build Clean R14 Branch
+
+on:
+  push:
+    branches:
+      - fix/qug-protected-trust-root-clean-r13-20261004
+    paths:
+      - ".github/workflows/build-clean-r14-branch.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  build-clean-branch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Create privacy-clean R14 commit and branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          PUBLIC_REPO='RUMBO-IA/Rumbo'
+          SOURCE_SHA='1ce7a2e6ba44f90eac162aa39a4e5715e8fa377e'
+          PARENT_SHA='35462ff67832b4c6bd6a964e1e73e096119013dd'
+          NEW_BRANCH='fix/qug-protected-trust-root-clean-r14-20261005'
+          EXPECTED_TREE='15114391b3b27df57c01f06ab8a1af170ea68171'
+
+          src_tree="$(gh api "repos/$PUBLIC_REPO/git/commits/$SOURCE_SHA" --jq '.tree.sha')"
+          test "$src_tree" = "$EXPECTED_TREE"
+
+          if gh api "repos/$PUBLIC_REPO/git/ref/heads/$NEW_BRANCH" >/dev/null 2>&1; then
+            echo "FAIL_BRANCH_ALREADY_EXISTS" >&2
+            exit 1
+          fi
+
+          commit_json="$(gh api --method POST "repos/$PUBLIC_REPO/git/commits"             -f message='fix(authority): repair inert carrier shell materialization R14 clean'             -f tree="$src_tree"             -f parents[]="$PARENT_SHA"             -f author[name]='fscfede-beep'             -f author[email]='293577326+fscfede-beep@users.noreply.github.com'             -f committer[name]='fscfede-beep'             -f committer[email]='293577326+fscfede-beep@users.noreply.github.com')"
+
+          clean_sha="$(printf '%s' "$commit_json" | python3 -c 'import json,sys;print(json.load(sys.stdin)["sha"])')"
+          test -n "$clean_sha"
+
+          gh api --method POST "repos/$PUBLIC_REPO/git/refs"             -f ref="refs/heads/$NEW_BRANCH"             -f sha="$clean_sha" >/dev/null
+
+          gh api "repos/$PUBLIC_REPO/commits/$clean_sha" > /tmp/meta.json
+          python3 - "$clean_sha" /tmp/meta.json <<'PY'
+          import json,sys
+          clean_sha,path=sys.argv[1:3]
+          doc=json.load(open(path,encoding="utf-8"))
+          a=doc["commit"]["author"]; c=doc["commit"]["committer"]
+          assert a["name"]=="fscfede-beep", (clean_sha,a)
+          assert c["name"]=="fscfede-beep", (clean_sha,c)
+          assert a["email"]=="293577326+fscfede-beep@users.noreply.github.com"
+          assert c["email"]=="293577326+fscfede-beep@users.noreply.github.com"
+          print("CLEAN_PUBLIC_COMMIT_SHA="+clean_sha)
+          print("PUBLIC_METADATA=PASS")
+          print("EXTERNAL_SPEND_USD=0")
+          PY
