@@ -35,7 +35,14 @@ SECONDARY_REQUIRED = (
 )
 SECONDARY_README = pathlib.Path("apps/landing-publica/README.md")
 PUBLIC_GLOBS = ("apps/landing-publica/*.html",)
-LEGAL_EXEMPT_NAMES = {path.name.casefold() for path in TRUST_REQUIRED} | {"privacy.html", "terms.html"}
+HUMAN_CONTROL_EXEMPT_NAMES = {
+    "privacy.html",
+    "terms.html",
+    "refund.html",
+    "processing-terms.html",
+    "subprocessors.html",
+    "retention.html",
+}
 
 REQUIRED_PRIMARY_COLORS = {
     "#171918", "#f2efe7", "#e66a2c", "#54788a",
@@ -227,7 +234,7 @@ def verify(root: pathlib.Path = ROOT) -> list[str]:
         return errors
 
     for path in _public_surfaces(root):
-        require_human_control = path.name.casefold() not in LEGAL_EXEMPT_NAMES
+        require_human_control = path.name.casefold() not in HUMAN_CONTROL_EXEMPT_NAMES
         _check_surface(
             root,
             path,
@@ -271,6 +278,7 @@ def verify(root: pathlib.Path = ROOT) -> list[str]:
         if required_phrase not in readme:
             errors.append(f"README missing current brand semantic: {required_phrase}")
     for legacy_phrase in (
+        "human-controlled ai crm and automation for small businesses in latin america",
         "human-controlled ai crm and workflow automation for small businesses in latin america",
         "helps small businesses organize customer conversations",
     ):
