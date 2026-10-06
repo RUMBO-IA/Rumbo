@@ -12,6 +12,22 @@ DISTRIBUTION_LOCK_PATH = pathlib.Path("docs/brand/distribution_lock_v1.json")
 PRIMARY = pathlib.Path("index.html")
 OPENAI_SUPPORT = pathlib.Path("openai-support.html")
 README = pathlib.Path("README.md")
+TRUST_REQUIRED = (
+    pathlib.Path("privacy.html"),
+    pathlib.Path("terms.html"),
+    pathlib.Path("refund.html"),
+    pathlib.Path("security.html"),
+    pathlib.Path("support.html"),
+    pathlib.Path("trust-center.html"),
+    pathlib.Path("processing-terms.html"),
+    pathlib.Path("subprocessors.html"),
+    pathlib.Path("retention.html"),
+    pathlib.Path("responsible-ai.html"),
+    pathlib.Path("incident-response.html"),
+    pathlib.Path("continuity.html"),
+    pathlib.Path("support-policy.html"),
+    pathlib.Path("status.html"),
+)
 SECONDARY_REQUIRED = (
     pathlib.Path("apps/landing-publica/index.html"),
     pathlib.Path("apps/landing-publica/index-es.html"),
@@ -19,7 +35,14 @@ SECONDARY_REQUIRED = (
 )
 SECONDARY_README = pathlib.Path("apps/landing-publica/README.md")
 PUBLIC_GLOBS = ("apps/landing-publica/*.html",)
-LEGAL_EXEMPT_NAMES = {"privacy.html", "terms.html"}
+HUMAN_CONTROL_EXEMPT_NAMES = {
+    "privacy.html",
+    "terms.html",
+    "refund.html",
+    "processing-terms.html",
+    "subprocessors.html",
+    "retention.html",
+}
 
 REQUIRED_PRIMARY_COLORS = {
     "#171918", "#f2efe7", "#e66a2c", "#54788a",
@@ -32,16 +55,6 @@ FORBIDDEN_ALIASES = ("Rumbo AI", "RUMBO.AI", "RumboIA")
 HUMAN_CONTROL = re.compile(
     r"human[- ]controlled|human control|control humano|persona aprobando|una persona aprueba",
     re.I,
-)
-REQUIRED_README_SEMANTICS = (
-    "operational ai systems",
-    "revenue recovery",
-    "agent reliability",
-    "guardian",
-)
-FORBIDDEN_README_LEGACY_FRAMING = (
-    "human-controlled ai crm and automation for small businesses in latin america",
-    "rumbo ia helps small businesses organize customer conversations",
 )
 
 
@@ -162,7 +175,7 @@ def _read_required(root: pathlib.Path, rel: pathlib.Path, errors: list[str]) -> 
 
 
 def _public_surfaces(root: pathlib.Path) -> list[pathlib.Path]:
-    rels = [PRIMARY, OPENAI_SUPPORT, README, *SECONDARY_REQUIRED, SECONDARY_README]
+    rels = [PRIMARY, OPENAI_SUPPORT, README, *TRUST_REQUIRED, *SECONDARY_REQUIRED, SECONDARY_README]
     seen = set(rels)
     for pattern in PUBLIC_GLOBS:
         for path in sorted(root.glob(pattern)):
@@ -215,13 +228,13 @@ def verify(root: pathlib.Path = ROOT) -> list[str]:
     except (OSError, ValueError, json.JSONDecodeError) as exc:
         return [f"distribution lock invalid: {exc}"]
 
-    required = [PRIMARY, OPENAI_SUPPORT, README, *SECONDARY_REQUIRED, SECONDARY_README]
+    required = [PRIMARY, OPENAI_SUPPORT, README, *TRUST_REQUIRED, *SECONDARY_REQUIRED, SECONDARY_README]
     texts = {rel: _read_required(root, rel, errors) for rel in required}
     if errors:
         return errors
 
     for path in _public_surfaces(root):
-        require_human_control = path.name.casefold() not in LEGAL_EXEMPT_NAMES
+        require_human_control = path.name.casefold() not in HUMAN_CONTROL_EXEMPT_NAMES
         _check_surface(
             root,
             path,
@@ -261,12 +274,16 @@ def verify(root: pathlib.Path = ROOT) -> list[str]:
     readme = texts[README].casefold()
     if "main" not in readme or "production" not in readme:
         errors.append("README must preserve main-vs-production release posture")
-    for required_phrase in REQUIRED_README_SEMANTICS:
+    for required_phrase in ("operational ai systems", "revenue recovery", "agent reliability", "guardian"):
         if required_phrase not in readme:
             errors.append(f"README missing current brand semantic: {required_phrase}")
-    for legacy_phrase in FORBIDDEN_README_LEGACY_FRAMING:
+    for legacy_phrase in (
+        "human-controlled ai crm and automation for small businesses in latin america",
+        "human-controlled ai crm and workflow automation for small businesses in latin america",
+        "helps small businesses organize customer conversations",
+    ):
         if legacy_phrase in readme:
-            errors.append(f"README contains legacy CRM/LATAM framing: {legacy_phrase}")
+            errors.append("README contains legacy CRM/LATAM positioning")
     for field in ("domain", "application_sha", "deployment_id"):
         value = str(production_lock[field]).casefold()
         if value not in readme:
