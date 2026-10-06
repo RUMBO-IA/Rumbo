@@ -1,6 +1,6 @@
 {
   "schema": "rumbo.public-protected-authority-anchor/v1",
-  "observed_at": "2026-10-02T19:57:50.305973Z",
+  "observed_at": "2026-10-06T03:00:00Z",
   "authority_effect": "PRIVATE_CONTROL_PROMOTION_ANCHOR",
   "public_authority": {
     "repository": "RUMBO-IA/Rumbo",
@@ -18,8 +18,8 @@
     "kind": "PRIVATE_CONTROL_REPOSITORY",
     "repository": "RUMBO-IA/rumbo-control-queue",
     "repository_identity_sha256": "91032dab12172e730c93b2032b03d59df1401339ef1681af0a86158c723eb8a7",
-    "authorized_main_sha": "14d6cf5cc0fad22d123bb651c06f3b9737b29e57",
-    "authorized_tree_sha": "0ddf26cb2ae61181b3db421522a29f08818df733"
+    "authorized_main_sha": "b667881e6c28edff88225e24b95085892f3c8802",
+    "authorized_tree_sha": "62c60f967e9c0f2284c6dc8ae1929619a4ae2539"
   },
   "private_native_enforcement": {
     "state": "DISABLED_ON_GITHUB_FREE_PRIVATE_REPOSITORY",
