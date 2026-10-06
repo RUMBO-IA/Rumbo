@@ -205,7 +205,7 @@ class PublicProductionSurfaceTests(unittest.TestCase):
             pathlib.Path("."),
             {
                 "domain": "rumbo.verso.fans",
-                "application_sha": "a" * 40,
+                "application_sha": next(iter(surface.LEGACY_PRE_TRUST_CENTER_APPLICATION_SHAS)),
                 "deployment_id": "dpl_test",
             },
             1.0,
