@@ -11,7 +11,7 @@ BASE_README = "# RUMBO IA — Operational AI Systems\nHuman-controlled Operation
 SECONDARY = "<title>RUMBO IA</title><p>Human-controlled AI workspace.</p>"
 SECONDARY_README = "# RUMBO IA secondary landing\nHuman-controlled candidate surface. Production promotion requires a publication receipt."
 LEGAL = "<title>RUMBO IA</title><p>Legal information for RUMBO IA.</p>"
-TRUST_DOC = "<title>RUMBO IA Trust</title><p>Operational trust information for RUMBO IA.</p>"
+TRUST_DOC = "<title>RUMBO IA Trust</title><p>Operational trust information for RUMBO IA with human control.</p>"
 SUPPORT = "<title>RUMBO IA | Operational AI Systems Support</title><p>Operational AI Systems with human control.</p><p>Revenue Recovery · Agent Reliability · Guardian</p>"
 REGISTRY = {
     "schema_version": 1,
@@ -214,6 +214,24 @@ class BrandContractTests(unittest.TestCase):
             make_surface(root, readme=legacy)
             errors = brand.verify(root)
             self.assertTrue(any("README contains legacy CRM/LATAM positioning" in e for e in errors), errors)
+
+    def test_readme_rejects_original_legacy_crm_latam_positioning(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = pathlib.Path(td)
+            legacy = BASE_README + "\nHuman-controlled AI CRM and automation for small businesses in Latin America."
+            make_surface(root, readme=legacy)
+            errors = brand.verify(root)
+            self.assertTrue(any("README contains legacy CRM/LATAM positioning" in e for e in errors), errors)
+
+    def test_nonlegal_trust_page_requires_human_control(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = pathlib.Path(td); make_surface(root)
+            (root / "security.html").write_text(
+                "<title>RUMBO IA Security</title><p>Operational security controls.</p>",
+                encoding="utf-8",
+            )
+            errors = brand.verify(root)
+            self.assertTrue(any("security.html" in e and "human-control" in e for e in errors), errors)
 
     def test_trust_center_required_surfaces_fail_closed_when_missing(self):
         with tempfile.TemporaryDirectory() as td:
