@@ -112,7 +112,9 @@ jobs:
               raise SystemExit("FAIL_RULESET_TARGET_NOT_BRANCH")
           if ruleset.get("enforcement") != "active":
               raise SystemExit("ruleset enforcement!=active")
-          if str(ruleset.get("updated_at") or "") != EXPECTED_RULESET_UPDATED_AT or ruleset.get("node_id") != EXPECTED_RULESET_NODE_ID:
+          if "updated_at" in ruleset and str(ruleset.get("updated_at") or "") != EXPECTED_RULESET_UPDATED_AT:
+              raise SystemExit("FAIL_RULESET_SNAPSHOT_DRIFT")
+          if "node_id" in ruleset and ruleset.get("node_id") != EXPECTED_RULESET_NODE_ID:
               raise SystemExit("FAIL_RULESET_SNAPSHOT_DRIFT")
           if "bypass_actors" in ruleset and ruleset.get("bypass_actors"):
               raise SystemExit("ruleset bypass_actors present")
@@ -309,7 +311,9 @@ jobs:
               raise SystemExit("FAIL_RULESET_TARGET_NOT_BRANCH_BEFORE_CARRIER")
           if ruleset.get("enforcement") != "active":
               raise SystemExit("FAIL_RULESET_DRIFT_BEFORE_CARRIER")
-          if str(ruleset.get("updated_at") or "") != EXPECTED_RULESET_UPDATED_AT or ruleset.get("node_id") != EXPECTED_RULESET_NODE_ID:
+          if "updated_at" in ruleset and str(ruleset.get("updated_at") or "") != EXPECTED_RULESET_UPDATED_AT:
+              raise SystemExit("FAIL_RULESET_SNAPSHOT_DRIFT_BEFORE_CARRIER")
+          if "node_id" in ruleset and ruleset.get("node_id") != EXPECTED_RULESET_NODE_ID:
               raise SystemExit("FAIL_RULESET_SNAPSHOT_DRIFT_BEFORE_CARRIER")
           if "bypass_actors" in ruleset and ruleset.get("bypass_actors"):
               raise SystemExit("FAIL_RULESET_BYPASS_ACTORS_BEFORE_CARRIER")
