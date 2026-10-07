@@ -80,6 +80,7 @@ LEGACY_METADATA_EXCEPTIONS = {
     "3fa70aa3446acf36f678e42bf348399b563e8370": frozenset({"author-name", "committer-name"}),
     "bedb3089919a623b2ebc21dc4b1c8cbf8810fa92": frozenset({"author-name", "committer-name"}),
     "0e332a336a65c8602808feb23ef91f9a6ffb11ce": frozenset({"author-name", "committer-name"}),
+    "a82290c0ac4c2f193bcdf483e18ab57da97a1666": frozenset({"author-name", "committer-name"}),
 }
 
 
