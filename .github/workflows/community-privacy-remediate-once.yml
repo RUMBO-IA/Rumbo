@@ -1,0 +1,141 @@
+name: One-time community privacy remediation
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - reopened
+      - synchronize
+
+permissions:
+  contents: write
+
+jobs:
+  remediate:
+    if: >-
+      github.repository == 'RUMBO-IA/Rumbo' &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.head.ref == 'ops/community-labs-remediate-v2-2026-10-07' &&
+      github.event.pull_request.base.ref == 'main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out exact helper head
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Build privacy-clean candidate and remove helper branch
+        shell: bash
+        env:
+          EXPECTED_BASE: 525b152bb6679db887c1d8c4f28bf993bda294ad
+          SOURCE_BRANCH: feat/community-labs-v1-clean-2026-10-07
+          EXPECTED_SOURCE: 9d2600b8909879621ffe20f09035dc8a7a4e45f8
+          HELPER_BRANCH: ops/community-labs-remediate-v2-2026-10-07
+          TARGET_BRANCH: feat/community-labs-v2-privacy-clean-2026-10-07
+          EXPECTED_HELPER_HEAD: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+
+          test "$(git rev-parse HEAD)" = "$EXPECTED_HELPER_HEAD"
+          git fetch origin main "$SOURCE_BRANCH" --quiet
+          test "$(git rev-parse origin/main)" = "$EXPECTED_BASE"
+          test "$(git rev-parse "origin/$SOURCE_BRANCH")" = "$EXPECTED_SOURCE"
+
+          if git ls-remote --exit-code --heads origin "refs/heads/$TARGET_BRANCH" >/dev/null 2>&1; then
+            echo "TARGET_BRANCH_ALREADY_EXISTS"
+            exit 12
+          fi
+
+          paths=(
+            ".devcontainer/devcontainer.json"
+            ".github/CODEOWNERS"
+            ".github/ISSUE_TEMPLATE/bug_report.yml"
+            ".github/ISSUE_TEMPLATE/community_idea.yml"
+            ".github/PULL_REQUEST_TEMPLATE.md"
+            "CODE_OF_CONDUCT.md"
+            "docs/community/RUMBO_LABS_V1.md"
+          )
+
+          tmp="$(mktemp -d)"
+          trap 'rm -rf "$tmp"' EXIT
+
+          for p in "${paths[@]}"; do
+            mkdir -p "$tmp/$(dirname "$p")"
+            git show "origin/$SOURCE_BRANCH:$p" > "$tmp/$p"
+          done
+
+          python - "$tmp" <<'PY'
+          from pathlib import Path
+          import sys
+
+          root = Path(sys.argv[1])
+
+          replacements = {
+              ".github/ISSUE_TEMPLATE/community_idea.yml": {
+                  "        - Public documentation / developer experience":
+                  "        - Documentation / usability",
+              },
+              ".github/PULL_REQUEST_TEMPLATE.md": {
+                  "- [ ] Accessibility / developer experience":
+                  "- [ ] Accessibility / usability",
+              },
+              "docs/community/RUMBO_LABS_V1.md": {
+                  "RUMBO needs two independent contribution surfaces:":
+                  "RUMBO uses two collaboration areas:",
+                  "Open Lab content may include only material that is already safe to publish: public code, examples, tests, documentation, synthetic fixtures, defensive research, and public developer tooling.":
+                  "Open Lab accepts publishable code, examples, tests, documentation, synthetic fixtures, defensive research, and tooling.",
+              },
+          }
+
+          for rel, mapping in replacements.items():
+              path = root / rel
+              text = path.read_text(encoding="utf-8")
+              for old, new in mapping.items():
+                  if old not in text:
+                      raise SystemExit(f"EXPECTED_TEXT_NOT_FOUND:{rel}")
+                  text = text.replace(old, new, 1)
+              path.write_text(text, encoding="utf-8")
+          PY
+
+          git switch --detach "$EXPECTED_BASE"
+
+          for p in "${paths[@]}"; do
+            mkdir -p "$(dirname "$p")"
+            cp "$tmp/$p" "$p"
+          done
+
+          git add -- "${paths[@]}"
+
+          expected="$(printf '%s\n' "${paths[@]}" | LC_ALL=C sort)"
+          actual="$(git diff --cached --name-only | LC_ALL=C sort)"
+          test "$actual" = "$expected"
+
+          git config user.name "RUMBO Privacy Automation"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          GIT_AUTHOR_NAME="RUMBO Privacy Automation" \
+          GIT_AUTHOR_EMAIL="41898282+github-actions[bot]@users.noreply.github.com" \
+          GIT_COMMITTER_NAME="RUMBO Privacy Automation" \
+          GIT_COMMITTER_EMAIL="41898282+github-actions[bot]@users.noreply.github.com" \
+            git commit -m "docs(community): establish privacy-clean RUMBO Labs model"
+
+          test "$(git rev-parse HEAD^)" = "$EXPECTED_BASE"
+          test "$(git show -s --format=%an HEAD)" = "RUMBO Privacy Automation"
+          test "$(git show -s --format=%ae HEAD)" = "41898282+github-actions[bot]@users.noreply.github.com"
+          test "$(git show -s --format=%cn HEAD)" = "RUMBO Privacy Automation"
+          test "$(git show -s --format=%ce HEAD)" = "41898282+github-actions[bot]@users.noreply.github.com"
+
+          final="$(git diff --name-only "$EXPECTED_BASE"...HEAD | LC_ALL=C sort)"
+          test "$final" = "$expected"
+
+          git push origin "HEAD:refs/heads/$TARGET_BRANCH"
+
+          helper_remote="$(git ls-remote --heads origin "refs/heads/$HELPER_BRANCH" | awk '{print $1}')"
+          test "$helper_remote" = "$EXPECTED_HELPER_HEAD"
+          git push origin ":refs/heads/$HELPER_BRANCH"
+
+          echo "PRIVACY_CLEAN_SHA=$(git rev-parse HEAD)"
