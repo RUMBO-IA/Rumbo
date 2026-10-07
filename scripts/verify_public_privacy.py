@@ -74,6 +74,12 @@ LEGACY_METADATA_EXCEPTIONS = {
     "552113dae9099835f61b4a44475d858da240146a": frozenset(
         {"committer-name"}
     ),
+    # PR #353 exact-head tree was validated before promotion, but GitHub's
+    # server-side rebase recreated the public-main commit with only the
+    # committer display name rewritten. Keep this exact-SHA/exact-field only.
+    "2d8b86c86d6ce0da2b98145b5a75e002367efe6b": frozenset(
+        {"committer-name"}
+    ),
 }
 
 

@@ -167,6 +167,12 @@ class PrivacyGateRegressionTests(unittest.TestCase):
         self.assertIn(f"git:commit:{other}:committer-name", violations)
         self.assertIn(f"git:commit:{other}:committer-email", violations)
 
+    def test_pr353_server_rebase_exception_is_exact_sha_and_field(self):
+        integrated = "2d8b86c86d6ce0da2b98145b5a75e002367efe6b"
+        self.assertTrue(gate.is_legacy_metadata_exception(integrated, "committer-name"))
+        self.assertFalse(gate.is_legacy_metadata_exception(integrated, "committer-email"))
+        self.assertFalse(gate.is_legacy_metadata_exception("f" * 40, "committer-name"))
+
     def test_full_ancestry_metadata_scan_passes_current_clean_history(self):
         self.assertEqual(gate.commit_metadata_violations("HEAD", set()), [])
 
