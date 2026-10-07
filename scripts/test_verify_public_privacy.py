@@ -134,6 +134,8 @@ class PrivacyGateRegressionTests(unittest.TestCase):
             "bedb3089919a623b2ebc21dc4b1c8cbf8810fa92",
             "0e332a336a65c8602808feb23ef91f9a6ffb11ce",
             "a82290c0ac4c2f193bcdf483e18ab57da97a1666",
+            "0adfe4671885bb6ab635153c174fc4b96a43802b",
+            "80bec0fa82cc76ba2e6ab68b80c534a87c3f9e85",
         ):
             self.assertTrue(gate.is_legacy_metadata_exception(commit_sha, "author-name"))
             self.assertTrue(gate.is_legacy_metadata_exception(commit_sha, "committer-name"))
