@@ -4,17 +4,25 @@ This repository is RUMBO's public product and engineering surface. It is not the
 
 ## Choose the correct collaboration lane
 
-### Public Open Lab
+### Public product/community front door — this repository
 
-Use this repository for public code, documentation, tests, reproducible examples, synthetic fixtures, accessibility/usability work, and other changes that are safe to review in public.
+`RUMBO-IA/Rumbo` is the public product and community front door. For people who are not repository collaborators, the default contribution path here is:
 
-Public contributors normally work through:
+`bug / idea / analysis -> Issue or Collaboration proposal -> maintainer triage`
 
-`Issue or proposal -> personal fork -> contributor branch -> pull request -> CI -> maintainer review`
+External code pull requests to this repository are not an accepted integration path. If one is opened, maintainers may inspect it as evidence or a prototype, then close or redirect it. It does not become mergeable merely because CI runs.
 
-A GitHub organization membership is not required.
+Repository collaborators may use pull requests for governed product changes under the existing authority controls.
 
-Focused pull requests are welcome on this public surface. Search existing Issues and pull requests first and keep each change narrow enough to review.
+### Public Open Lab — dedicated repository
+
+Community code contributions belong in the future `RUMBO-IA/rumbo-open-lab` repository after it is provisioned with an explicit outbound license and approved inbound-contribution terms.
+
+The Open Lab contribution path will be:
+
+`Issue or proposal -> personal fork of rumbo-open-lab -> contributor branch -> secretless untrusted CI -> maintainer review -> internal acceptance candidate`
+
+A GitHub organization membership is not required for the public fork path.
 
 ### Private Closed Lab
 
@@ -24,14 +32,16 @@ Work that requires non-public collaboration belongs in a dedicated private lab r
 
 Sensitive canonical repositories use a stricter collaborator-only model. An external contributor should not prepare changes for those repositories unless a maintainer explicitly opens that path.
 
-## Suitable public contributions
+## Suitable public input on this repository
 
-- fixes to the public website or documentation;
-- tests and improvements for privacy, commercial-coherence, and security-header verification;
-- accessibility and usability improvements;
-- focused public engineering utilities;
-- examples or synthetic fixtures that do not expose private state;
-- narrowly scoped fixes that preserve human supervision and documented boundaries.
+- reproducible bug reports and sanitized diagnostics;
+- root-cause analysis and technical observations;
+- accessibility and usability feedback;
+- focused design proposals;
+- public-safe documentation corrections proposed through an Issue;
+- ideas for examples, tests, tools, or synthetic fixtures that may later belong in the Open Lab.
+
+Maintainers may implement an accepted idea directly in this repository or move an explicitly publishable work item into the dedicated Open Lab once that repository is active.
 
 ## Do not include
 
@@ -43,7 +53,9 @@ Sensitive canonical repositories use a stricter collaborator-only model. An exte
 
 ## Before opening a pull request
 
-Run the public privacy regression tests, commercial-coherence tests, security-header verifier, and `git diff --check`.
+If you are not a repository collaborator, open an Issue or Collaboration proposal instead of preparing an integration PR against `RUMBO-IA/Rumbo`.
+
+Repository collaborators opening governed product PRs must run the public privacy regression tests, commercial-coherence tests, security-header verifier, and `git diff --check`.
 
 Explain:
 - the problem;
@@ -51,7 +63,7 @@ Explain:
 - how you tested it;
 - whether the change needs any external service, credential, paid resource, or network access.
 
-Any external cost must be clearly opt-in. The default contribution path must remain usable without RUMBO-funded compute.
+Any external cost must be clearly opt-in. The default community path must remain usable without RUMBO-funded compute.
 
 ## Contribution does not imply authority
 
@@ -75,12 +87,12 @@ Use the **Collaboration proposal** Issue form. Repeated useful contributions may
 
 ## Interim external-contribution acceptance gate
 
-Public pull requests from third parties may be opened and reviewed while RUMBO finalizes the Open Lab licensing and inbound-contribution policy.
+GitHub may technically allow a third party to open a pull request against this public repository. Such a pull request is evaluation-only and may be closed or redirected to an Issue.
 
-Until this public repository publishes an explicit outbound license and an approved inbound-contribution policy:
+Until the dedicated Open Lab publishes an explicit outbound license and approved inbound-contribution policy:
 
-- maintainers may discuss, review, test, and request changes to an external contribution;
-- externally authored code or documentation is not authorized for merge as an accepted Open Lab contribution;
+- maintainers may inspect an external patch as evidence or a prototype;
+- externally authored code or documentation is not authorized for merge as an accepted community contribution;
 - no public pull request creates employment, partnership, repository authority, or a license grant by implication;
 - do not submit material whose ownership or submission rights are uncertain.
 

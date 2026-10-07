@@ -1,6 +1,10 @@
 ## Scope
 Describe the smallest public-surface change this PR proposes.
 
+## Repository-authority lane
+- [ ] I am an authorized repository collaborator proposing a governed `RUMBO-IA/Rumbo` change.
+- [ ] I am an external contributor and understand that PRs against this front-door repository are evaluation-only; community code belongs in `rumbo-open-lab` once that repository is activated.
+
 ## Contribution lane
 - [ ] Public documentation / website
 - [ ] Public test / verifier

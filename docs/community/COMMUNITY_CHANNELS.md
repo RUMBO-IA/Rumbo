@@ -8,7 +8,11 @@ Use for reproducible bugs, scoped proposals, collaboration proposals, and work t
 
 ## GitHub Pull Requests
 
-Use for reviewable source changes. A pull request is the evidence-bearing path for code integration.
+In `RUMBO-IA/Rumbo`, pull requests are the governed integration path for repository collaborators. External contributors should normally start with an Issue or Collaboration proposal.
+
+Once `RUMBO-IA/rumbo-open-lab` is activated, fork pull requests there become the public community code path.
+
+A pull request is evidence, not authority: review, acceptance, integration, deployment, and production authorization remain separate states.
 
 ## GitHub Discussions
 

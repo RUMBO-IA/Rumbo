@@ -23,15 +23,17 @@ A browser profile, GitHub account, OpenAI/Codex account, API identity, and produ
 
 ## 3. Open Lab
 
-Current public upstream: `RUMBO-IA/Rumbo`.
+Target public repository: `RUMBO-IA/rumbo-open-lab`.
 
-Default contribution path:
+It is not yet provisioned. Until it exists with approved license and inbound terms, `RUMBO-IA/Rumbo` acts as the public product/community front door and external contributors should use Issues and collaboration proposals rather than product-code integration PRs.
 
-`idea/bug -> issue -> contributor fork -> contributor branch -> pull request -> untrusted CI -> maintainer review -> governed merge candidate`
+Once activated, the Open Lab contribution path is:
 
-Community contributors do **not** need direct write access to the upstream repository. Public forks are the default sandbox for source collaboration.
+`idea/bug -> issue -> contributor fork of rumbo-open-lab -> contributor branch -> secretless untrusted CI -> maintainer review -> internal acceptance candidate`
 
-Open Lab accepts publishable code, examples, tests, documentation, synthetic fixtures, defensive research, and tooling.
+Community contributors do **not** need organization membership or direct upstream write access. Public forks are the default source sandbox.
+
+Open Lab may accept explicitly publishable code, examples, tests, documentation, synthetic fixtures, defensive research, and tooling.
 
 Never place private control-plane state, customer data, credentials, production secrets, private provider identifiers, or non-public business records in this lane.
 
@@ -61,7 +63,7 @@ Use the minimum role that satisfies the task:
 
 | Persona | Default access |
 | --- | --- |
-| Public contributor | No upstream membership; fork + PR |
+| Public contributor | Issues/proposals on Rumbo; fork + PR on Open Lab once active |
 | Community triager | Triage on public repo only |
 | Trusted public maintainer | Write only where needed |
 | Private lab contributor | Write on Closed Lab only |
@@ -77,11 +79,12 @@ Outside collaborators should be preferred over full organization membership when
 
 Preferred zero-new-spend sequence:
 
-1. Contributor forks `RUMBO-IA/Rumbo`.
-2. Contributor opens the fork in their own local dev container or personal GitHub Codespaces quota.
-3. The environment receives no RUMBO production secrets.
-4. The contributor opens a PR against upstream.
-5. Fork PR workflows are treated as untrusted and receive no secrets.
+1. Contributor discusses the work through `RUMBO-IA/Rumbo` Issues or the Open Lab issue tracker.
+2. Once the dedicated Open Lab is active, the contributor forks `RUMBO-IA/rumbo-open-lab`.
+3. Contributor opens the fork in their own local dev container or personal GitHub Codespaces quota.
+4. The environment receives no RUMBO production secrets.
+5. The contributor opens a PR against the Open Lab upstream.
+6. Fork PR workflows are treated as untrusted, receive no repository/organization secrets, and run only on GitHub-hosted or contributor-owned isolated compute.
 
 ### Private
 
@@ -112,7 +115,7 @@ GitHub is the authority for source collaboration. A Discord or other chat commun
 Recommended public intake:
 
 - GitHub Issues for bugs and scoped ideas;
-- Pull Requests for proposed code;
+- Pull Requests for governed collaborator changes in `RUMBO-IA/Rumbo`, and for public community code in the dedicated Open Lab once activated;
 - GitHub Discussions for Q&A, proposals, showcases, and community coordination when enabled;
 - private vulnerability reporting for undisclosed security issues.
 
@@ -156,7 +159,7 @@ Public contributors need no private-access record unless they are promoted to a 
 
 This model must operate with no new paid service by default.
 
-Public collaboration can work entirely through GitHub public forks, pull requests, Issues, local Dev Containers, and contributors' own included resources.
+Public collaboration can work entirely through Issues and Discussions on the front door plus, once activated, Open Lab forks and pull requests, local Dev Containers, and contributors' own included resources.
 
 Any private-seat, Codespaces, Actions, cloud sandbox, storage, AI, or marketplace action that may create new spend remains blocked until cost is proven to be USD 0 or separately authorized.
 
@@ -171,4 +174,4 @@ The collaboration model should be implemented as separate repositories, not only
 
 This boundary limits license spillover and access spillover. Publishing or licensing Open Lab material does not publish, license, or authorize access to Core, Closed Lab, customer data, production credentials, or unrelated RUMBO source.
 
-Until `rumbo-open-lab` is provisioned with approved license and inbound terms, `RUMBO-IA/Rumbo` may accept Issues, proposals and reviewable pull requests for evaluation, but externally authored contributions remain non-mergeable under the interim acceptance policy.
+Until `rumbo-open-lab` is provisioned with approved license and inbound terms, `RUMBO-IA/Rumbo` accepts Issues and proposals as the external intake path. Third-party product-code pull requests are evaluation-only if opened and may be closed or redirected; they are not an accepted integration path.
