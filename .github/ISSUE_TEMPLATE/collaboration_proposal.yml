@@ -1,0 +1,57 @@
+name: Collaboration proposal
+description: Propose a bounded way to contribute to RUMBO beyond a single bug or idea.
+title: "[Collaboration] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form for public collaboration proposals. Do not include credentials, client data, private repository content, unreleased security details, or production information.
+
+  - type: textarea
+    id: goal
+    attributes:
+      label: What would you like to contribute?
+      description: Describe the outcome, not access you think you need.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: lane
+    attributes:
+      label: Best-fit lane
+      options:
+        - Public Open Lab
+        - Documentation / examples
+        - Testing / quality
+        - Community support / triage
+        - Private Closed Lab may eventually be needed
+        - Not sure
+    validations:
+      required: true
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Relevant work or evidence
+      description: Link public work, prior contributions, a minimal prototype, or explain your experience. Do not share private material.
+
+  - type: textarea
+    id: resources
+    attributes:
+      label: External services or resources
+      description: State whether the proposal requires cloud compute, APIs, paid tools, datasets, credentials, or other external dependencies.
+      placeholder: "None" is a valid answer.
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: boundaries
+    attributes:
+      label: Safety boundaries
+      options:
+        - label: I will not post secrets, client data, private repository content, or undisclosed vulnerability details.
+          required: true
+        - label: I understand that a proposal or contribution does not grant repository, merge, deployment, or production authority.
+          required: true
+        - label: I understand that RUMBO may keep the work on the public fork/PR path without granting organization membership.
+          required: true
