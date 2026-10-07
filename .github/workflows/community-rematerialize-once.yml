@@ -1,0 +1,100 @@
+name: One-time community branch rematerializer
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - reopened
+      - synchronize
+
+permissions:
+  contents: write
+
+jobs:
+  rematerialize:
+    if: >-
+      github.repository == 'RUMBO-IA/Rumbo' &&
+      github.event.pull_request.number == 323 &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.head.ref == 'feat/community-labs-v1-2026-10-07' &&
+      github.event.pull_request.base.ref == 'main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out exact PR head
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Rematerialize audited files on clean branch
+        shell: bash
+        env:
+          EXPECTED_BASE: 525b152bb6679db887c1d8c4f28bf993bda294ad
+          EXPECTED_HEAD: ${{ github.event.pull_request.head.sha }}
+          TARGET_BRANCH: feat/community-labs-v1-clean-2026-10-07
+        run: |
+          set -euo pipefail
+
+          test "$(git rev-parse HEAD)" = "$EXPECTED_HEAD"
+          git fetch origin main --quiet
+          test "$(git rev-parse origin/main)" = "$EXPECTED_BASE"
+
+          if git ls-remote --exit-code --heads origin "refs/heads/$TARGET_BRANCH" >/dev/null 2>&1; then
+            echo "TARGET_BRANCH_ALREADY_EXISTS"
+            exit 12
+          fi
+
+          paths=(
+            ".devcontainer/devcontainer.json"
+            ".github/CODEOWNERS"
+            ".github/ISSUE_TEMPLATE/bug_report.yml"
+            ".github/ISSUE_TEMPLATE/community_idea.yml"
+            ".github/PULL_REQUEST_TEMPLATE.md"
+            "CODE_OF_CONDUCT.md"
+            "docs/community/RUMBO_LABS_V1.md"
+          )
+
+          tmp="$(mktemp -d)"
+          trap 'rm -rf "$tmp"' EXIT
+
+          for p in "${paths[@]}"; do
+            mkdir -p "$tmp/$(dirname "$p")"
+            git show "$EXPECTED_HEAD:$p" > "$tmp/$p"
+          done
+
+          git switch --detach "$EXPECTED_BASE"
+
+          for p in "${paths[@]}"; do
+            mkdir -p "$(dirname "$p")"
+            cp "$tmp/$p" "$p"
+          done
+
+          git add -- "${paths[@]}"
+
+          expected="$(printf '%s\n' "${paths[@]}" | LC_ALL=C sort)"
+          actual="$(git diff --cached --name-only | LC_ALL=C sort)"
+          test "$actual" = "$expected"
+
+          git config user.name "RUMBO Privacy Automation"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          GIT_AUTHOR_NAME="RUMBO Privacy Automation" \
+          GIT_AUTHOR_EMAIL="41898282+github-actions[bot]@users.noreply.github.com" \
+          GIT_COMMITTER_NAME="RUMBO Privacy Automation" \
+          GIT_COMMITTER_EMAIL="41898282+github-actions[bot]@users.noreply.github.com" \
+            git commit -m "docs(community): establish RUMBO Open Lab and Closed Lab model"
+
+          test "$(git rev-parse HEAD^)" = "$EXPECTED_BASE"
+          test "$(git show -s --format=%an HEAD)" = "RUMBO Privacy Automation"
+          test "$(git show -s --format=%ae HEAD)" = "41898282+github-actions[bot]@users.noreply.github.com"
+          test "$(git show -s --format=%cn HEAD)" = "RUMBO Privacy Automation"
+          test "$(git show -s --format=%ce HEAD)" = "41898282+github-actions[bot]@users.noreply.github.com"
+
+          final="$(git diff --name-only "$EXPECTED_BASE"...HEAD | LC_ALL=C sort)"
+          test "$final" = "$expected"
+
+          git push origin "HEAD:refs/heads/$TARGET_BRANCH"
+          echo "REMATERIALIZED_SHA=$(git rev-parse HEAD)"
