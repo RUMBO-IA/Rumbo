@@ -246,6 +246,94 @@ jobs:
               f.write(f"canonical_tree_sha={canonical_tree}\n")
               f.write(f"public_sha={public_sha}\n")
 
+  probe-runner-admission-hardening:
+    # Read-only feasibility probe. It does not enable the persistent carrier.
+    if: >-
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/main'
+    name: Probe QUG runner admission hardening · READ_ONLY
+    needs: authorize
+    runs-on: [self-hosted, Linux, X64, rumbo-ci-linux]
+    timeout-minutes: 5
+    permissions: {}
+    env:
+      PUBLIC_AUTHORITY_SHA: ${{ needs.authorize.outputs.public_sha }}
+    steps:
+      - name: Read-only runner job-hook feasibility
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          test "$RUNNER_OS" = "Linux"
+          test "$(hostname)" = "DESKTOP-QUGVQLB"
+          test "$GITHUB_REPOSITORY" = "RUMBO-IA/Rumbo"
+          test "$GITHUB_WORKFLOW_REF" = "RUMBO-IA/Rumbo/.github/workflows/qug-protected-trust-root-r1.yml@refs/heads/main"
+          test "$GITHUB_WORKFLOW_SHA" = "$PUBLIC_AUTHORITY_SHA"
+          test -r "$GITHUB_EVENT_PATH"
+          test -f "$GITHUB_EVENT_PATH"
+          test ! -L "$GITHUB_EVENT_PATH"
+
+          runner_root="$(realpath "$RUNNER_TEMP/../..")"
+          test -d "$runner_root"
+          test ! -L "$runner_root"
+
+          if test -w "$runner_root"; then
+            echo "RUMBO_RUNNER_ROOT_WRITABLE_BY_JOB_USER=true"
+          else
+            echo "RUMBO_RUNNER_ROOT_WRITABLE_BY_JOB_USER=false"
+          fi
+
+          env_file="$runner_root/.env"
+          if test -e "$env_file"; then
+            test -f "$env_file"
+            test ! -L "$env_file"
+            if test -w "$env_file"; then
+              echo "RUMBO_RUNNER_ENV_WRITABLE_BY_JOB_USER=true"
+            else
+              echo "RUMBO_RUNNER_ENV_WRITABLE_BY_JOB_USER=false"
+            fi
+          else
+            echo "RUMBO_RUNNER_ENV_PRESENT=false"
+          fi
+
+          if test -n "${ACTIONS_RUNNER_HOOK_JOB_STARTED:-}"; then
+            echo "RUMBO_JOB_STARTED_HOOK_CONFIGURED=true"
+          else
+            echo "RUMBO_JOB_STARTED_HOOK_CONFIGURED=false"
+          fi
+
+          if command -v sudo >/dev/null 2>&1 && sudo -n true >/dev/null 2>&1; then
+            echo "RUMBO_NONINTERACTIVE_SUDO_AVAILABLE=true"
+          else
+            echo "RUMBO_NONINTERACTIVE_SUDO_AVAILABLE=false"
+          fi
+
+          system_units="$(
+            systemctl list-unit-files --type=service --no-legend 'actions.runner.*' 2>/dev/null |
+              awk 'NF {count++} END {print count+0}'
+          )"
+          user_units="$(
+            systemctl --user list-unit-files --type=service --no-legend 'actions.runner.*' 2>/dev/null |
+              awk 'NF {count++} END {print count+0}'
+          )"
+          echo "RUMBO_SYSTEM_RUNNER_SERVICE_COUNT=$system_units"
+          echo "RUMBO_USER_RUNNER_SERVICE_COUNT=$user_units"
+
+          if test -d /etc/rumbo/runner-hooks && test ! -L /etc/rumbo/runner-hooks; then
+            if test -w /etc/rumbo/runner-hooks; then
+              echo "RUMBO_ROOT_HOOK_DIR_WRITABLE_BY_JOB_USER=true"
+            else
+              echo "RUMBO_ROOT_HOOK_DIR_WRITABLE_BY_JOB_USER=false"
+            fi
+          else
+            echo "RUMBO_ROOT_HOOK_DIR_PRESENT=false"
+          fi
+
+          echo "RUMBO_RUNNER_GUARD_PROBE=PASS"
+          echo "RUMBO_PROBE_MUTATION_PERFORMED=false"
+          echo "RUMBO_EXTERNAL_SPEND_USD=0"
+          echo "RUMBO_PRODUCTION=NO_GO"
+
   apply-desktop-authority:
     # R9 canonicalizes authority only. Persistent QUG activation remains
     # structurally impossible until server-side selected-workflow isolation

@@ -336,5 +336,52 @@ class ControlAuthorityAnchorTests(unittest.TestCase):
         self.assertIn(r'include\.path|includeif\..*\.path', materialize)
         self.assertIn('worktree add --detach "$wt" "$CANONICAL_SHA"', materialize)
 
+
+    def test_r14_runner_admission_probe_is_read_only_and_carrier_stays_inert(self):
+        workflow = self.trust_root_workflow()
+        probe_start = workflow.index("  probe-runner-admission-hardening:")
+        carrier_start = workflow.index("  apply-desktop-authority:", probe_start)
+        self.assertGreaterEqual(probe_start, 0)
+        self.assertGreater(carrier_start, probe_start)
+        probe = workflow[probe_start:carrier_start]
+
+        self.assertIn("Probe QUG runner admission hardening · READ_ONLY", probe)
+        self.assertIn("needs: authorize", probe)
+        self.assertIn("runs-on: [self-hosted, Linux, X64, rumbo-ci-linux]", probe)
+        self.assertIn('test "$GITHUB_REPOSITORY" = "RUMBO-IA/Rumbo"', probe)
+        self.assertIn("GITHUB_WORKFLOW_REF", probe)
+        self.assertIn("GITHUB_WORKFLOW_SHA", probe)
+        self.assertIn("ACTIONS_RUNNER_HOOK_JOB_STARTED", probe)
+        self.assertIn("RUMBO_NONINTERACTIVE_SUDO_AVAILABLE", probe)
+        self.assertIn("RUMBO_SYSTEM_RUNNER_SERVICE_COUNT", probe)
+        self.assertIn("RUMBO_USER_RUNNER_SERVICE_COUNT", probe)
+        self.assertIn("RUMBO_PROBE_MUTATION_PERFORMED=false", probe)
+        self.assertIn("RUMBO_EXTERNAL_SPEND_USD=0", probe)
+        self.assertIn("RUMBO_PRODUCTION=NO_GO", probe)
+
+        for forbidden in (
+            "chmod ",
+            "chown ",
+            "mkdir ",
+            "touch ",
+            "rm ",
+            "mv ",
+            "cp ",
+            "tee ",
+            "sed -i",
+            "systemctl restart",
+            "systemctl --user restart",
+            "git push",
+            "curl -X POST",
+            "curl -X PATCH",
+            "curl -X DELETE",
+        ):
+            self.assertNotIn(forbidden, probe)
+
+        carrier = workflow[carrier_start:]
+        self.assertIn("if: ${{ false }}", carrier)
+        self.assertIn("DISABLED_PENDING_RUNNER_POLICY", carrier)
+
+
 if __name__ == "__main__":
     unittest.main()
