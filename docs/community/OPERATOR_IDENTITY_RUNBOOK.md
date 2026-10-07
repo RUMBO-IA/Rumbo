@@ -66,7 +66,7 @@ Keep personal and RUMBO browser contexts separate and name them clearly.
 
 ## AI coding contexts
 
-Keep AI coding state separate from GitHub authority. Different OpenAI/Codex accounts or separate `CODEX_HOME` roots may isolate AI history and credentials, but they do not create independent GitHub reviewers.
+Keep AI coding state separate from GitHub authority. Different OpenAI/Codex accounts or separate `CODEX_HOME` roots may isolate AI history and credentials, but they do not create distinct GitHub reviewers.
 
 ## Three-role operator model
 
@@ -76,7 +76,7 @@ RUMBO may use these logical roles even when one human temporarily operates all t
 - **B — Builder:** normal development work.
 - **C — Automation / Test:** bounded automation and non-human verification.
 
-A, B, and C count as independent GitHub actors only after distinct GitHub identities are actually established and their permissions are separately verified.
+A, B, and C count as distinct GitHub actors only after separate GitHub identities are actually established and their permissions are separately verified.
 
 ## Pre-push proof
 

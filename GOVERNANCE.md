@@ -15,7 +15,7 @@ Minimum privilege is the default. A person receives only the repository role nee
 
 ## Authority states
 
-These states are independent:
+These states are separate:
 
 `CONTRIBUTED != REVIEWED != ACCEPTED != MERGED != DEPLOYED != PRODUCTION_AUTHORIZED != LIVE_EFFECT_VERIFIED`
 
@@ -35,7 +35,7 @@ Closed Lab access is invitation-only, repository-scoped, revocable, and separate
 
 ## Reviews and conflicts
 
-A contributor must not be treated as an independent reviewer of their own work merely because the same person operates another browser profile, AI account, automation context, or machine identity.
+A contributor must not be treated as a separate reviewer of their own work merely because the same person operates another browser profile, AI account, automation context, or machine identity.
 
 ## Cost boundary
 
