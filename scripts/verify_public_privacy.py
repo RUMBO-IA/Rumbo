@@ -67,6 +67,12 @@ LEGACY_METADATA_EXCEPTIONS = {
     "fb7de533ededc62fc6744a4c90f2d3cc314d5728": frozenset(
         {"committer-name"}
     ),
+    # Phase B R16 authority promotion was validated before GitHub wrote
+    # the repository-owner committer display name on public main. Keep the
+    # quarantine exact-SHA and exact-field only.
+    "552113dae9099835f61b4a44475d858da240146a": frozenset(
+        {"committer-name"}
+    ),
 }
 
 
