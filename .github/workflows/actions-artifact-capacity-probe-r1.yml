@@ -1,0 +1,33 @@
+name: RUMBO Actions Artifact Capacity Probe R1
+
+on:
+  push:
+    branches:
+      - ops/artifact-capacity-probe-r1-20261007
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rumbo-actions-artifact-capacity-probe-r1
+  cancel-in-progress: true
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Create tiny non-authority probe
+        shell: bash
+        run: |
+          set -euo pipefail
+          printf '%s\n' 'RUMBO_ARTIFACT_CAPACITY_PROBE_R1' > /tmp/rumbo-artifact-capacity-probe.txt
+          wc -c /tmp/rumbo-artifact-capacity-probe.txt
+
+      - name: Upload tiny capacity probe
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: rumbo-artifact-capacity-probe-r1
+          path: /tmp/rumbo-artifact-capacity-probe.txt
+          retention-days: 1
+          if-no-files-found: error
