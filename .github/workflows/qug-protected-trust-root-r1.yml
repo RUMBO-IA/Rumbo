@@ -38,6 +38,8 @@ jobs:
 
           SHA = re.compile(r"^[0-9a-f]{40}$")
           EXPECTED_RULESET_ID = 22317339
+          EXPECTED_RULESET_UPDATED_AT = "2026-10-01T00:55:26.160-03:00"
+          EXPECTED_RULESET_NODE_ID = "RRS_lACqUmVwb3NpdG9yec5Qpw2wzgFUiRs"
           EXPECTED_PRIVACY_WORKFLOW_ID = 347174988
           EXPECTED_PRIVACY_WORKFLOW_PATH = ".github/workflows/privacy-gate.yml"
           EXPECTED_PRIVACY_WORKFLOW_BLOB = "1cb3ed7881961516b54fb5ab663890914440463a"
@@ -110,11 +112,11 @@ jobs:
               raise SystemExit("FAIL_RULESET_TARGET_NOT_BRANCH")
           if ruleset.get("enforcement") != "active":
               raise SystemExit("ruleset enforcement!=active")
-          if "bypass_actors" not in ruleset:
-              raise SystemExit("FAIL_RULESET_BYPASS_VISIBILITY")
-          if ruleset.get("bypass_actors"):
+          if str(ruleset.get("updated_at") or "") != EXPECTED_RULESET_UPDATED_AT or ruleset.get("node_id") != EXPECTED_RULESET_NODE_ID:
+              raise SystemExit("FAIL_RULESET_SNAPSHOT_DRIFT")
+          if "bypass_actors" in ruleset and ruleset.get("bypass_actors"):
               raise SystemExit("ruleset bypass_actors present")
-          if ruleset.get("current_user_can_bypass") != "never":
+          if "current_user_can_bypass" in ruleset and ruleset.get("current_user_can_bypass") != "never":
               raise SystemExit("FAIL_RULESET_CURRENT_USER_BYPASS")
           ref_name=((ruleset.get("conditions") or {}).get("ref_name") or {})
           includes=set(ref_name.get("include") or [])
@@ -267,6 +269,8 @@ jobs:
         run: |
           import json, os, urllib.parse, urllib.request
 
+          EXPECTED_RULESET_UPDATED_AT = "2026-10-01T00:55:26.160-03:00"
+          EXPECTED_RULESET_NODE_ID = "RRS_lACqUmVwb3NpdG9yec5Qpw2wzgFUiRs"
           EXPECTED_PRIVACY_WORKFLOW_ID = 347174988
           EXPECTED_PRIVACY_WORKFLOW_PATH = ".github/workflows/privacy-gate.yml"
           EXPECTED_PRIVACY_APP_ID = 15368
@@ -305,11 +309,11 @@ jobs:
               raise SystemExit("FAIL_RULESET_TARGET_NOT_BRANCH_BEFORE_CARRIER")
           if ruleset.get("enforcement") != "active":
               raise SystemExit("FAIL_RULESET_DRIFT_BEFORE_CARRIER")
-          if "bypass_actors" not in ruleset:
-              raise SystemExit("FAIL_RULESET_BYPASS_VISIBILITY_BEFORE_CARRIER")
-          if ruleset.get("bypass_actors"):
+          if str(ruleset.get("updated_at") or "") != EXPECTED_RULESET_UPDATED_AT or ruleset.get("node_id") != EXPECTED_RULESET_NODE_ID:
+              raise SystemExit("FAIL_RULESET_SNAPSHOT_DRIFT_BEFORE_CARRIER")
+          if "bypass_actors" in ruleset and ruleset.get("bypass_actors"):
               raise SystemExit("FAIL_RULESET_BYPASS_ACTORS_BEFORE_CARRIER")
-          if ruleset.get("current_user_can_bypass") != "never":
+          if "current_user_can_bypass" in ruleset and ruleset.get("current_user_can_bypass") != "never":
               raise SystemExit("FAIL_RULESET_BYPASS_CAPABILITY_BEFORE_CARRIER")
           ref_name=((ruleset.get("conditions") or {}).get("ref_name") or {})
           includes=set(ref_name.get("include") or [])

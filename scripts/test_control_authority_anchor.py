@@ -22,11 +22,11 @@ class ControlAuthorityAnchorTests(unittest.TestCase):
         data = self.load()
         guard.validate_static(data)
         self.assertEqual(
-            "ade8705d0f2c8fbbba922f23a0d838e97e25dbc7",
+            "00d8a3cdf96ddffd1ec09a8fb5487d70ee352fd5",
             data["subject"]["authorized_main_sha"],
         )
         self.assertEqual(
-            "1b4cd8ba09e98ead225a55d43b6f9168e68781ba",
+            "9ae06c0f3bc1cefa1e2fe6c34a443dd280ca63af",
             data["subject"]["authorized_tree_sha"],
         )
 
@@ -211,8 +211,8 @@ class ControlAuthorityAnchorTests(unittest.TestCase):
         marker = "Revalidate public authority immediately before carrier"
         self.assertIn(marker, workflow)
         pre_carrier = workflow[workflow.index(marker):]
-        self.assertIn('current_user_can_bypass") != "never"', pre_carrier)
-        self.assertIn("FAIL_RULESET_BYPASS_CAPABILITY_BEFORE_CARRIER", pre_carrier)
+        self.assertIn('EXPECTED_RULESET_UPDATED_AT = "2026-10-01T00:55:26.160-03:00"', pre_carrier)
+        self.assertIn("FAIL_RULESET_SNAPSHOT_DRIFT_BEFORE_CARRIER", pre_carrier)
         self.assertIn('if "~ALL" not in includes:', pre_carrier)
         self.assertIn("FAIL_RULESET_SCOPE_BEFORE_CARRIER", pre_carrier)
 
@@ -262,14 +262,17 @@ class ControlAuthorityAnchorTests(unittest.TestCase):
         self.assertIn("FAIL_RULESET_EXCLUSIONS_PRESENT", workflow)
         self.assertIn("FAIL_RULESET_EXCLUSIONS_BEFORE_CARRIER", workflow)
 
-    def test_ruleset_bypass_visibility_is_required_not_assumed(self):
+    def test_ruleset_snapshot_pin_covers_hidden_bypass_fields(self):
         workflow = self.trust_root_workflow()
-        self.assertIn('ruleset=get(f"https://api.github.com/repos/RUMBO-IA/Rumbo/rulesets/{EXPECTED_RULESET_ID}", token)', workflow)
-        self.assertIn('ruleset=get("https://api.github.com/repos/RUMBO-IA/Rumbo/rulesets/22317339", token)', workflow)
-        self.assertGreaterEqual(workflow.count('if "bypass_actors" not in ruleset:'), 2)
-        self.assertIn("FAIL_RULESET_BYPASS_VISIBILITY", workflow)
-        self.assertIn("FAIL_RULESET_BYPASS_VISIBILITY_BEFORE_CARRIER", workflow)
-        self.assertGreaterEqual(workflow.count('ruleset.get("current_user_can_bypass") != "never"'), 2)
+        stamp = 'EXPECTED_RULESET_UPDATED_AT = "2026-10-01T00:55:26.160-03:00"'
+        node = 'EXPECTED_RULESET_NODE_ID = "RRS_lACqUmVwb3NpdG9yec5Qpw2wzgFUiRs"'
+        self.assertGreaterEqual(workflow.count(stamp), 2)
+        self.assertGreaterEqual(workflow.count(node), 2)
+        self.assertIn("FAIL_RULESET_SNAPSHOT_DRIFT", workflow)
+        self.assertIn("FAIL_RULESET_SNAPSHOT_DRIFT_BEFORE_CARRIER", workflow)
+        self.assertGreaterEqual(workflow.count('if "bypass_actors" in ruleset and ruleset.get("bypass_actors"):'), 2)
+        self.assertNotIn('if "bypass_actors" not in ruleset:', workflow)
+        self.assertGreaterEqual(workflow.count('if "current_user_can_bypass" in ruleset and ruleset.get("current_user_can_bypass") != "never":'), 2)
 
     def test_private_fetch_uses_exact_https_origin_and_protocol_lockdown(self):
         workflow = self.trust_root_workflow()
