@@ -212,7 +212,7 @@ class ControlAuthorityAnchorTests(unittest.TestCase):
         self.assertIn(marker, workflow)
         pre_carrier = workflow[workflow.index(marker):]
         self.assertIn('EXPECTED_RULESET_UPDATED_AT = "2026-10-01T00:55:26.160-03:00"', pre_carrier)
-        self.assertIn("FAIL_RULESET_SNAPSHOT_DRIFT_BEFORE_CARRIER", pre_carrier)
+        self.assertIn("FAIL_RULESET_UPDATED_AT_DRIFT_BEFORE_CARRIER", pre_carrier)
         self.assertIn('if "~ALL" not in includes:', pre_carrier)
         self.assertIn("FAIL_RULESET_SCOPE_BEFORE_CARRIER", pre_carrier)
 
@@ -262,16 +262,19 @@ class ControlAuthorityAnchorTests(unittest.TestCase):
         self.assertIn("FAIL_RULESET_EXCLUSIONS_PRESENT", workflow)
         self.assertIn("FAIL_RULESET_EXCLUSIONS_BEFORE_CARRIER", workflow)
 
-    def test_ruleset_snapshot_is_visibility_aware_and_rejects_exposed_drift(self):
+    def test_ruleset_snapshot_normalizes_timestamp_and_rejects_exposed_drift(self):
         workflow = self.trust_root_workflow()
         stamp = 'EXPECTED_RULESET_UPDATED_AT = "2026-10-01T00:55:26.160-03:00"'
         node = 'EXPECTED_RULESET_NODE_ID = "RRS_lACqUmVwb3NpdG9yec5Qpw2wzgFUiRs"'
         self.assertGreaterEqual(workflow.count(stamp), 2)
         self.assertGreaterEqual(workflow.count(node), 2)
-        self.assertGreaterEqual(workflow.count('if "updated_at" in ruleset and'), 2)
+        self.assertGreaterEqual(workflow.count('if "updated_at" in ruleset:'), 2)
         self.assertGreaterEqual(workflow.count('if "node_id" in ruleset and'), 2)
-        self.assertIn("FAIL_RULESET_SNAPSHOT_DRIFT", workflow)
-        self.assertIn("FAIL_RULESET_SNAPSHOT_DRIFT_BEFORE_CARRIER", workflow)
+        self.assertGreaterEqual(workflow.count("parse_ruleset_time"), 4)
+        self.assertIn("FAIL_RULESET_UPDATED_AT_DRIFT", workflow)
+        self.assertIn("FAIL_RULESET_NODE_ID_DRIFT", workflow)
+        self.assertIn("FAIL_RULESET_UPDATED_AT_DRIFT_BEFORE_CARRIER", workflow)
+        self.assertIn("FAIL_RULESET_NODE_ID_DRIFT_BEFORE_CARRIER", workflow)
         self.assertGreaterEqual(workflow.count('if "bypass_actors" in ruleset and ruleset.get("bypass_actors"):'), 2)
         self.assertNotIn('if "bypass_actors" not in ruleset:', workflow)
         self.assertGreaterEqual(workflow.count('if "current_user_can_bypass" in ruleset and ruleset.get("current_user_can_bypass") != "never":'), 2)
