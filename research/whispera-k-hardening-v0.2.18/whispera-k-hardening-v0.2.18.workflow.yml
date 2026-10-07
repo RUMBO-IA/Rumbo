@@ -1,0 +1,180 @@
+name: Whispera K hardening v0.2.18
+
+on:
+  push:
+    branches:
+      - research/whispera-k-hardening-v0.2.18
+
+permissions:
+  contents: read
+
+concurrency:
+  group: whispera-k-hardening-v0.2.18
+  cancel-in-progress: true
+
+jobs:
+  harden-and-verify:
+    runs-on: windows-latest
+    timeout-minutes: 75
+    env:
+      BASE_REPO: https://github.com/kazu00001/Whispera-K.git
+      BASE_TAG: v0.2.18
+      BASE_SHA: 3bbd712e0391287a01d264af6bcac43023965ac6
+      FFMPEG_URL: https://github.com/BtbN/FFmpeg-Builds/releases/download/autobuild-2026-10-05-13-07/ffmpeg-n9.0.2-22-g46d8f462ee-win64-lgpl-9.0.zip
+      FFMPEG_SHA256: 1c73d2256f0198805daf0f765feab8d3f21d3ab85e8dda0c2bb44ce1e3a126c7
+    steps:
+      - name: Checkout RUMBO control files
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+      - name: Setup Node 22
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 22
+
+      - name: Setup stable Rust
+        shell: pwsh
+        run: |
+          rustup update stable
+          rustup default stable
+          rustc --version
+          cargo --version
+
+      - name: Clone exact Whispera base
+        shell: pwsh
+        run: |
+          git clone --depth 1 --branch "$env:BASE_TAG" "$env:BASE_REPO" whispera
+          $sha = (git -C whispera rev-parse HEAD).Trim()
+          if ($sha -ne $env:BASE_SHA) { throw "Base SHA mismatch: $sha" }
+          Write-Host "BASE_SHA_OK=$sha"
+
+      - name: Record expected RED on upstream security contract
+        shell: pwsh
+        run: |
+          node research/whispera-k-hardening-v0.2.18/verify-hardening.mjs whispera
+          $red = $LASTEXITCODE
+          if ($red -eq 0) { throw "Upstream unexpectedly satisfies the hardened contract; review overlay assumptions." }
+          Write-Host "EXPECTED_RED_EXIT=$red"
+          exit 0
+
+      - name: Apply RUMBO hardening overlay
+        shell: pwsh
+        run: |
+          ./research/whispera-k-hardening-v0.2.18/apply-hardening.ps1 -Root ./whispera
+
+      - name: Resolve hardened JavaScript lockfile without lifecycle scripts
+        working-directory: whispera/apps/desktop
+        shell: pwsh
+        run: |
+          npm install --package-lock-only --ignore-scripts
+          npm ci --ignore-scripts
+
+      - name: Install pinned FFmpeg 9.0.2 build with digest verification
+        shell: pwsh
+        run: |
+          $archive = Join-Path $env:RUNNER_TEMP 'ffmpeg.zip'
+          $extract = Join-Path $env:RUNNER_TEMP 'ffmpeg'
+          Invoke-WebRequest -Uri $env:FFMPEG_URL -OutFile $archive
+          $actual = (Get-FileHash $archive -Algorithm SHA256).Hash.ToLowerInvariant()
+          if ($actual -ne $env:FFMPEG_SHA256) { throw "FFmpeg archive hash mismatch: $actual" }
+          Expand-Archive -LiteralPath $archive -DestinationPath $extract -Force
+          $binary = Get-ChildItem $extract -Recurse -Filter ffmpeg.exe | Select-Object -First 1
+          if (-not $binary) { throw 'Pinned FFmpeg archive did not contain ffmpeg.exe' }
+          $vendor = 'whispera/apps/desktop/vendor/ffmpeg'
+          New-Item -ItemType Directory -Force $vendor | Out-Null
+          $target = Join-Path $vendor 'ffmpeg.exe'
+          Copy-Item $binary.FullName $target -Force
+          $license = Get-ChildItem $extract -Recurse -File | Where-Object { $_.Name -match '^(LICENSE|COPYING)(\.txt)?$' } | Select-Object -First 1
+          if ($license) { Copy-Item $license.FullName "$target.LICENSE" -Force } else { 'BtbN FFmpeg LGPL build; see upstream distribution for license texts.' | Set-Content "$target.LICENSE" -Encoding utf8 }
+          @(
+            'RUMBO hardened build FFmpeg provenance'
+            "URL=$env:FFMPEG_URL"
+            "ARCHIVE_SHA256=$env:FFMPEG_SHA256"
+            "BINARY_SHA256=$((Get-FileHash $target -Algorithm SHA256).Hash.ToLowerInvariant())"
+          ) | Set-Content "$target.README" -Encoding utf8
+          $versionOutput = & $target -version 2>&1
+          $ffmpegExit = $LASTEXITCODE
+          $versionOutput | Select-Object -First 3
+          if ($ffmpegExit -ne 0) { throw "Pinned FFmpeg did not execute: exit $ffmpegExit" }
+
+      - name: Install vendored library dependencies without scripts
+        working-directory: whispera/apps/desktop/vendor/edge-drop
+        run: npm ci --ignore-scripts
+
+      - name: Resolve hardened Rust lockfile
+        working-directory: whispera/apps/desktop/src-tauri
+        shell: pwsh
+        run: |
+          cargo update -p tauri --precise 2.12.0
+          cargo update -p tauri-runtime-wry --precise 2.12.0
+          cargo tree -p tauri
+          cargo tree -p tauri-runtime-wry
+          cargo tree -p tauri-plugin-updater
+
+      - name: Verify hardening contract GREEN
+        shell: pwsh
+        run: node research/whispera-k-hardening-v0.2.18/verify-hardening.mjs whispera
+
+      - name: Production npm vulnerability gate
+        working-directory: whispera/apps/desktop
+        run: npm audit --omit=dev --audit-level=high
+
+      - name: Full npm build-chain vulnerability gate
+        working-directory: whispera/apps/desktop
+        run: npm audit --audit-level=high
+
+      - name: Rust vulnerability gate
+        working-directory: whispera/apps/desktop/src-tauri
+        shell: pwsh
+        run: |
+          cargo install cargo-audit --locked
+          cargo audit
+
+      - name: Native tests
+        working-directory: whispera/apps/desktop/src-tauri
+        run: cargo test --locked
+
+      - name: Install Chromium for silent UI tests
+        working-directory: whispera/apps/desktop
+        run: npx playwright install chromium
+
+      - name: UI release regression suite
+        working-directory: whispera/apps/desktop
+        run: npm run test:release
+
+      - name: Build unsigned verification installer
+        working-directory: whispera/apps/desktop
+        shell: pwsh
+        run: |
+          '{"bundle":{"createUpdaterArtifacts":false}}' | Set-Content unsigned-build.json -Encoding utf8
+          npm run tauri build -- --bundles nsis --config unsigned-build.json
+
+      - name: Create receipts and patch artifact
+        shell: pwsh
+        run: |
+          $out = Join-Path $env:RUNNER_TEMP 'whispera-hardening-output'
+          New-Item -ItemType Directory -Force $out | Out-Null
+          git -C whispera diff --binary | Set-Content (Join-Path $out 'whispera-k-v0.2.18-rumbo-hardening.patch') -Encoding utf8
+          Copy-Item whispera/apps/desktop/package-lock.json (Join-Path $out 'package-lock.json')
+          Copy-Item whispera/apps/desktop/src-tauri/Cargo.lock (Join-Path $out 'Cargo.lock')
+          Copy-Item whispera/RUMBO_HARDENING.md (Join-Path $out 'RUMBO_HARDENING.md')
+          $exe = Get-ChildItem whispera/apps/desktop/src-tauri/target/release/bundle/nsis/*.exe | Select-Object -First 1
+          if (-not $exe) { throw 'Verification installer missing' }
+          Copy-Item $exe.FullName (Join-Path $out $exe.Name)
+          $receipts = [ordered]@{
+            base_tag = $env:BASE_TAG
+            base_sha = $env:BASE_SHA
+            ffmpeg_archive_sha256 = $env:FFMPEG_SHA256
+            ffmpeg_binary_sha256 = (Get-FileHash whispera/apps/desktop/vendor/ffmpeg/ffmpeg.exe -Algorithm SHA256).Hash.ToLowerInvariant()
+            installer_sha256 = (Get-FileHash $exe.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+            generated_at_utc = [DateTime]::UtcNow.ToString('o')
+            installer_signed_for_distribution = $false
+          }
+          $receipts | ConvertTo-Json | Set-Content (Join-Path $out 'receipts.json') -Encoding utf8
+          Get-ChildItem $out | Format-Table Name,Length
+
+      - name: Upload verified hardening artifacts
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: whispera-k-v0.2.18-rumbo-hardening
+          path: ${{ runner.temp }}/whispera-hardening-output/
+          retention-days: 14
