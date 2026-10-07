@@ -159,3 +159,16 @@ This model must operate with no new paid service by default.
 Public collaboration can work entirely through GitHub public forks, pull requests, Issues, local Dev Containers, and contributors' own included resources.
 
 Any private-seat, Codespaces, Actions, cloud sandbox, storage, AI, or marketplace action that may create new spend remains blocked until cost is proven to be USD 0 or separately authorized.
+
+## 13. Physical repository boundary
+
+The collaboration model should be implemented as separate repositories, not only as labels inside one codebase:
+
+- `RUMBO-IA/Rumbo`: public product/community front door and bootstrap governance;
+- `RUMBO-IA/rumbo-open-lab`: dedicated public, explicitly licensed Open Lab for community code;
+- `RUMBO-IA/rumbo-closed-lab`: dedicated private collaboration/incubation repository;
+- canonical private control/runtime repositories: separate Core authority.
+
+This boundary limits license spillover and access spillover. Publishing or licensing Open Lab material does not publish, license, or authorize access to Core, Closed Lab, customer data, production credentials, or unrelated RUMBO source.
+
+Until `rumbo-open-lab` is provisioned with approved license and inbound terms, `RUMBO-IA/Rumbo` may accept Issues, proposals and reviewable pull requests for evaluation, but externally authored contributions remain non-mergeable under the interim acceptance policy.

@@ -25,3 +25,11 @@ No automation may add or change the repository license without an explicit owner
 Until an owner-approved outbound license and inbound-contribution policy are published, third-party pull requests may be reviewed but must not be merged as accepted Open Lab contributions.
 
 This is an interim governance safeguard, not a contributor license agreement and not a grant of rights.
+
+## Recommended license scope boundary
+
+Prefer applying the future Open Lab license to a dedicated public repository such as `RUMBO-IA/rumbo-open-lab`, rather than assuming the same license covers every file in `RUMBO-IA/Rumbo`.
+
+A dedicated repository makes the publication boundary explicit and reduces accidental licensing of unrelated product, governance, brand, or operational material.
+
+Any license decision must identify the repository or files it actually covers.

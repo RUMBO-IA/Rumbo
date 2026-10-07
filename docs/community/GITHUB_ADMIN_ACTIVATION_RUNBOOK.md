@@ -46,3 +46,17 @@ After each administrative mutation:
 - record actor and timestamp;
 - confirm no billing-enabled feature was activated;
 - record the receipt in the canonical control-plane issue.
+
+## 0. Provision the dedicated public Open Lab
+
+Create `RUMBO-IA/rumbo-open-lab` as a public repository only after the Open Lab outbound license and inbound-contribution policy are owner-approved.
+
+Initial posture:
+- maintainers/owners only have direct write authority;
+- community contribution is fork-first;
+- no production secrets or customer data;
+- no direct deployment authority;
+- CODEOWNERS and contribution policy are installed before accepting external code;
+- the selected Open Lab license applies to this repository/surface, not automatically to `RUMBO-IA/Rumbo` or private Core repositories.
+
+After creation, move or copy only material explicitly approved for Open Lab publication. Do not bulk-export the public product repository.

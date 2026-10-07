@@ -85,3 +85,11 @@ Until this public repository publishes an explicit outbound license and an appro
 - do not submit material whose ownership or submission rights are uncertain.
 
 When the policy is activated, this section must be replaced or updated together with the published license and contributor terms.
+
+## Repository boundary
+
+This repository is the current public product/community front door; it is not automatically the licensed Open Lab codebase.
+
+The target structure uses a dedicated public `RUMBO-IA/rumbo-open-lab` repository for code that RUMBO explicitly chooses to publish under an open-source license. Until that repository and its license/inbound terms exist, public pull requests here remain evaluation proposals under the interim acceptance gate above.
+
+A license selected for the future Open Lab must not be assumed to apply to private Core repositories or to unrelated public RUMBO source.
