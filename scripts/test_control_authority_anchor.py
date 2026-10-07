@@ -22,11 +22,11 @@ class ControlAuthorityAnchorTests(unittest.TestCase):
         data = self.load()
         guard.validate_static(data)
         self.assertEqual(
-            "00d8a3cdf96ddffd1ec09a8fb5487d70ee352fd5",
+            "6e1b47f8f98902714faae0c46e7c8b215a441bd3",
             data["subject"]["authorized_main_sha"],
         )
         self.assertEqual(
-            "9ae06c0f3bc1cefa1e2fe6c34a443dd280ca63af",
+            "2b87812299daeba13e23fb6a85c4a267b97f98c3",
             data["subject"]["authorized_tree_sha"],
         )
 
