@@ -1,0 +1,65 @@
+name: One-shot clean Vercel storm guard R3
+
+on:
+  push:
+    branches:
+      - ops/vercel-deployment-storm-guard-r3-20261007
+
+permissions:
+  contents: write
+
+jobs:
+  rebuild-clean-head:
+    if: github.actor == 'fscfede-beep'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 0
+      - name: Rebuild exact clean candidate
+        shell: bash
+        env:
+          EXPECTED_BASE: 3e9b8347fc86a2e39372d6b92f6c6c5197cd620c
+          TARGET_BRANCH: ops/vercel-deployment-storm-guard-r3-20261007
+        run: |
+          set -euo pipefail
+          old_head="$(git rev-parse HEAD)"
+          git fetch origin main
+          test "$(git rev-parse origin/main)" = "$EXPECTED_BASE"
+          git reset --hard "$EXPECTED_BASE"
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p = Path("vercel.json")
+          data = json.loads(p.read_text(encoding="utf-8"))
+          enabled = data.setdefault("git", {}).setdefault("deploymentEnabled", {})
+          for key in (
+              "main",
+              "probe/vercel-git-block-*",
+              "bootstrap/*",
+              "ops/*",
+              "research/*",
+              "oss/*",
+              "recovery/*",
+              "test/*",
+              "fix/control-authority-*",
+              "fix/authority-*",
+              "fix/privacy-*",
+              "fix/qug-*",
+              "feat/community-*",
+          ):
+              enabled[key] = False
+          p.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+          PY
+          git diff --exit-code -- . ':!vercel.json'
+          test "$(git diff --name-only | tr -d '\r')" = "vercel.json"
+          git config user.name "RUMBO Privacy Automation"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add vercel.json
+          git commit -m "chore(vercel): suppress non-surface preview fan-out"
+          test "$(git show -s --format=%an HEAD)" = "RUMBO Privacy Automation"
+          test "$(git show -s --format=%ae HEAD)" = "41898282+github-actions[bot]@users.noreply.github.com"
+          test "$(git show -s --format=%cn HEAD)" = "RUMBO Privacy Automation"
+          test "$(git show -s --format=%ce HEAD)" = "41898282+github-actions[bot]@users.noreply.github.com"
+          git push --force-with-lease="refs/heads/$TARGET_BRANCH:$old_head" origin "HEAD:refs/heads/$TARGET_BRANCH"
