@@ -67,6 +67,12 @@ LEGACY_METADATA_EXCEPTIONS = {
     "fb7de533ededc62fc6744a4c90f2d3cc314d5728": frozenset(
         {"committer-name"}
     ),
+    # PR #333 exact clean candidate a1649dab... was promoted with identical
+    # parent/tree, but GitHub's server-side integration rewrote only the
+    # committer name on protected main. Keep the quarantine exact-SHA/field.
+    "552113dae9099835f61b4a44475d858da240146a": frozenset(
+        {"committer-name"}
+    ),
 }
 
 
