@@ -1,0 +1,7 @@
+# RUMBO public-surface ownership.
+# Keep this file itself owner-controlled so community changes cannot silently change review authority.
+* @fscfede-beep
+/.github/ @fscfede-beep
+/SECURITY.md @fscfede-beep
+/CONTRIBUTING.md @fscfede-beep
+/docs/community/ @fscfede-beep
