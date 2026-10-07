@@ -51,7 +51,18 @@
   "git": {
     "deploymentEnabled": {
       "main": false,
-      "probe/vercel-git-block-*": false
+      "probe/vercel-git-block-*": false,
+      "bootstrap/*": false,
+      "ops/*": false,
+      "research/*": false,
+      "oss/*": false,
+      "recovery/*": false,
+      "test/*": false,
+      "fix/control-authority-*": false,
+      "fix/authority-*": false,
+      "fix/privacy-*": false,
+      "fix/qug-*": false,
+      "feat/community-*": false
     }
   }
 }
