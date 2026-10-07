@@ -67,6 +67,13 @@ LEGACY_METADATA_EXCEPTIONS = {
     "fb7de533ededc62fc6744a4c90f2d3cc314d5728": frozenset(
         {"committer-name"}
     ),
+    # PR #333 exact-head metadata was approved before promotion, but the
+    # server-side rebase rewrote only the committer name on public main.
+    # Keep this exception exact-SHA and exact-field only. Future promotions
+    # must preserve their validated commit object rather than extending this.
+    "552113dae9099835f61b4a44475d858da240146a": frozenset(
+        {"committer-name"}
+    ),
 }
 
 
