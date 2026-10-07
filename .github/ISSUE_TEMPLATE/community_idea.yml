@@ -1,0 +1,44 @@
+name: Community idea
+description: Propose a bounded public RUMBO experiment, integration, improvement, or new idea.
+title: "[IDEA] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form for public/community-safe ideas only. Do not include secrets, private customer data, private RUMBO control-plane details, or undisclosed vulnerabilities.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or opportunity
+      description: What problem should be solved, and for whom?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed experiment
+      description: Describe the smallest safe experiment that could test the idea.
+    validations:
+      required: true
+  - type: dropdown
+    id: lane
+    attributes:
+      label: Best-fit lane
+      options:
+        - Documentation / usability
+        - Open-source code or example
+        - Agent reliability / evaluation
+        - Security / assurance (defensive)
+        - Community tooling
+        - Other
+    validations:
+      required: true
+  - type: checkboxes
+    id: boundary
+    attributes:
+      label: Boundary confirmation
+      options:
+        - label: I will not include credentials, secrets, customer data, private control-plane state, or production identifiers.
+          required: true
+        - label: I understand acceptance of an idea does not grant production authority, employment, partnership, or access to private RUMBO systems.
+          required: true

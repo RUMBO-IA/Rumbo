@@ -1,0 +1,39 @@
+name: Public bug report
+description: Report a reproducible defect in the public RUMBO surface.
+title: "[BUG] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not use this form for undisclosed security vulnerabilities. Use the private vulnerability-reporting route in SECURITY.md.
+  - type: textarea
+    id: observed
+    attributes:
+      label: Observed behavior
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Minimal reproduction
+      description: Provide public-safe steps, logs, or a minimal example. Remove secrets and private data.
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: OS, runtime, browser, commit SHA, or other public-safe context.
+  - type: checkboxes
+    id: boundary
+    attributes:
+      label: Safety confirmation
+      options:
+        - label: This report contains no secret, credential, customer data, or undisclosed exploit detail.
+          required: true
