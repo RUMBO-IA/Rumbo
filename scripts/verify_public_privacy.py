@@ -61,6 +61,13 @@ LEGACY_METADATA_EXCEPTIONS = {
     "2dceea6141e2f542b0c7c6bd8a0ab0535fd289b1": frozenset(
         {"committer-name"}
     ),
+    # PR #329 exact-head metadata was approved before promotion, but the
+    # resulting protected-main commit carries a server-side committer name
+    # that is not part of the public metadata allowlist. Quarantine only this
+    # exact already-public commit and only the committer-name field.
+    "fb7de533ededc62fc6744a4c90f2d3cc314d5728": frozenset(
+        {"committer-name"}
+    ),
 }
 
 
