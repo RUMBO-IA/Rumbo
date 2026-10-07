@@ -29,7 +29,7 @@ Sensitive canonical repositories use a stricter collaborator-only model. An exte
 - fixes to the public website or documentation;
 - tests and improvements for privacy, commercial-coherence, and security-header verification;
 - accessibility and usability improvements;
-- focused public developer tooling;
+- focused public engineering utilities;
 - examples or synthetic fixtures that do not expose private state;
 - narrowly scoped fixes that preserve human supervision and documented boundaries.
 
