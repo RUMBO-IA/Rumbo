@@ -67,6 +67,13 @@ LEGACY_METADATA_EXCEPTIONS = {
     "fb7de533ededc62fc6744a4c90f2d3cc314d5728": frozenset(
         {"committer-name"}
     ),
+    # PR #333 exact-head metadata was approved and its required privacy/Vercel
+    # checks passed before promotion, but GitHub server integration recreated
+    # the public-main object with only the committer name rewritten.
+    # Quarantine only that immutable SHA and only that one metadata field.
+    "552113dae9099835f61b4a44475d858da240146a": frozenset(
+        {"committer-name"}
+    ),
 }
 
 
