@@ -128,6 +128,18 @@ class PrivacyGateRegressionTests(unittest.TestCase):
         self.assertFalse(gate.is_legacy_metadata_exception(rebase_sha, "author-email"))
         self.assertFalse(gate.is_legacy_metadata_exception("8" * 40, "committer-name"))
 
+    def test_r17_public_ref_residue_exceptions_are_exact_sha_and_name_fields_only(self):
+        for commit_sha in (
+            "3fa70aa3446acf36f678e42bf348399b563e8370",
+            "bedb3089919a623b2ebc21dc4b1c8cbf8810fa92",
+            "0e332a336a65c8602808feb23ef91f9a6ffb11ce",
+        ):
+            self.assertTrue(gate.is_legacy_metadata_exception(commit_sha, "author-name"))
+            self.assertTrue(gate.is_legacy_metadata_exception(commit_sha, "committer-name"))
+            self.assertFalse(gate.is_legacy_metadata_exception(commit_sha, "author-email"))
+            self.assertFalse(gate.is_legacy_metadata_exception(commit_sha, "committer-email"))
+        self.assertFalse(gate.is_legacy_metadata_exception("7" * 40, "author-name"))
+
     def test_legacy_metadata_exception_does_not_generalize(self):
         legacy = "7734270af5e1928215838fb0f0aee940599d43e4"
         private_email = "private.committer" + "@" + "example.test"

@@ -74,6 +74,12 @@ LEGACY_METADATA_EXCEPTIONS = {
     "552113dae9099835f61b4a44475d858da240146a": frozenset(
         {"committer-name"}
     ),
+    # Immutable public-ref residues created during R17 reconciliation.
+    # Ruleset-wide non-fast-forward protection prevents removing these refs;
+    # quarantine only the two display-name fields on each exact SHA.
+    "3fa70aa3446acf36f678e42bf348399b563e8370": frozenset({"author-name", "committer-name"}),
+    "bedb3089919a623b2ebc21dc4b1c8cbf8810fa92": frozenset({"author-name", "committer-name"}),
+    "0e332a336a65c8602808feb23ef91f9a6ffb11ce": frozenset({"author-name", "committer-name"}),
 }
 
 
