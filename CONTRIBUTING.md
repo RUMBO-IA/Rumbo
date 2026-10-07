@@ -72,3 +72,16 @@ Undisclosed security issues belong in GitHub's private **Report a vulnerability*
 ## Want to collaborate more deeply?
 
 Use the **Collaboration proposal** Issue form. Repeated useful contributions may lead to additional repository-scoped responsibilities, but no role upgrade is automatic.
+
+## Interim external-contribution acceptance gate
+
+Public pull requests from third parties may be opened and reviewed while RUMBO finalizes the Open Lab licensing and inbound-contribution policy.
+
+Until this public repository publishes an explicit outbound license and an approved inbound-contribution policy:
+
+- maintainers may discuss, review, test, and request changes to an external contribution;
+- externally authored code or documentation is not authorized for merge as an accepted Open Lab contribution;
+- no public pull request creates employment, partnership, repository authority, or a license grant by implication;
+- do not submit material whose ownership or submission rights are uncertain.
+
+When the policy is activated, this section must be replaced or updated together with the published license and contributor terms.

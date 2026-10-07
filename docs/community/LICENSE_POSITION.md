@@ -19,3 +19,9 @@ License selection is a legal/commercial policy decision and is not implied by ac
 ## Admission rule
 
 No automation may add or change the repository license without an explicit owner-approved license identifier or approved license text.
+
+## Interim merge rule
+
+Until an owner-approved outbound license and inbound-contribution policy are published, third-party pull requests may be reviewed but must not be merged as accepted Open Lab contributions.
+
+This is an interim governance safeguard, not a contributor license agreement and not a grant of rights.

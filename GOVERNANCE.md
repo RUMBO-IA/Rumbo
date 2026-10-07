@@ -40,3 +40,11 @@ A contributor must not be treated as a separate reviewer of their own work merel
 ## Cost boundary
 
 No collaboration feature may create new external spend unless the cost is independently verified as zero or separately authorized.
+
+## External contribution acceptance
+
+Technical review and legal/IP acceptance are separate gates.
+
+While no public Open Lab license and inbound-contribution policy are published, external pull requests may be evaluated but are not authorized for merge as accepted community contributions.
+
+This interim rule does not affect maintainer-authored changes or private work governed under separately approved terms.
