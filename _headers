@@ -1,0 +1,8 @@
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' https://cdn-cookieyes.com 'sha256-JYugNwFi/uy8GX2Wr84YKL/ciF497MC4y1fvoqGf8Tc='; script-src-attr 'none'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://cdn-cookieyes.com; font-src 'self' data:; connect-src 'self' https://*.cookieyes.com https://cdn-cookieyes.com https://arsogtofweecxsvxuwxf.supabase.co; frame-src 'none'; frame-ancestors 'none'; object-src 'none'; media-src 'none'; worker-src 'none'; manifest-src 'self'; base-uri 'none'; form-action 'self'; upgrade-insecure-requests
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Frame-Options: DENY
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+  Cross-Origin-Resource-Policy: same-site
+  Strict-Transport-Security: max-age=31536000
