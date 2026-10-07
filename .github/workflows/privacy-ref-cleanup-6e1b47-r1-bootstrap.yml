@@ -1,0 +1,59 @@
+name: RUMBO Privacy Ref Cleanup 6e1b47 R1
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [main]
+    paths:
+      - ".github/workflows/privacy-ref-cleanup-6e1b47-r1-bootstrap.yml"
+
+permissions:
+  contents: write
+  pull-requests: read
+
+jobs:
+  cleanup:
+    if: >-
+      github.actor == 'fscfede-beep' &&
+      github.event.pull_request.head.repo.full_name == 'RUMBO-IA/Rumbo' &&
+      github.event.pull_request.head.ref == 'bootstrap/privacy-ref-cleanup-6e1b47-r1-20261007' &&
+      github.event.pull_request.base.sha == '9ed987fdd32955c4d8e5b7265954c202c71280a3'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout exact public base
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: 9ed987fdd32955c4d8e5b7265954c202c71280a3
+          fetch-depth: 0
+          persist-credentials: true
+      - name: Remove exact superseded privacy-invalid refs
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_HEAD: ${{ github.event.pull_request.head.sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          repo="RUMBO-IA/Rumbo"
+          temp_branch="bootstrap/privacy-ref-cleanup-6e1b47-r1-20261007"
+          b312="fix/authority-select-private-6e1b47f8-r8-20261007"
+          s312="cb115dfeb7e81a2dc053a30e126bfc24e385e69a"
+          b314="fix/authority-select-private-main-6e1b47f8-r8-20261007"
+          s314="6e1e052f9bd29619ea42cb5135fca29a2dc77a45"
+          [[ "$SOURCE_HEAD" =~ ^[0-9a-f]{40}$ ]]
+          test "$(git ls-remote origin "refs/heads/$temp_branch" | awk '{print $1}')" = "$SOURCE_HEAD"
+          test "$(gh api "repos/$repo/pulls/312" --jq '.state+":"+(.merged_at//"")')" = "closed:"
+          test "$(gh api "repos/$repo/pulls/314" --jq '.state+":"+(.merged_at//"")')" = "closed:"
+          test "$(git ls-remote origin "refs/heads/$b312" | awk '{print $1}')" = "$s312"
+          test "$(git ls-remote origin "refs/heads/$b314" | awk '{print $1}')" = "$s314"
+          git push origin --delete "$b312"
+          git push origin --delete "$b314"
+          test -z "$(git ls-remote origin "refs/heads/$b312" | awk '{print $1}')"
+          test -z "$(git ls-remote origin "refs/heads/$b314" | awk '{print $1}')"
+          test "$(git ls-remote origin "refs/heads/$temp_branch" | awk '{print $1}')" = "$SOURCE_HEAD"
+          git push origin --delete "$temp_branch"
+          echo "PR312_INVALID_REF_CLEANUP=PASS"
+          echo "PR314_INVALID_REF_CLEANUP=PASS"
+          echo "BOOTSTRAP_REF_CLEANUP=PASS"
+          echo "EXTERNAL_SPEND_USD=0"
+          echo "PRODUCTION=NO_GO"
