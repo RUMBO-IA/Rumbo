@@ -224,5 +224,24 @@ class WorkspaceScopeGuardTests(unittest.TestCase):
         self.assertTrue(MOD.evaluate_workspace_scope(receipt)["ok"])
 
 
+    def test_windows_unc_paths_are_case_insensitive(self):
+        self.assertEqual(
+            MOD.normalize_path(r"\\SERVER\Share\Project"),
+            MOD.normalize_path(r"\\server\share\project"),
+        )
+
+    def test_windows_extended_drive_paths_are_case_insensitive(self):
+        self.assertEqual(
+            MOD.normalize_path(r"\\?\C:\Work\Project"),
+            MOD.normalize_path(r"\\?\c:\work\project"),
+        )
+
+    def test_posix_paths_remain_case_sensitive(self):
+        self.assertNotEqual(
+            MOD.normalize_path("/Repo/Case"),
+            MOD.normalize_path("/repo/case"),
+        )
+
+
 if __name__ == "__main__":
     unittest.main()
