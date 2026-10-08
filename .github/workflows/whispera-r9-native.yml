@@ -26,13 +26,15 @@ jobs:
           git checkout e892dc108c98b960a420331747b3bf727db30941
           $head=(git rev-parse HEAD).Trim()
           if($head -ne 'e892dc108c98b960a420331747b3bf727db30941'){ throw "BASE_SHA_MISMATCH:$head" }
-          if((git status --porcelain).Trim()){ throw 'UPSTREAM_NOT_CLEAN' }
+          $status=(git status --porcelain | Out-String).Trim()
+          if($status){ throw "UPSTREAM_NOT_CLEAN:$status" }
           Pop-Location
           $encoded=(Get-Content -Raw carrier/ci/whispera-r9/WHISPERA_R9.zip.b64).Trim()
           [IO.File]::WriteAllBytes((Join-Path $PWD 'R9.zip'),[Convert]::FromBase64String($encoded))
           $sha=(Get-FileHash -Algorithm SHA256 R9.zip).Hash.ToLowerInvariant()
           if($sha -ne '1da3f788eeaf6648707a974dcde4299bed82495ab030330c229c37f377e17185'){ throw "R9_BUNDLE_SHA_MISMATCH:$sha" }
           Expand-Archive -Path R9.zip -DestinationPath R9
+          if(-not (Test-Path 'R9/whispera_r9_work/WINDOWS_APPLY_VALIDATE_R9.ps1')){ throw 'R9_BUNDLE_LAYOUT_INVALID' }
           Write-Host "MATERIALIZE_PASS source=$head bundle=$sha"
 
       - name: Apply and validate R9 on Windows
@@ -50,7 +52,7 @@ jobs:
         run: |
           $ErrorActionPreference='Continue'
           Write-Host '--- git status ---'
-          git -C whispera status --short
+          if(Test-Path 'whispera'){ git -C whispera status --short }
           Write-Host '--- native receipt ---'
           if(Test-Path 'whispera/.local/RUMBO_VOICE_CORE_R9_NATIVE_RECEIPT.json'){
             Get-Content -Raw 'whispera/.local/RUMBO_VOICE_CORE_R9_NATIVE_RECEIPT.json'
@@ -58,5 +60,9 @@ jobs:
             Write-Host 'NATIVE_RECEIPT_MISSING'
           }
           Write-Host '--- promotion gate ---'
-          python 'R9/whispera_r9_work/promotion_gate_r9.py' whispera
-          Write-Host "PROMOTION_GATE_EXIT=$LASTEXITCODE"
+          if(Test-Path 'R9/whispera_r9_work/promotion_gate_r9.py'){
+            python 'R9/whispera_r9_work/promotion_gate_r9.py' whispera
+            Write-Host "PROMOTION_GATE_EXIT=$LASTEXITCODE"
+          } else {
+            Write-Host 'PROMOTION_GATE_NOT_MATERIALIZED'
+          }
