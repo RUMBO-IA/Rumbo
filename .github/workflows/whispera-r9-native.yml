@@ -1,4 +1,4 @@
-name: Whispera R9.1 native validation
+name: Whispera R9.2 native validation
 
 on:
   push:
@@ -16,7 +16,7 @@ jobs:
     runs-on: windows-latest
     timeout-minutes: 50
     steps:
-      - name: Materialize exact source and R9.1 bundle
+      - name: Materialize exact source and R9.2 bundle
         shell: pwsh
         run: |
           $ErrorActionPreference='Stop'
@@ -34,12 +34,12 @@ jobs:
           $encoded=(Get-Content -Raw carrier/ci/whispera-r9/WHISPERA_R9.zip.b64).Trim()
           [IO.File]::WriteAllBytes((Join-Path $PWD 'R9.zip'),[Convert]::FromBase64String($encoded))
           $sha=(Get-FileHash -Algorithm SHA256 R9.zip).Hash.ToLowerInvariant()
-          if($sha -ne '7618ee30c65cf5d597257f9a65bf994e4b11db2d4d530a371b7e1ca743051a74'){ throw "R9_1_BUNDLE_SHA_MISMATCH:$sha" }
+          if($sha -ne '59ffda5d205e4430c4c6482bf1231541c2dc78bbbdc47ffcad85036da4ed5d00'){ throw "R9_2_BUNDLE_SHA_MISMATCH:$sha" }
           Expand-Archive -Path R9.zip -DestinationPath R9
           if(-not (Test-Path 'R9/whispera_r9_work/WINDOWS_APPLY_VALIDATE_R9.ps1')){ throw 'R9_BUNDLE_LAYOUT_INVALID' }
           Write-Host "MATERIALIZE_PASS source=$head bundle=$sha"
 
-      - name: Apply and validate R9.1 on Windows
+      - name: Apply and validate R9.2 on Windows
         shell: pwsh
         run: |
           $ErrorActionPreference='Stop'
