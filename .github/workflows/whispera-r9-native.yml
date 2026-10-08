@@ -1,0 +1,62 @@
+name: Whispera R9 native validation
+
+on:
+  push:
+    branches:
+      - whispera-r9-native-ci-20261008
+    paths:
+      - ci/whispera-r9/**
+      - .github/workflows/whispera-r9-native.yml
+
+permissions:
+  contents: read
+
+jobs:
+  native-r9:
+    runs-on: windows-latest
+    timeout-minutes: 50
+    steps:
+      - name: Materialize exact source and R9 bundle
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          git clone --depth 1 --branch whispera-r9-native-ci-20261008 https://github.com/RUMBO-IA/Rumbo.git carrier
+          git clone https://github.com/kazu00001/Whispera-K.git whispera
+          Push-Location whispera
+          git checkout e892dc108c98b960a420331747b3bf727db30941
+          $head=(git rev-parse HEAD).Trim()
+          if($head -ne 'e892dc108c98b960a420331747b3bf727db30941'){ throw "BASE_SHA_MISMATCH:$head" }
+          if((git status --porcelain).Trim()){ throw 'UPSTREAM_NOT_CLEAN' }
+          Pop-Location
+          $encoded=(Get-Content -Raw carrier/ci/whispera-r9/WHISPERA_R9.zip.b64).Trim()
+          [IO.File]::WriteAllBytes((Join-Path $PWD 'R9.zip'),[Convert]::FromBase64String($encoded))
+          $sha=(Get-FileHash -Algorithm SHA256 R9.zip).Hash.ToLowerInvariant()
+          if($sha -ne '1da3f788eeaf6648707a974dcde4299bed82495ab030330c229c37f377e17185'){ throw "R9_BUNDLE_SHA_MISMATCH:$sha" }
+          Expand-Archive -Path R9.zip -DestinationPath R9
+          Write-Host "MATERIALIZE_PASS source=$head bundle=$sha"
+
+      - name: Apply and validate R9 on Windows
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          $checkout=(Resolve-Path 'whispera').Path
+          $bundle=(Resolve-Path 'R9/whispera_r9_work').Path
+          & "$bundle/WINDOWS_APPLY_VALIDATE_R9.ps1" -Checkout $checkout -BundleRoot $bundle
+          if($LASTEXITCODE -ne 0){ throw "WINDOWS_APPLY_VALIDATE_R9_FAILED:$LASTEXITCODE" }
+
+      - name: Read back native receipt and promotion boundary
+        if: always()
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Continue'
+          Write-Host '--- git status ---'
+          git -C whispera status --short
+          Write-Host '--- native receipt ---'
+          if(Test-Path 'whispera/.local/RUMBO_VOICE_CORE_R9_NATIVE_RECEIPT.json'){
+            Get-Content -Raw 'whispera/.local/RUMBO_VOICE_CORE_R9_NATIVE_RECEIPT.json'
+          } else {
+            Write-Host 'NATIVE_RECEIPT_MISSING'
+          }
+          Write-Host '--- promotion gate ---'
+          python 'R9/whispera_r9_work/promotion_gate_r9.py' whispera
+          Write-Host "PROMOTION_GATE_EXIT=$LASTEXITCODE"
