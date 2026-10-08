@@ -19,6 +19,16 @@ The public repository keeps consequential behavior behind explicit verification 
 - CI checks public privacy invariants, commercial-offer coherence, security-header configuration, and the RUMBO brand contract on governed brand/public surfaces;
 - repository security and reporting rules are documented in [`SECURITY.md`](SECURITY.md).
 
+## Community collaboration
+
+RUMBO separates its public product/community front door from independently scoped open-source contributions:
+
+- **[RUMBO Open Lab](https://github.com/RUMBO-IA/rumbo-open-lab)** — public, Apache-2.0-licensed experiments and community proposals. Start with its [contribution guide](https://github.com/RUMBO-IA/rumbo-open-lab/blob/main/CONTRIBUTING.md), [DCO 1.1 sign-off rules](https://github.com/RUMBO-IA/rumbo-open-lab/blob/main/DCO.md), and [security policy](https://github.com/RUMBO-IA/rumbo-open-lab/blob/main/SECURITY.md). Contributions use forks and pull requests; organization membership is not required.
+- **[RUMBO community Discussions](https://github.com/RUMBO-IA/Rumbo/discussions)** — ideas and questions about the public product. Use [Issues](https://github.com/RUMBO-IA/Rumbo/issues/new/choose) for reproducible public problems; never include confidential details or credentials.
+- **Private collaboration** — separate, explicitly approved, repository-scoped onboarding only. Public participation does not grant access to private labs, Core repositories, production systems, secrets, deployment authority, or paid resources.
+
+The Open Lab license applies **only** within its stated repository scope; it does not license this product repository wholesale. A proposal, review or Open Lab merge does not authorize integration into production or proprietary Core. External contributions must satisfy their own rights, security and review gates before acceptance.
+
 ## Release posture
 
 This repository distinguishes the mutable Git `main` branch from production traffic. The current `main` head is intentionally not hardcoded here; GitHub is the source of truth for the branch head. The owner-authorized production binding for `rumbo.verso.fans` is application commit `6eeadb84b1dd57f17c4a46891770d2425e83c742` through Vercel deployment `dpl_961FH2Y7gDi6T2unCTvii6AASvnb`, as authorized by canonical registry issue #72 comment `6001040749`. Live provider effect remains subject to exact promotion and readback.
