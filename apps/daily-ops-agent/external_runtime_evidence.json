@@ -1,0 +1,19 @@
+{
+  "schema_version": "rumbo-external-runtime-evidence-v1",
+  "date": "2026-10-02",
+  "agents_sdk_version": "0.22.3",
+  "mcp_major": 2,
+  "mcp_server_implemented": true,
+  "mcp_stdio_discovery_proven": true,
+  "mcp_discovered_tool_count": 5,
+  "mcp_fixture_read_loop_proven": true,
+  "mcp_write_approval_interrupt_proven": true,
+  "mcp_write_provider_called_before_approval": false,
+  "gmail_idempotency_strategy": "deterministic-message-id-plus-readback",
+  "calendar_idempotency_strategy": "deterministic-event-id-plus-readback",
+  "external_google_oauth_provisioned": false,
+  "external_openai_model_run_proven": false,
+  "external_live_provider_read_proven": false,
+  "external_live_provider_write_proven": false,
+  "production_proven": false
+}
