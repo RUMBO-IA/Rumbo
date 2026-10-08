@@ -21,8 +21,10 @@ jobs:
         run: |
           $ErrorActionPreference='Stop'
           git clone --depth 1 --branch whispera-r9-native-ci-20261008 https://github.com/RUMBO-IA/Rumbo.git carrier
-          git clone https://github.com/kazu00001/Whispera-K.git whispera
+          git -c core.autocrlf=false clone --no-checkout https://github.com/kazu00001/Whispera-K.git whispera
           Push-Location whispera
+          git config core.autocrlf false
+          git config core.eol lf
           git checkout e892dc108c98b960a420331747b3bf727db30941
           $head=(git rev-parse HEAD).Trim()
           if($head -ne 'e892dc108c98b960a420331747b3bf727db30941'){ throw "BASE_SHA_MISMATCH:$head" }
