@@ -1,0 +1,37 @@
+{
+  "schema": "rumbo.siwc.successor-provenance/v1",
+  "date": "2026-10-09",
+  "source": {
+    "repository": "RUMBO-IA/Rumbo",
+    "branch": "oss/siwc-agent-reliability-v0.1.0-r2-clean",
+    "commit": "e588c59039471753c5d861ac5d500378cebe653f",
+    "path": "oss/siwc-agent-reliability-local-v0.1.0",
+    "historical_validation_run": 37576888459
+  },
+  "successor": {
+    "branch": "oss/siwc-multi-account-v0.2.0-r1-20261009",
+    "base_main": "a16c59802d696bf5d155e07c11d22347f3f88149",
+    "version": "0.2.0",
+    "changes": [
+      "multiple isolated ChatGPT account registrations",
+      "stable host registration shared only as host identity",
+      "active-account selector",
+      "Windows DPAPI CurrentUser credential protection",
+      "serialized refresh-token rotation",
+      "refresh-token revocation on logout",
+      "Codex app-server launch for the selected account"
+    ]
+  },
+  "local_verification": {
+    "node_version": "22.16.0",
+    "tests": "6/6 PASS",
+    "client_sha256": "85d83eac64d64af0ed58266ef08b3cba8b35ba90bb84467aaa9a57b0967ac9ca",
+    "test_sha256": "05f1be9a74984490acfad53928da033d84b46c13043bbd2a29b4d8e98c261143",
+    "package_sha256": "0d2ba7e8dbed9b953cd8a5c7e4a8fe6fd394114c985ce58e7a1dc67fc1a084f6",
+    "readme_sha256": "3d5c99344dd0c0ee760c6f186c17f52971b91fcd2b72da5c0c670c40100910a2"
+  },
+  "live_oauth": "NOT_EXECUTED",
+  "live_inference": "NOT_EXECUTED",
+  "external_spend_usd": 0,
+  "production": "NO_GO"
+}
