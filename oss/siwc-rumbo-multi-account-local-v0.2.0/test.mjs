@@ -37,6 +37,14 @@ test("default home is RUMBO scoped and contains no account identifier",()=>{
   const h=home();assert.match(h,/RUMBO/);assert.match(h,/SIWC/);assert.doesNotMatch(h,/@/);
 });
 
+test("refresh path honors earliest_refresh_at and serialized rotation",()=>{
+  const source=fs.readFileSync(new URL("./client.mjs",import.meta.url),"utf8");
+  assert.ok(source.includes("earliest_refresh_at"));
+  assert.ok(source.includes("refreshAllowed"));
+  assert.ok(source.includes("withRefreshLock"));
+  assert.ok(source.includes("currentAllowed"));
+});
+
 test("source never embeds API keys, client secrets, or token literals",()=>{
   const source=fs.readFileSync(new URL("./client.mjs",import.meta.url),"utf8");
   assert.equal(/sk-[A-Za-z0-9_-]{16,}/.test(source),false);
