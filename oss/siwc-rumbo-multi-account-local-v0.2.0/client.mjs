@@ -270,10 +270,15 @@ async function credential(accountId = activeId(), dir = home()) {
   const account=accountById(accountId,dir);
   let secret=await readSecret(accountId,dir);
   const now=Date.now();
-  if(Number(secret.expires_at||0)-now <= 5*60*1000 && secret.refresh_token){
+  const earliest = secret.earliest_refresh_at ? Date.parse(secret.earliest_refresh_at) : 0;
+  const refreshAllowed = !earliest || Number.isNaN(earliest) || now >= earliest;
+  if(Number(secret.expires_at||0)-now <= 5*60*1000 && secret.refresh_token && refreshAllowed){
     secret=await withRefreshLock(accountId, async()=>{
       let current=await readSecret(accountId,dir);
-      if(Number(current.expires_at||0)-Date.now()>5*60*1000) return current;
+      const currentNow=Date.now();
+      const currentEarliest=current.earliest_refresh_at ? Date.parse(current.earliest_refresh_at) : 0;
+      const currentAllowed=!currentEarliest || Number.isNaN(currentEarliest) || currentNow >= currentEarliest;
+      if(Number(current.expires_at||0)-currentNow>5*60*1000 || !currentAllowed) return current;
       const t=await form(TOKEN,{grant_type:"refresh_token",client_id:account.client_id,refresh_token:current.refresh_token,resource:API});
       const scopes=String(t.scope||current.scopes?.join(" ")||"").split(/\s+/).filter(Boolean).sort();
       const next={...current,access_token:t.access_token,refresh_token:t.refresh_token||current.refresh_token,id_token:t.id_token||current.id_token,expires_at:Date.now()+(Number(t.expires_in||3600)*1000),earliest_refresh_at:t.earliest_refresh_at||current.earliest_refresh_at||null,scopes,saved_at:new Date().toISOString()};
