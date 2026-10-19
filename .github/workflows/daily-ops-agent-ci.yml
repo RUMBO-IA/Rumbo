@@ -1,0 +1,74 @@
+name: RUMBO Daily Ops Agent CI
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'apps/daily-ops-agent/**'
+      - '.github/workflows/daily-ops-agent-ci.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'apps/daily-ops-agent/**'
+      - '.github/workflows/daily-ops-agent-ci.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  daily-ops-agent:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: '3.14'
+      - name: Assert zero-spend test environment
+        run: |
+          python - <<'PY'
+          import os
+          assert not os.environ.get("OPENAI_API_KEY"), "OPENAI_API_KEY must not be present in zero-spend CI"
+          print("zero-spend-environment: PASS")
+          PY
+      - name: Install pinned agent dependency
+        run: python -m pip install --disable-pip-version-check -r apps/daily-ops-agent/requirements.txt
+      - name: Run daily ops agent tests
+        run: python -m unittest discover -s apps/daily-ops-agent -p "test*.py" -v
+      - name: Enforce provider-evidence claim boundary
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          evidence = json.loads(Path("apps/daily-ops-agent/provider_evidence.json").read_text())
+          assert evidence["provider"] == "gmail"
+          assert evidence["effect"] == "create_draft"
+          assert evidence["message_sent"] is False
+          assert evidence["provider_write_success"] is True
+          assert evidence["provider_readback_confirmed"] is True
+          assert evidence["chatgpt_connector_path_proven"] is True
+          assert evidence["external_agents_sdk_provider_path_proven"] is False
+          assert evidence["production_proven"] is False
+          print("provider-evidence-claim-boundary: PASS")
+          native = json.loads(Path("apps/daily-ops-agent/native_chatgpt_evidence.json").read_text())
+          assert native["writes_during_daily_brief"] == 0
+          assert native["native_chatgpt_read_workflow_proven"] is True
+          assert native["external_agents_sdk_provider_path_proven"] is False
+          assert native["production_proven"] is False
+          print("native-chatgpt-claim-boundary: PASS")
+          external = json.loads(Path("apps/daily-ops-agent/external_runtime_evidence.json").read_text())
+          assert external["mcp_server_implemented"] is True
+          assert external["mcp_stdio_discovery_proven"] is True
+          assert external["mcp_fixture_read_loop_proven"] is True
+          assert external["mcp_write_approval_interrupt_proven"] is True
+          assert external["mcp_write_provider_called_before_approval"] is False
+          assert external["external_google_oauth_provisioned"] is False
+          assert external["external_openai_model_run_proven"] is False
+          assert external["external_live_provider_read_proven"] is False
+          assert external["external_live_provider_write_proven"] is False
+          assert external["production_proven"] is False
+          print("external-runtime-claim-boundary: PASS")
+          PY

@@ -1,0 +1,19 @@
+{
+  "schema_version": "rumbo-native-chatgpt-evidence-v1",
+  "date": "2026-10-02",
+  "timezone": "America/Argentina/Buenos_Aires",
+  "calendar_primary_events": 0,
+  "gmail_candidate_messages_reviewed": 4,
+  "signals": {
+    "security_alert_present": true,
+    "ci_failures_present": true,
+    "codex_usage_limit_present": true,
+    "service_sunset_deadline_present": true,
+    "service_sunset_date": "2026-10-07"
+  },
+  "writes_during_daily_brief": 0,
+  "pii_redacted": true,
+  "native_chatgpt_read_workflow_proven": true,
+  "external_agents_sdk_provider_path_proven": false,
+  "production_proven": false
+}

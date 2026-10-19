@@ -1,0 +1,16 @@
+{
+  "schema_version": "rumbo-provider-evidence-v1",
+  "date": "2026-10-02",
+  "provider": "gmail",
+  "effect": "create_draft",
+  "recipient_scope": "self",
+  "message_sent": false,
+  "provider_write_success": true,
+  "provider_readback_methods": ["list_drafts", "read_email"],
+  "provider_readback_confirmed": true,
+  "draft_label_confirmed": true,
+  "pii_redacted": true,
+  "chatgpt_connector_path_proven": true,
+  "external_agents_sdk_provider_path_proven": false,
+  "production_proven": false
+}
