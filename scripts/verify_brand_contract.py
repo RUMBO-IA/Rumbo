@@ -51,6 +51,14 @@ FORBIDDEN_PUBLIC_CLAIMS = (
     "100% secure", "guaranteed roi", "roi guaranteed",
     "guaranteed revenue", "fully autonomous",
 )
+FORBIDDEN_LEGACY_POSITIONING = (
+    "human-controlled ai crm",
+    "ai crm and automation",
+    "unified crm",
+    "crm integration",
+    "latin america",
+    "latam",
+)
 FORBIDDEN_ALIASES = ("Rumbo AI", "RUMBO.AI", "RumboIA")
 HUMAN_CONTROL = re.compile(
     r"human[- ]controlled|human control|control humano|persona aprobando|una persona aprueba",
@@ -211,6 +219,9 @@ def _check_surface(
     for claim in FORBIDDEN_PUBLIC_CLAIMS:
         if _normalize(claim) in normalized:
             errors.append(f"unsupported public claim present in {rel}: {claim}")
+    for legacy in FORBIDDEN_LEGACY_POSITIONING:
+        if legacy in normalized:
+            errors.append(f"legacy public positioning present in {rel}: {legacy}")
 
 
 def verify(root: pathlib.Path = ROOT) -> list[str]:
