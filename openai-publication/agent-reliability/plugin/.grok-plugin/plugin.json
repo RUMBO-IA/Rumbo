@@ -1,0 +1,9 @@
+{
+  "name": "rumbo-coding-agent-reliability",
+  "version": "0.1.6",
+  "description": "Evidence-first skills for coding-agent continuity, controlled execution and final-state audit.",
+  "author": {"name":"RUMBO IA","url":"https://rumbo.verso.fans"},
+  "homepage": "https://rumbo.verso.fans",
+  "keywords": ["rumbo agent reliability","rumbo coding agent","rumbo final-state audit"],
+  "skills": "./skills"
+}
