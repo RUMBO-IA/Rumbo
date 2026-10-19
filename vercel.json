@@ -46,6 +46,26 @@
       "source": "/apps/landing-publica/index.html",
       "destination": "/",
       "permanent": true
+    },
+    {
+      "source": "/apps/landing-publica/index-en-openai",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/apps/landing-publica/index-en-openai.html",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/apps/landing-publica/index-es",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/apps/landing-publica/index-es.html",
+      "destination": "/",
+      "permanent": true
     }
   ],
   "git": {
