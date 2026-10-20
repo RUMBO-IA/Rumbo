@@ -34,7 +34,7 @@ SECONDARY_REQUIRED = (
     pathlib.Path("apps/landing-publica/index-en-openai.html"),
 )
 SECONDARY_README = pathlib.Path("apps/landing-publica/README.md")
-PUBLIC_GLOBS = ("apps/landing-publica/*.html",)
+PUBLIC_GLOBS = ("*.html", "apps/landing-publica/*.html",)
 HUMAN_CONTROL_EXEMPT_NAMES = {
     "privacy.html",
     "terms.html",
