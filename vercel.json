@@ -66,6 +66,26 @@
       "source": "/apps/landing-publica/index-es.html",
       "destination": "/",
       "permanent": true
+    },
+    {
+      "source": "/apps/landing-publica/privacy",
+      "destination": "/privacy",
+      "permanent": true
+    },
+    {
+      "source": "/apps/landing-publica/privacy.html",
+      "destination": "/privacy",
+      "permanent": true
+    },
+    {
+      "source": "/apps/landing-publica/terms",
+      "destination": "/terms",
+      "permanent": true
+    },
+    {
+      "source": "/apps/landing-publica/terms.html",
+      "destination": "/terms",
+      "permanent": true
     }
   ],
   "git": {
