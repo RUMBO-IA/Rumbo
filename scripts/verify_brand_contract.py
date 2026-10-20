@@ -34,7 +34,8 @@ SECONDARY_REQUIRED = (
     pathlib.Path("apps/landing-publica/index-en-openai.html"),
 )
 SECONDARY_README = pathlib.Path("apps/landing-publica/README.md")
-PUBLIC_GLOBS = ("*.html", "apps/landing-publica/*.html",)
+PUBLIC_GLOBS = ("apps/landing-publica/*.html",)
+LEGACY_POSITIONING_GLOBS = ("*.html", "apps/landing-publica/*.html")
 HUMAN_CONTROL_EXEMPT_NAMES = {
     "privacy.html",
     "terms.html",
@@ -58,6 +59,11 @@ FORBIDDEN_LEGACY_POSITIONING = (
     "crm integration",
     "latin america",
     "latam",
+    "crm unificado",
+    "integración de crm",
+    "integracion de crm",
+    "américa latina",
+    "america latina",
 )
 FORBIDDEN_ALIASES = ("Rumbo AI", "RUMBO.AI", "RumboIA")
 HUMAN_CONTROL = re.compile(
@@ -254,6 +260,22 @@ def verify(root: pathlib.Path = ROOT) -> list[str]:
             errors,
             require_human_control=require_human_control,
         )
+
+    legacy_seen: set[pathlib.Path] = set()
+    for pattern in LEGACY_POSITIONING_GLOBS:
+        for path in sorted(root.glob(pattern)):
+            if not path.is_file():
+                continue
+            rel = path.relative_to(root)
+            if rel in legacy_seen:
+                continue
+            legacy_seen.add(rel)
+            normalized = _normalize(path.read_text(encoding="utf-8-sig"))
+            for legacy in FORBIDDEN_LEGACY_POSITIONING:
+                if legacy in normalized:
+                    errors.append(
+                        f"legacy public positioning present in {rel.as_posix()}: {legacy}"
+                    )
 
     support = texts[OPENAI_SUPPORT].casefold()
     for required_phrase in (
