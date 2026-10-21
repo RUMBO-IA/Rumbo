@@ -1,4 +1,4 @@
-# RUMBO IA Social Authority V24
+# RUMBO IA Social Authority V25
 
 > Compatibility filename retained. Current reconciliation: 2026-10-02.
 > Fresh authenticated/provider readback supersedes older observations stored under this path.

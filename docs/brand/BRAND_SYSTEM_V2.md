@@ -1,8 +1,8 @@
-# RUMBO IA Brand System V2 — Candidate
+# RUMBO IA Brand System V2
 
-Status: CANDIDATE / NON-PRODUCTION  
+Status: SOURCE_CANON / NON-PRODUCTION
 Observed: 2026-10-02  
-Supersedes the CRM-first visual/copy direction for candidate public surfaces. V1 remains historical compatibility evidence until V2 is merged and separately promoted.
+Integrated through clean-lineage PR #188. V1 remains historical compatibility evidence. Source canon does not grant public-logo, profile-edit, publication, or production authority.
 
 ## Public identity
 
@@ -37,7 +37,7 @@ Other repositories, demos, diagnostics and internal systems are capabilities/evi
 
 A remote tool accepting an action does not prove effect. A source merge does not prove production deployment. Ambiguous consequential outcomes fail closed.
 
-## Candidate visual authority
+## Visual design authority boundary
 
 Canva Brand Board: `DAHWsPbUL-U`  
 Expanded candidate pack: `DAHW0o_QUmQ`
@@ -49,7 +49,7 @@ Expanded candidate pack: `DAHW0o_QUmQ`
 - Warm orange: `#E66A2C`
 - Muted blue: `#54788A`
 
-Candidate status extensions may use restrained derived colors, but they do not replace the four primary tokens above.
+Design-candidate status extensions may use restrained derived colors, but they do not replace the four primary tokens above.
 
 ### Typography
 
@@ -98,7 +98,7 @@ Do not use as company display names:
 
 ## Public-profile boundary
 
-Current profile copy is defined in `docs/brand/PROFILE_COPY_V1.md`. Current observed profile state is reconciled in `docs/brand/SOCIAL_AUTHORITY_V24.md` and `docs/brand/distribution_lock_v1.json`.
+Current profile copy is defined in `docs/brand/PROFILE_COPY_V2.md`. Current observed profile state is reconciled in `docs/brand/SOCIAL_AUTHORITY_V25.md` and `docs/brand/distribution_lock_v2.json`. Historical V24/v1 compatibility files do not override the current reconciliation.
 
 Defined copy does not imply a remote profile was edited:
 
@@ -106,10 +106,10 @@ Defined copy does not imply a remote profile was edited:
 
 ## Landing boundary
 
-Candidate public landing branch: `brand/public-identity-r1-20261001`  
-Candidate PR: #185  
-Candidate Vercel deployment: `dpl_Aw6dmJfrRx1sEPZ8CCMDv23AEf7y`  
-Target: `null` / preview
+Source integration: clean-lineage PR #188 (MERGED)
+Protected source canon: `main`
+Exact current-main preview observed 2026-10-02: `dpl_9QK277x4DL3SfWSM17mZRzL9bDVv`
+Target: `null` / preview / noindex
 
 The canonical production domain remains governed by #72 and `production_lock_v1.json`.
 
