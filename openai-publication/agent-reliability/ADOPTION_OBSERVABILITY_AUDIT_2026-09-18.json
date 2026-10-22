@@ -1,0 +1,39 @@
+{
+  "schema": "rumbo.openai-plugin-adoption-observability-audit/v1",
+  "observed_at": "2026-09-18T13:57:00-03:00",
+  "subject": {
+    "display_name": "RUMBO Agent Reliability",
+    "package_slug": "rumbo-coding-agent-reliability",
+    "version": "0.1.6",
+    "known_historical_app_id": "plugin_asdk_app_6a9b9c5f7a708191a145dddc5734dff2"
+  },
+  "findings": {
+    "openai_publisher_install_count": "NOT_OBSERVABLE",
+    "openai_publisher_active_user_count": "NOT_OBSERVABLE",
+    "openai_public_directory_readback": "NOT_PROVEN",
+    "current_connected_account_exact_app_id_status": "NOT_INSTALLED",
+    "current_plugin_directory_search_match": "NOT_FOUND",
+    "self_measurement_for_current_package": "NOT_AVAILABLE_SKILLS_ONLY"
+  },
+  "evidence": {
+    "canonical_repo": "https://github.com/RUMBO-IA/Rumbo",
+    "main_commit": "b9c1a30a90408d299467b2c1eb3eb9ec475dd707",
+    "manifest_path": "openai-publication/agent-reliability/plugin/.codex-plugin/plugin.json",
+    "architecture": "skills-only; no MCP server, auth flow, or remote runtime",
+    "historical_readiness_path": "openai-publication/agent-reliability/FINAL_READINESS.json",
+    "historical_readiness_observed_at": "2026-09-07T13:32:00-03:00",
+    "historical_readiness_state": "SUBMISSION_PACKET_READY_ACCOUNT_GATES_OPEN",
+    "current_directory_searches": ["RUMBO", "RUMBO Agent Reliability", "rumbo-coding-agent-reliability"],
+    "current_exact_app_permission_probe": "not_installed",
+    "linked_vercel_project": "rumbo-ia-publica",
+    "linked_vercel_runtime_logs_last_30_days": "0 grouped request-path entries exposed",
+    "analytics_connectors_found": "none"
+  },
+  "conclusion": "No exact publisher-side install/user count can be asserted from currently accessible OpenAI or RUMBO surfaces. The current skills-only package has no remote execution surface from which publisher telemetry could be collected.",
+  "safe_next_measurement": {
+    "native_openai_metrics": "Treat as unavailable until OpenAI exposes publisher analytics or an export.",
+    "skills_only_proxy": "Optional disclosed landing-page activation; measures visits or activations, not ChatGPT accounts.",
+    "measurable_account_usage": "Requires a separately disclosed remote app/MCP component with consented authentication and privacy-safe telemetry."
+  },
+  "integrity_rule": "Never convert directory presence, a stale readiness artifact, web traffic, or local installation into a claimed account count."
+}
