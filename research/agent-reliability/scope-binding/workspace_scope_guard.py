@@ -16,6 +16,8 @@ from typing import Any
 
 
 _WINDOWS_DRIVE = re.compile(r"^[A-Za-z]:/")
+_WINDOWS_UNC = re.compile(r"^//[^/]+/[^/]+(?:/|$)")
+_WINDOWS_EXTENDED = re.compile(r"^//\?/(?:[A-Za-z]:/|UNC/)", re.I)
 
 
 def normalize_path(value: str) -> str:
@@ -25,7 +27,11 @@ def normalize_path(value: str) -> str:
     normalized = posixpath.normpath(raw)
     if len(normalized) > 1:
         normalized = normalized.rstrip("/")
-    if _WINDOWS_DRIVE.match(normalized):
+    if (
+        _WINDOWS_DRIVE.match(normalized)
+        or _WINDOWS_UNC.match(normalized)
+        or _WINDOWS_EXTENDED.match(normalized)
+    ):
         normalized = normalized.casefold()
     return normalized
 
