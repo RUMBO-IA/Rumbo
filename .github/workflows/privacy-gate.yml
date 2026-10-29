@@ -3,8 +3,6 @@ name: Public privacy gate
 on:
   pull_request:
     branches: [main]
-  pull_request_target:
-    branches: [main]
   push:
 
 permissions:
@@ -53,50 +51,3 @@ jobs:
       - name: Verify public control authority anchor offline
         run: python scripts/verify_control_authority_anchor.py --anchor docs/control-authority-anchor-v1.json --offline
 
-  # Trusted base code + untrusted candidate data. Never execute candidate scripts.
-  # The workflow definition for pull_request_target comes from the protected base.
-  privacy-private-pr:
-    if: ${{ github.event_name == 'pull_request_target' }}
-    runs-on: ubuntu-latest
-    timeout-minutes: 8
-    permissions:
-      contents: read
-    steps:
-      - name: Checkout trusted base verifier
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          ref: ${{ github.event.pull_request.base.sha }}
-          path: trusted
-          persist-credentials: false
-      - name: Checkout untrusted candidate as data only
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
-          path: candidate
-          fetch-depth: 0
-          persist-credentials: false
-      - name: Install trusted Python runtime
-        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
-        with:
-          python-version: '3.12'
-      - name: Scan candidate data using trusted base verifier
-        env:
-          RUMBO_PRIVACY_DENY_HASHES: ${{ secrets.RUMBO_PRIVACY_DENY_HASHES }}
-          RUMBO_PRIVACY_COMMIT_SHA: ${{ github.event.pull_request.head.sha }}
-          RUMBO_PRIVACY_SCAN_ALL_REFS: '1'
-        shell: bash
-        run: |
-          set -euo pipefail
-          python - <<'PY'
-          import importlib.util
-          from pathlib import Path
-          trusted = Path('trusted/scripts/verify_public_privacy.py').resolve()
-          candidate = Path('candidate').resolve()
-          if not trusted.is_file() or not (candidate / '.git').exists():
-              raise SystemExit('PRIVACY_GATE_FAIL: missing trusted verifier or candidate checkout')
-          spec = importlib.util.spec_from_file_location('trusted_public_privacy', trusted)
-          module = importlib.util.module_from_spec(spec)
-          spec.loader.exec_module(module)
-          module.ROOT = candidate
-          raise SystemExit(module.main())
-          PY
