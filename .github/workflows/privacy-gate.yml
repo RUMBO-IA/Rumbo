@@ -27,15 +27,25 @@ jobs:
         run: python scripts/verify_brand_contract.py
       - name: Run privacy gate regression tests
         run: python scripts/test_verify_public_privacy.py
-      # Untrusted PR code never receives the private deny-list secret.
-      - name: Verify public privacy invariants (untrusted candidate, no secrets)
+      # Candidate code runs without the private deny-list. The verifier itself
+      # fails closed when the secret is absent; do not report this as a passing
+      # privacy check or silently weaken its private-policy requirement.
+      - name: Verify public privacy invariants (PR, expected fail-closed)
         if: ${{ github.event_name == 'pull_request' }}
         env:
           RUMBO_PRIVACY_COMMIT_SHA: ${{ github.event.pull_request.head.sha }}
           RUMBO_PRIVACY_SCAN_ALL_REFS: '1'
-        run: python scripts/verify_public_privacy.py
-      # The private deny-list is available only on the protected main push.
-      # No secrets are exposed to PR-controlled scripts or other branch pushes.
+        shell: bash
+        run: |
+          set +e
+          output=$(python scripts/verify_public_privacy.py 2>&1)
+          status=$?
+          set -e
+          printf '%s\\n' "$output"
+          test "$status" -eq 2
+          printf '%s\\n' "$output" | grep -Fq 'PRIVACY_GATE_FAIL: private deny-hash set is missing'
+      # Secret-backed verification only on trusted main, never on PR or
+      # non-main branch pushes. This is not a replacement for PR review.
       - name: Verify public privacy invariants (trusted main only)
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
         env:
