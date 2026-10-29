@@ -10,7 +10,6 @@ permissions:
 
 jobs:
   privacy:
-    if: ${{ github.event_name != 'pull_request_target' }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -28,11 +27,8 @@ jobs:
         run: python scripts/verify_brand_contract.py
       - name: Run privacy gate regression tests
         run: python scripts/test_verify_public_privacy.py
-      # PR runs the public regression tests above, but never executes a
-      # secret-dependent privacy scan with an absent deny-list. The private
-      # scan is NOT satisfied on PR and must not be represented as such.
-      # Secret-backed verification only on trusted main, never on PR or
-      # non-main branch pushes. This is not a replacement for PR review.
+      # The private deny-list is never available to untrusted PR code.
+      # PR verification remains incomplete until an independent trusted gate exists.
       - name: Verify public privacy invariants (trusted main only)
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
         env:
