@@ -57,3 +57,8 @@ test('reject missing security policy file', () => {
 test('reject missing robots.txt', () => {
   assert.ok(evaluateStaticPolicy(config, existingPaths.filter((x) => x !== 'robots.txt')).includes('REQUIRED_PUBLIC_FILE_MISSING:robots.txt'));
 });
+
+test('the isolated static policy pilot does not introduce root build or dependency tooling', () => {
+  assert.equal(existsSync(resolve(root, 'package.json')), false, 'root package.json can trigger a Vercel dependency install');
+  assert.equal(existsSync(resolve(root, 'turbo.json')), false, 'Turborepo is outside the dependency-free static pilot');
+});
