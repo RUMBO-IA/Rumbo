@@ -14,3 +14,6 @@ Ordinary pull_request tests run without RUMBO_PRIVACY_DENY_HASHES. The secret-de
 3. Validate exact-SHA binding, missing-secret fail-closed behavior, fork and internal PR handling.
 4. Audit hostile inputs: symlinks, large files, git metadata, Unicode, subprocesses and logs.
 5. Obtain real trusted check results on exact HEAD and retain branch protection. No bypass, merge, deployment or spending.
+
+## Same-repository PR caveat
+A pull_request workflow from a branch within the same repository may access repository secrets. The static test checks only known YAML patterns; it does not enforce security against an author modifying other workflows. A protected environment with required approval and a trusted verifier are necessary before considering the private gate operational. GitHub repository administrators must confirm environment rules, branch rules, and required checks; no such settings have been verified or changed here.
