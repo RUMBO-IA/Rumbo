@@ -43,3 +43,26 @@ jobs:
         run: python -m unittest scripts.test_control_authority_anchor -v
       - name: Verify public control authority anchor offline
         run: python scripts/verify_control_authority_anchor.py --anchor docs/control-authority-anchor-v1.json --offline
+      - name: Run dependency-free static policy regression when present
+        shell: bash
+        run: |
+          set -euo pipefail
+          test_file='scripts/ci-pilot/verify-static.test.mjs'
+          policy_file='scripts/ci-pilot/verify-static.mjs'
+          # Once this contract reaches main, future PR heads may not silently remove it.
+          if git cat-file -e "refs/remotes/origin/main:$test_file" 2>/dev/null; then
+            test -f "$test_file"
+            test -f "$policy_file"
+          fi
+          if [[ -e "$test_file" || -e "$policy_file" ]]; then
+            test -f "$test_file"
+            test -f "$policy_file"
+            # For this isolated static pilot, preserve the root build-free contract.
+            test ! -e package.json
+            test ! -e turbo.json
+            node --version
+            node -e "if(Number(process.versions.node.split('.')[0]) < 20) process.exit(1)"
+            node --test "$test_file"
+          else
+            echo 'STATIC_POLICY_PILOT_NOT_PRESENT'
+          fi
