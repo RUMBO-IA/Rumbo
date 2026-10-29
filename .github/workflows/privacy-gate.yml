@@ -4,19 +4,23 @@ on:
   pull_request:
     branches: [main]
   push:
+    branches: [main]
 
 permissions:
   contents: read
 
 jobs:
   privacy:
+    # Candidate intentionally fails closed for PRs until a trusted verifier is installed.
+    # Never run untrusted PR checkout with a repository secret.
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           persist-credentials: false
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          ref: ${{ github.sha }}
           fetch-depth: 0
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
@@ -30,7 +34,7 @@ jobs:
       - name: Verify public privacy invariants
         env:
           RUMBO_PRIVACY_DENY_HASHES: ${{ secrets.RUMBO_PRIVACY_DENY_HASHES }}
-          RUMBO_PRIVACY_COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          RUMBO_PRIVACY_COMMIT_SHA: ${{ github.sha }}
           RUMBO_PRIVACY_SCAN_ALL_REFS: '1'
         run: python scripts/verify_public_privacy.py
       - name: Test commercial coherence verifier
@@ -43,3 +47,14 @@ jobs:
         run: python -m unittest scripts.test_control_authority_anchor -v
       - name: Verify public control authority anchor offline
         run: python scripts/verify_control_authority_anchor.py --anchor docs/control-authority-anchor-v1.json --offline
+
+  privacy-pr-untrusted-blocked:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Fail closed until trusted PR verifier exists
+        run: |
+          echo 'FAIL_CLOSED: privacy PR verifier must not execute untrusted PR scripts with repository secrets' >&2
+          exit 1
