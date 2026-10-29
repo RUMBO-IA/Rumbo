@@ -219,6 +219,30 @@ class PrivacyGateRegressionTests(unittest.TestCase):
         self.assertIsNotNone(match)
         self.assertEqual(match.group(1).strip(), gate.PUBLIC_NAME)
 
+    def test_tracked_symlink_is_rejected_without_reading_target(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            target = root / "private-target.txt"
+            target.write_text("synthetic private marker", encoding="utf-8")
+            link = root / "linked.txt"
+            try:
+                link.symlink_to(target)
+            except (OSError, NotImplementedError):
+                self.skipTest("symlinks unavailable on this platform")
+            self.assertTrue(link.is_symlink())
+            self.assertFalse(link.is_file() and not link.is_symlink())
+            with mock.patch.object(gate, "ROOT", root), mock.patch.object(gate, "tracked_files", return_value=[link]), mock.patch.object(gate, "commit_metadata_violations", return_value=[]), mock.patch.object(gate, "metadata_scan_refs", return_value=["HEAD"]), mock.patch.object(gate, "text_of", side_effect=AssertionError("symlink target must not be read")):
+                # main() also reads attribution files; provide synthetic expected fixtures.
+                (root / "README.md").write_text("## Founder\\nSebastián\\n", encoding="utf-8")
+                (root / "index.html").write_text("Fundador: Sebastián<", encoding="utf-8")
+                (root / "apps/landing-publica").mkdir(parents=True)
+                (root / "apps/landing-publica/index-en-openai.html").write_text("RUMBO IA is developed by Sebastián<", encoding="utf-8")
+                with mock.patch.dict(gate.os.environ, {"RUMBO_PRIVACY_DENY_HASHES": "a" * 64}, clear=True), mock.patch("builtins.print") as output:
+                    result = gate.main()
+                self.assertEqual(result, 1)
+                self.assertTrue(any("symlink-not-allowed" in str(call) for call in output.call_args_list))
+
 
 if __name__ == "__main__":
     unittest.main()
