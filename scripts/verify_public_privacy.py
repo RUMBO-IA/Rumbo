@@ -227,6 +227,11 @@ def main() -> int:
     for commit_ref in metadata_scan_refs():
         violations.extend(commit_metadata_violations(commit_ref, deny))
     for path in tracked_files():
+        # A tracked symlink can point outside the candidate checkout. Never
+        # dereference candidate-controlled links in a secret-bearing scan.
+        if path.is_symlink():
+            violations.append(f"{path.relative_to(ROOT).as_posix()}:symlink-not-allowed")
+            continue
         text = text_of(path)
         if text is None:
             continue
