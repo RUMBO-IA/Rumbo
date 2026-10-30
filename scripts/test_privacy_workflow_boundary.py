@@ -54,9 +54,17 @@ def validate(workflow: str) -> list[str]:
         errors.append('PRIVILEGED_CHAIN_EVENT')
     if 'pull_request' not in events:
         errors.append('MISSING_PUBLIC_PR_TRIGGER')
+    if set(events) != {'push', 'pull_request'}:
+        errors.append('UNEXPECTED_WORKFLOW_TRIGGER')
     if sum(v.count(SECRET) for v in values(doc)) != 1:
         errors.append('PRIVATE_SECRET_REFERENCE_COUNT')
     jobs = doc.get('jobs')
+    if not isinstance(jobs, dict) or set(jobs) != {'privacy'}:
+        errors.append('UNEXPECTED_JOB_SET')
+    allowed_secret = '${{ ' + SECRET + ' }}'
+    if any(isinstance(v, str) and 'secrets.' in v.lower() and v != allowed_secret
+           for v in values(doc)):
+        errors.append('UNAUTHORIZED_SECRET_REFERENCE')
     job = jobs.get('privacy') if isinstance(jobs, dict) else None
     steps = job.get('steps') if isinstance(job, dict) else None
     if not isinstance(steps, list) or not all(isinstance(s, dict) for s in steps):
@@ -135,6 +143,32 @@ class PrivacyWorkflowBoundaryTest(unittest.TestCase):
     def test_job_permission_override_is_rejected(self):
         changed = self.source.replace('  privacy:\n', '  privacy:\n    permissions: write-all\n')
         self.assertIn('MISSING_READONLY_TOKEN', validate(changed))
+
+    def test_unexpected_job_is_rejected(self):
+        changed = self.source + """
+  extra:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - run: echo harmless
+"""
+        self.assertIn('UNEXPECTED_JOB_SET', validate(changed))
+
+    def test_other_secret_is_rejected(self):
+        changed = self.source.replace(
+            "          RUMBO_PRIVACY_SCAN_ALL_REFS: '1'",
+            "          RUMBO_PRIVACY_SCAN_ALL_REFS: '1'\n          EXTRA: ${{ secrets.OTHER_CREDENTIAL }}"
+        )
+        self.assertIn('UNAUTHORIZED_SECRET_REFERENCE', validate(changed))
+
+    def test_workflow_dispatch_is_rejected(self):
+        changed = self.source.replace('on:\n', 'on:\n  workflow_dispatch:\n', 1)
+        self.assertIn('UNEXPECTED_WORKFLOW_TRIGGER', validate(changed))
+
+    def test_schedule_is_rejected(self):
+        changed = self.source.replace('on:\n', "on:\n  schedule:\n    - cron: '0 1 * * *'\n", 1)
+        self.assertIn('UNEXPECTED_WORKFLOW_TRIGGER', validate(changed))
 
     def test_custom_tag_is_rejected(self):
         self.assertIn('UNSUPPORTED_YAML_INDIRECTION', validate('x: !!python/object:example {}'))
