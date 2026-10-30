@@ -85,7 +85,7 @@ def validate(workflow: str) -> list[str]:
             errors.append('MISSING_PRIVATE_VERIFIER')
         if 'uses' in step or 'continue-on-error' in step:
             errors.append('UNSUPPORTED_PRIVATE_STEP_OVERRIDE')
-    if doc.get('permissions') != {'contents': 'read'} or 'permissions' in job:
+    if doc.get('permissions') != {'contents': 'read'} or (isinstance(job, dict) and 'permissions' in job):
         errors.append('MISSING_READONLY_TOKEN')
     return errors
 
@@ -145,14 +145,11 @@ class PrivacyWorkflowBoundaryTest(unittest.TestCase):
         self.assertIn('MISSING_READONLY_TOKEN', validate(changed))
 
     def test_unexpected_job_is_rejected(self):
-        changed = self.source + """
-  extra:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - run: echo harmless
-"""
+        changed = self.source.replace(
+            '  privacy:\\n',
+            '  extra:\\n    runs-on: ubuntu-latest\\n    permissions:\\n      contents: write\\n    steps:\\n      - run: echo harmless\\n  privacy:\\n',
+            1
+        )
         self.assertIn('UNEXPECTED_JOB_SET', validate(changed))
 
     def test_other_secret_is_rejected(self):
