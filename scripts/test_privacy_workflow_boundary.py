@@ -145,11 +145,18 @@ class PrivacyWorkflowBoundaryTest(unittest.TestCase):
         self.assertIn('MISSING_READONLY_TOKEN', validate(changed))
 
     def test_unexpected_job_is_rejected(self):
-        changed = self.source.replace(
-            '  privacy:\\n',
-            '  extra:\\n    runs-on: ubuntu-latest\\n    permissions:\\n      contents: write\\n    steps:\\n      - run: echo harmless\\n  privacy:\\n',
-            1
+        original = '  privacy:' + chr(10)
+        injected = (
+            '  extra:' + chr(10)
+            + '    runs-on: ubuntu-latest' + chr(10)
+            + '    permissions:' + chr(10)
+            + '      contents: write' + chr(10)
+            + '    steps:' + chr(10)
+            + '      - run: echo harmless' + chr(10)
+            + original
         )
+        self.assertEqual(self.source.count(original), 1)
+        changed = self.source.replace(original, injected, 1)
         self.assertIn('UNEXPECTED_JOB_SET', validate(changed))
 
     def test_other_secret_is_rejected(self):
