@@ -4,6 +4,8 @@ import tempfile
 import unittest
 
 from scripts import verify_brand_contract as brand
+from scripts.test_pr367_retired_routes import RetiredLandingRoutesTest
+from scripts.test_pr367_legacy_positioning import LegacyPublicPositioningTest
 
 BASE_STYLE = ":root{--bg:#171918;--panel:#1f2220;--panel2:#252927;--line:#343835;--text:#F2EFE7;--muted:#A9AAA4;--orange:#E66A2C;--green:#8AB7A2;--blue:#54788A;--red:#C76868}"
 BASE_INDEX = f"<title>RUMBO IA</title><style>{BASE_STYLE}</style><p>IA con control humano</p><span>DATOS SIMULADOS</span>"
