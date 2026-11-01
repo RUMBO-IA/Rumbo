@@ -38,6 +38,11 @@
   ],
   "redirects": [
     {
+      "source": "/es",
+      "destination": "/",
+      "permanent": true
+    },
+    {
       "source": "/apps/landing-publica",
       "destination": "/",
       "permanent": true
