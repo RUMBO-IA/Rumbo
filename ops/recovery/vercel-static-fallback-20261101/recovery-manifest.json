@@ -1,0 +1,26 @@
+{
+  "schema": "rumbo.vercel.portable.recovery.v1",
+  "captured": "2026-11-01",
+  "source": "https://rumbo.verso.fans",
+  "verifiedPreview": "dpl_H1LHQH5JkmqKv5x11xiriGyVyc5B",
+  "verifiedPreviewStatus": "READY",
+  "routes": [
+    "/",
+    "/privacy",
+    "/terms",
+    "/refund",
+    "/security",
+    "/trust-center",
+    "/status",
+    "/openai-support",
+    "/styles.css"
+  ],
+  "mirroredSource": "protected-preview",
+  "thirdPartyScriptsRemoved": [
+    "cdn-cookieyes.com"
+  ],
+  "secretsIncluded": 0,
+  "productionChanges": false,
+  "productionLockIssue": "https://github.com/RUMBO-IA/Rumbo/issues/72",
+  "liveDomainChangeAllowed": false
+}
