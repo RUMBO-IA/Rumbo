@@ -57,13 +57,13 @@ FORBIDDEN_LEGACY_POSITIONING = (
     "ai crm and automation",
     "unified crm",
     "crm integration",
-    "latin america",
-    "latam",
     "crm unificado",
     "integración de crm",
     "integracion de crm",
-    "américa latina",
-    "america latina",
+    "integración y sincronización de crm",
+    "integracion y sincronizacion de crm",
+    "integración y sincronizacion de crm",
+    "integracion y sincronización de crm",
 )
 FORBIDDEN_ALIASES = ("Rumbo AI", "RUMBO.AI", "RumboIA")
 HUMAN_CONTROL = re.compile(
@@ -226,7 +226,7 @@ def _check_surface(
         if _normalize(claim) in normalized:
             errors.append(f"unsupported public claim present in {rel}: {claim}")
     for legacy in FORBIDDEN_LEGACY_POSITIONING:
-        if legacy in normalized:
+        if _normalize(legacy) in normalized:
             errors.append(f"legacy public positioning present in {rel}: {legacy}")
 
 
@@ -272,7 +272,7 @@ def verify(root: pathlib.Path = ROOT) -> list[str]:
             legacy_seen.add(rel)
             normalized = _normalize(path.read_text(encoding="utf-8-sig"))
             for legacy in FORBIDDEN_LEGACY_POSITIONING:
-                if legacy in normalized:
+                if _normalize(legacy) in normalized:
                     errors.append(
                         f"legacy public positioning present in {rel.as_posix()}: {legacy}"
                     )
