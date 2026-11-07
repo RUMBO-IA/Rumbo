@@ -1,6 +1,12 @@
 {
   "cleanUrls": true,
   "trailingSlash": false,
+  "redirects": [
+    {"source": "/privacy", "destination": "https://rumbo.verso.fans/privacy", "permanent": true},
+    {"source": "/privacy.html", "destination": "https://rumbo.verso.fans/privacy", "permanent": true},
+    {"source": "/terms", "destination": "https://rumbo.verso.fans/terms", "permanent": true},
+    {"source": "/terms.html", "destination": "https://rumbo.verso.fans/terms", "permanent": true}
+  ],
   "rewrites": [
     {"source": "/es", "destination": "/index-es.html"}
   ],
