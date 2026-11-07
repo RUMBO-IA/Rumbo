@@ -1,0 +1,9 @@
+{
+  "name": "rumbo-siwc-multi-account-local",
+  "version": "0.2.0",
+  "type": "module",
+  "private": false,
+  "license": "MIT",
+  "engines": {"node": ">=22"},
+  "scripts": {"test": "node --test test.mjs"}
+}
