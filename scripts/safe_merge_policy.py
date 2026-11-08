@@ -23,6 +23,20 @@ class MergePolicy:
     privacy_workflow_path: str
     privacy_workflow_blob: str
     privacy_workflow_sha256: str
+    # Only an owner-approved independent GitHub App may attest private validation.
+    # Unset by default: a successful Actions step is not private authorization.
+    independent_privacy_app_id: int | None = None
+    independent_privacy_check_name: str = "RUMBO Protected Privacy Attestation"
+    # Pinned to verified GitHub branch-protection source App IDs, NOT permissions.
+    required_check_app_ids: tuple[tuple[str, int], ...] = (
+        ("privacy", 15368), ("Vercel", 8329),
+    )
+    # Immutable fingerprints of the current owner-configured PUBLIC ruleset
+    # email allowlists; these are NOT secret material.
+    ruleset_pattern_sha256: tuple[tuple[str, str], ...] = (
+        ("commit_author_email_pattern", "bbbec65e2c4f00bf44a325e8dd9a7cd27bf7ff9c8b4bc1fd7143a382706ea387"),
+        ("committer_email_pattern", "452219b9999b80d075fe962e6f9be1ff47c41be6d1ca7f8a0cbbecfa1910b810"),
+    )
 
 
 class PolicyError(ValueError):
@@ -39,8 +53,8 @@ DEFAULT_POLICY = MergePolicy(
     live_domain="rumbo.verso.fans",
     privacy_workflow_id=347174988,
     privacy_workflow_path=".github/workflows/privacy-gate.yml",
-    privacy_workflow_blob="1cb3ed7881961516b54fb5ab663890914440463a",
-    privacy_workflow_sha256="b2f9e4919268b618e6d601c0e9280df8b376a9dec338e71483d3c4a551795bc6",
+    privacy_workflow_blob="7ebdcd9c3e8bc13a03f569212c2a9c7a0c0d7124",
+    privacy_workflow_sha256="29fc3b7403502a20f873e6627c073c82083fab6d95ed7dca82a56ab9f4923151",
 )
 
 

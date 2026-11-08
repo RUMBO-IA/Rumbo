@@ -57,12 +57,16 @@ def evaluate(request: policy.MergeRequest, merge_policy: policy.MergePolicy, evi
         current_gate = "PR_IDENTITY"
         pr = evidence.pr(request.pr_number)
         identity_ok = (
-            pr.get("state") == "OPEN"
+            pr.get("number") == request.pr_number
+            and pr.get("state") == "OPEN"
             and pr.get("base") == request.expected_base
             and pr.get("head") == request.expected_head_sha
             and bool(pr.get("head_branch"))
             and pr.get("repo") == request.repository
-            and not pr.get("cross")
+            and pr.get("cross") is False
+            and pr.get("draft") is False
+            and isinstance(pr.get("author"), str)
+            and bool(pr.get("author"))
         )
         if not identity_ok:
             return _stop(gates, current_gate, {"reason": "PR identity drift"})
@@ -72,12 +76,54 @@ def evaluate(request: policy.MergeRequest, merge_policy: policy.MergePolicy, evi
             "base": request.expected_base,
         }))
 
+        current_gate = "INDEPENDENT_REVIEW"
+        review = evidence.independent_review_receipt(
+            request.pr_number, request.expected_head_sha, pr.get("author")
+        )
+        review_ok = (
+            isinstance(review, dict)
+            and review.get("commit_id") == request.expected_head_sha
+            and review.get("state") == "APPROVED"
+            and isinstance(review.get("reviewer"), str)
+            and bool(review.get("reviewer"))
+            and review.get("reviewer").casefold() != pr.get("author").casefold()
+            and review.get("author") == pr.get("author")
+            and review.get("permission") in {"write", "maintain", "admin"}
+            and type(review.get("review_id")) is int
+            and review["review_id"] > 0
+        )
+        if not review_ok:
+            return _stop(gates, current_gate, {"reason": "independent exact-HEAD approval is absent"})
+        gates.append(GateResult(current_gate, True, {"review": review}))
+
         current_gate = "REQUIRED_CHECKS"
         states = evidence.checks(request.expected_head_sha)
         required = _required_checks(request.expected_base, merge_policy)
         missing_or_bad = {name: states.get(name, "MISSING") for name in required if states.get(name) != "SUCCESS"}
         if missing_or_bad:
-            return _stop(gates, current_gate, {"checks": missing_or_bad})
+            details: dict[str, Any] = {"checks": missing_or_bad}
+            if "Vercel" in missing_or_bad:
+                # Diagnostic ONLY: never replace a missing source-pinned check
+                # with a static config prediction or an unverified deployment.
+                try:
+                    info = evidence.vercel_required_check_diagnostics(
+                        request.expected_head_sha, pr["head_branch"], required
+                    )
+                    if not isinstance(info, dict):
+                        raise ValueError("malformed diagnostic")
+                    details["vercel_policy"] = {
+                        "classification": info.get("classification", "NOT_PROVEN"),
+                        "automatic_deployment_enabled": info.get("automatic_deployment_enabled"),
+                        "policy_conflict": info.get("policy_conflict"),
+                        "merge_authorized": False,
+                    }
+                except Exception:
+                    # Diagnostic absence must not hide or overturn the hard gate.
+                    details["vercel_policy"] = {
+                        "classification": "NOT_PROVEN",
+                        "merge_authorized": False,
+                    }
+            return _stop(gates, current_gate, details)
         gates.append(GateResult(current_gate, True, {"checks": {name: "SUCCESS" for name in required}}))
 
         current_gate = "PRIVACY_ANCESTRY"
@@ -137,6 +183,56 @@ def evaluate(request: policy.MergeRequest, merge_policy: policy.MergePolicy, evi
 
         if mode == "dry-run":
             return MergeOutcome("DRY_RUN_PASS", None, tuple(gates), target_sha, live_id)
+
+        current_gate = "INDEPENDENT_REVIEW_RECHECK"
+        fresh_pr = evidence.pr(request.pr_number)
+        if (fresh_pr.get("state") != "OPEN"
+                or fresh_pr.get("number") != request.pr_number
+                or fresh_pr.get("draft") is not False
+                or fresh_pr.get("head") != request.expected_head_sha
+                or fresh_pr.get("base") != request.expected_base
+                or fresh_pr.get("head_branch") != pr.get("head_branch")
+                or fresh_pr.get("repo") != request.repository
+                or fresh_pr.get("cross") is not False
+                or fresh_pr.get("author") != pr.get("author")):
+            return _stop(gates, current_gate, {"reason": "PR state changed before write"}, target_sha=target_sha, live=live_id)
+        fresh_review = evidence.independent_review_receipt(
+            request.pr_number, request.expected_head_sha, pr.get("author")
+        )
+        if fresh_review != review:
+            return _stop(gates, current_gate, {"reason": "independent approval changed before write"}, target_sha=target_sha, live=live_id)
+        gates.append(GateResult(current_gate, True, {"review_id": review["review_id"]}))
+
+        # The initial green checks and independent private attestation may be
+        # revoked while the PR, target and review are being rechecked. Re-read
+        # both at the last non-mutating gate, before fast_forward. A detection
+        # after a push is too late to prevent unauthorized branch mutation.
+        current_gate = "REQUIRED_CHECKS_RECHECK"
+        fresh_states = evidence.checks(request.expected_head_sha)
+        fresh_bad = {
+            name: fresh_states.get(name, "MISSING")
+            for name in required if fresh_states.get(name) != "SUCCESS"
+        }
+        if fresh_bad:
+            return _stop(gates, current_gate, {"checks": fresh_bad},
+                         target_sha=target_sha, live=live_id)
+        gates.append(GateResult(current_gate, True, {
+            "checks": {name: "SUCCESS" for name in required},
+        }))
+
+        current_gate = "PRIVACY_ATTESTATION_RECHECK"
+        fresh_attestation = evidence.privacy_attestation_by_run(
+            attestation, request.expected_head_sha,
+            request.expected_base, pr.get("head_branch")
+        )
+        if fresh_attestation != attestation:
+            return _stop(gates, current_gate,
+                         {"reason": "independent privacy receipt changed before write"},
+                         target_sha=target_sha, live=live_id)
+        gates.append(GateResult(current_gate, True, {
+            "run_id": attestation.get("run_id"),
+            "independent_private_attestation": "verified_exact_head",
+        }))
 
         evidence.fast_forward(request.expected_base, target_sha, request.expected_head_sha)
         write_completed = True

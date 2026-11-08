@@ -29,6 +29,14 @@ jobs:
         run: python scripts/verify_brand_contract.py
       - name: Run privacy gate regression tests
         run: python scripts/test_verify_public_privacy.py
+      # Candidate-controlled public-only checks are advisory. Never pass
+      # secrets into an untrusted PR checkout, and never treat this as a
+      # substitute for an independent trusted private check.
+      - name: Verify public PR privacy invariants (no secrets)
+        if: ${{ github.event_name == 'pull_request' }}
+        env:
+          RUMBO_PRIVACY_COMMIT_SHA: ${{ github.event.pull_request.head.sha }}
+        run: python scripts/verify_public_privacy.py --public-only
       - name: Test privacy workflow secret boundary
         run: python -m unittest scripts.test_privacy_workflow_boundary -v
       # The private deny-list is never available to untrusted PR code.
