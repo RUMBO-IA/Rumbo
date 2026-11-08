@@ -1,0 +1,62 @@
+name: Candidate CI (secretless)
+'on':
+  push:
+    branches:
+    - test/vercel-ci-static-pilot-safe-20261029
+permissions:
+  contents: read
+jobs:
+  candidate-ci:
+    name: Candidate checks without private attestation
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      with:
+        persist-credentials: 'false'
+        ref: ${{ github.event.pull_request.head.sha || github.sha }}
+        fetch-depth: '0'
+    - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+      with:
+        python-version: '3.12'
+    - name: Install pinned workflow parser
+      run: python -m pip install --only-binary=PyYAML --require-hashes -r scripts/requirements-ci.txt
+    - name: Run brand contract regression tests
+      run: python -m unittest scripts.test_verify_brand_contract
+    - name: Verify brand contract
+      run: python scripts/verify_brand_contract.py
+    - name: Run privacy gate regression tests
+      run: python scripts/test_verify_public_privacy.py
+    - name: Test privacy workflow secret boundary
+      run: python -m unittest scripts.test_privacy_workflow_boundary -v
+    - name: Test commercial coherence verifier
+      run: python -m unittest scripts/test_verify_commercial_coherence.py
+    - name: Verify commercial coherence
+      run: python scripts/verify_commercial_coherence.py
+    - name: Verify security headers configuration
+      run: python scripts/verify_security_headers.py
+    - name: Test public control authority anchor
+      run: python -m unittest scripts.test_control_authority_anchor -v
+    - name: Verify public control authority anchor offline
+      run: python scripts/verify_control_authority_anchor.py --anchor docs/control-authority-anchor-v1.json --offline
+    - name: Enforce dependency-free static policy regression
+      shell: bash
+      run: 'set -euo pipefail
+
+        # Fail closed, including PRs that delete one or both verifier files.
+
+        test -f scripts/ci-pilot/verify-static.test.mjs
+
+        test -f scripts/ci-pilot/verify-static.mjs
+
+        test ! -e package.json
+
+        test ! -e turbo.json
+
+        node --version
+
+        node -e "if(Number(process.versions.node.split(''.'')[0]) < 20) process.exit(1)"
+
+        node --test scripts/ci-pilot/verify-static.test.mjs
+
+        '

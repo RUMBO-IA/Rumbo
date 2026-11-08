@@ -102,16 +102,41 @@ def tracked_files() -> list[Path]:
     return [ROOT / p.decode("utf-8") for p in raw.split(b"\0") if p]
 
 
+class PrivacyScanReadError(RuntimeError):
+    """Fail-closed error for an unreadable or malformed tracked text file."""
+
+
+# Recognized public text/code formats must never evade privacy scanning through
+# a NUL byte or invalid UTF-8. Binary media remain outside the text scanner;
+# those assets need a separate content/media review before publication.
+_REQUIRED_TEXT_SUFFIXES = frozenset({
+    ".html", ".htm", ".md", ".markdown", ".txt", ".css", ".js", ".mjs",
+    ".cjs", ".jsx", ".ts", ".tsx", ".json", ".jsonl", ".py",
+    ".yml", ".yaml", ".toml", ".xml", ".svg", ".csv",
+    ".sh", ".ps1", ".bat", ".cmd", ".ini", ".conf",
+})
+
+
 def text_of(path: Path) -> str | None:
+    """Read tracked public text, rejecting unreadable/malformed text by default.
+
+    Binary media are intentionally not decoded as text. The main() scanner
+    must fail if a tracked file cannot be read, rather than silently skip it.
+    """
     try:
         data = path.read_bytes()
-    except OSError:
-        return None
+    except OSError as exc:
+        raise PrivacyScanReadError("tracked file cannot be read") from exc
+    required_text = path.suffix.casefold() in _REQUIRED_TEXT_SUFFIXES
     if b"\0" in data:
+        if required_text:
+            raise PrivacyScanReadError("tracked text file contains NUL byte")
         return None
     try:
         return data.decode("utf-8")
-    except UnicodeDecodeError:
+    except UnicodeDecodeError as exc:
+        if required_text:
+            raise PrivacyScanReadError("tracked text file is not UTF-8") from exc
         return None
 
 
@@ -210,10 +235,12 @@ def commit_metadata_violations(commit_ref: str, deny: set[str]) -> list[str]:
     return violations
 
 
-def main() -> int:
-    raw_hashes = os.environ.get("RUMBO_PRIVACY_DENY_HASHES", "")
+def main(*, public_only: bool = False) -> int:
+    # Public PR checks never consume private deny hashes. An independently
+    # trusted private attestation is still mandatory before merge.
+    raw_hashes = "" if public_only else os.environ.get("RUMBO_PRIVACY_DENY_HASHES", "")
     deny = {h.strip().lower() for h in raw_hashes.split(",") if h.strip()}
-    if not deny:
+    if not deny and not public_only:
         print("PRIVACY_GATE_FAIL: private deny-hash set is missing")
         return 2
     if any(not re.fullmatch(r"[0-9a-f]{64}", h) for h in deny):
@@ -224,9 +251,18 @@ def main() -> int:
 
     # Every reachable commit is public history. On CI, scan the selected commit and
     # every fetched public ref so a stale or side branch cannot retain private metadata.
-    for commit_ref in metadata_scan_refs():
+    # PR public-only checks inspect their own HEAD, avoiding false failures
+    # from unrelated historical refs. Trusted main scanning retains
+    # the global-ref coverage with private deny hashes.
+    refs = ["HEAD"] if public_only else metadata_scan_refs()
+    for commit_ref in refs:
         violations.extend(commit_metadata_violations(commit_ref, deny))
     for path in tracked_files():
+        # A tracked symlink can point outside the candidate checkout. Never
+        # dereference candidate-controlled links in a secret-bearing scan.
+        if path.is_symlink():
+            violations.append(f"{path.relative_to(ROOT).as_posix()}:symlink-not-allowed")
+            continue
         text = text_of(path)
         if text is None:
             continue
@@ -263,9 +299,14 @@ def main() -> int:
             print(f"VIOLATION_FILE={item}")
         return 1
 
-    print("PRIVACY_GATE_PASS")
+    print("PUBLIC_PRIVACY_INVARIANTS_PASS" if public_only else "PRIVACY_GATE_PASS")
     return 0
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    if sys.argv[1:] == ["--public-only"]:
+        raise SystemExit(main(public_only=True))
+    if len(sys.argv) == 1:
+        raise SystemExit(main())
+    print("PRIVACY_GATE_FAIL: unsupported mode")
+    raise SystemExit(4)
