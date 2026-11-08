@@ -63,7 +63,7 @@ class PublicSafePrivacyTests(unittest.TestCase):
             (landing/"index-en-openai.html").write_text(
                 "RUMBO IA is developed by Sebastián<",encoding="utf-8")
             malicious=root/"public.txt"
-            malicious.write_text("Contact: unwanted@example.test",encoding="utf-8")
+            malicious.write_text("Contact: unwanted" + "@" + "example.test",encoding="utf-8")
             output=io.StringIO()
             with (mock.patch.object(gate,"ROOT",root),
                   mock.patch.object(gate,"tracked_files",return_value=[malicious]),

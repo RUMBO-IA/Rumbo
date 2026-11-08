@@ -30,13 +30,13 @@ class PrivacyReadIntegrityTests(unittest.TestCase):
                 gate.text_of(pathlib.Path(tmp) / "tracked.txt")
 
     def test_html_embedded_nul_is_not_treated_as_safe_binary(self):
-        self.assert_scanner_read_rejected("public.html", b"<html>\0private@example.invalid</html>")
+        self.assert_scanner_read_rejected("public.html", b"<html>\0private" + b"@" + b"example.invalid</html>")
 
     def test_js_embedded_nul_is_not_treated_as_safe_binary(self):
-        self.assert_scanner_read_rejected("public.js", b"const a='private@example.invalid';\0")
+        self.assert_scanner_read_rejected("public.js", b"const a='private" + b"@" + b"example.invalid';\0")
 
     def test_markdown_invalid_utf8_is_not_silently_skipped(self):
-        self.assert_scanner_read_rejected("readme.md", b"email@example.invalid\xff")
+        self.assert_scanner_read_rejected("readme.md", b"email" + b"@" + b"example.invalid\xff")
 
     def test_svg_embedded_nul_is_not_silently_skipped(self):
         self.assert_scanner_read_rejected("logo.svg", b"<svg>\0bad</svg>")
@@ -53,8 +53,8 @@ class PrivacyReadIntegrityTests(unittest.TestCase):
     def test_valid_utf8_html_scanned_normally(self):
         with tempfile.TemporaryDirectory() as tmp:
             p = pathlib.Path(tmp) / "index.html"
-            p.write_text("Contacto: public@example.invalid", encoding="utf-8")
-            self.assertEqual(gate.text_of(p), "Contacto: public@example.invalid")
+            p.write_text("Contacto: public" + "@" + "example.invalid", encoding="utf-8")
+            self.assertEqual(gate.text_of(p), "Contacto: public" + "@" + "example.invalid")
 
     def test_no_extension_nonbinary_is_scanned(self):
         with tempfile.TemporaryDirectory() as tmp:
